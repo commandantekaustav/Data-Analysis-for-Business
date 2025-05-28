@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S4: Core Applications & Problem Solving</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices: 
+        - Overview: Report Info: Session objectives. Goal: Inform. Viz: Static text. Method: HTML/Tailwind.
+        - DA Applications: Report Info: List of functions & DA examples. Goal: Inform/Organize. Viz: Interactive list/cards filtered by buttons. Interaction: Click to filter. Justification: Easy exploration of diverse examples. Method: HTML/Tailwind/JS.
+        - Business Problems: Report Info: List of problems & DA solutions. Goal: Inform/Organize. Viz: Expandable list items. Interaction: Click to toggle. Justification: Concise presentation, drill-down for details. Method: HTML/Tailwind/JS.
+        - Case Study - Scenario & Discussion: Report Info: ShopEase cart abandonment, discussion points. Goal: Inform. Viz: Text blocks, revealable discussion points (accordion). Interaction: Click to reveal. Justification: Step-by-step introduction. Method: HTML/Tailwind/JS.
+        - Case Study - Brainstorm DA Areas: Report Info: Guiding questions, expected areas. Goal: Engage/Organize. Viz: Clickable tags for DA areas linked to guiding questions. Interaction: Click to show relevant guiding questions. Justification: Simulates guided brainstorming. Method: HTML/Tailwind/JS.
+        - Case Study - Problem Framing: Report Info: Concept, example questions. Goal: Educate/Engage. Viz: Categorized (Who/What/When/Where/Why/Predictive) display of questions via buttons. Interaction: Filter questions by category. Justification: Structured learning of problem framing. Method: HTML/Tailwind/JS.
+        CONFIRMATION: No actual charts generated from report data (report is textual). Focus is on interactive presentation of concepts.
+     -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; }
+        .nav-button { transition: all 0.3s ease; }
+        .nav-button.active { background-color: #4338CA; color: white; }
+        .nav-button:not(.active):hover { background-color: #6366F1; color: white; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .tab-button { background-color: #E0E7FF; color: #4338CA; border: 1px solid #C7D2FE; }
+        .tab-button.active { background-color: #4338CA; color: white; }
+        .tab-button:hover:not(.active) { background-color: #C7D2FE; }
+        .accordion-header { cursor: pointer; }
+        .accordion-content { display: none; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .accordion-item.open .accordion-content { display: block; max-height: 1000px; /* Arbitrary large value */ }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-3xl font-bold text-center text-indigo-700">N-S4: Data Analytics Core Concepts & Application</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-2 sm:gap-4">
+                    <li><button onclick="showSection('overview')" class="nav-button active text-sm sm:text-base font-medium py-2 px-3 sm:px-4 rounded-md">Overview</button></li>
+                    <li><button onclick="showSection('daApplications')" class="nav-button text-sm sm:text-base font-medium py-2 px-3 sm:px-4 rounded-md">DA Applications</button></li>
+                    <li><button onclick="showSection('problemsSolved')" class="nav-button text-sm sm:text-base font-medium py-2 px-3 sm:px-4 rounded-md">Problems Solved</button></li>
+                    <li><button onclick="showSection('caseStudy')" class="nav-button text-sm sm:text-base font-medium py-2 px-3 sm:px-4 rounded-md">Case Study: ShopEase</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        <section id="overview" class="content-section active fade-in">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Session Overview</h2>
+            <p class="mb-3 text-lg">This session aims to broaden your understanding of Data Analytics (DA) applications across diverse business functions and to identify the common types of business problems that DA is uniquely positioned to solve.</p>
+            <p class="text-lg">We will explore expanded examples of DA in action and then delve into a practical mini-case study to see how DA principles are applied in a real-world scenario, focusing on problem identification and framing analytical questions.</p>
+        </section>
+
+        <section id="daApplications" class="content-section fade-in">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6">Expanded Examples of Data Analytics Applications</h2>
+            <p class="mb-6 text-lg">Data Analytics is transforming various business functions. Select a function below to see detailed examples of how DA is applied.</p>
+            <div id="daFunctionButtons" class="flex flex-wrap gap-3 mb-6"></div>
+            <div id="daApplicationDetails" class="mt-6 bg-white p-6 rounded-lg shadow-md min-h-[200px]">
+                <p class="text-gray-500 italic">Select a business function above to view details.</p>
+            </div>
+        </section>
+
+        <section id="problemsSolved" class="content-section fade-in">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6">Common Business Problems Data Analytics Solves</h2>
+            <p class="mb-6 text-lg">Data Analytics provides powerful solutions to many common business challenges. Click on a problem to learn more about how DA helps.</p>
+            <div id="problemList" class="space-y-4"></div>
+        </section>
+
+        <section id="caseStudy" class="content-section fade-in">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6">Mini-Case Study: ShopEase E-commerce Cart Abandonment</h2>
+            <div class="mb-6">
+                <button class="tab-button py-2 px-4 rounded-t-lg" onclick="openCaseStudyTab('scenario')">Scenario & Discussion</button>
+                <button class="tab-button py-2 px-4 rounded-t-lg" onclick="openCaseStudyTab('brainstorming')">Brainstorm DA Areas</button>
+                <button class="tab-button py-2 px-4 rounded-t-lg" onclick="openCaseStudyTab('problemFraming')">Problem Framing</button>
+            </div>
+
+            <div id="scenario" class="case-study-tab bg-white p-6 rounded-b-lg rounded-tr-lg shadow-md">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Scenario Presentation</h3>
+                <p class="mb-4">"Let's consider 'ShopEase,' an online retail company selling fashion apparel. ShopEase has noticed a significant problem: a high percentage of customers add items to their online shopping carts but then leave the website without completing the purchase. This is known as 'cart abandonment,' and it's a major revenue leak for e-commerce businesses."</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-500 mt-6 mb-3">Initial Discussion Points</h4>
+                <div id="shopEaseDiscussion" class="space-y-3"></div>
+            </div>
+
+            <div id="brainstorming" class="case-study-tab bg-white p-6 rounded-b-lg rounded-tr-lg shadow-md" style="display: none;">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Brainstorm DA Application Areas for ShopEase</h3>
+                <p class="mb-4">How could Data Analytics help ShopEase address cart abandonment? Below are key areas where DA might be applied, linked to guiding questions that help uncover them.</p>
+                <div id="daBrainstormAreas" class="flex flex-wrap gap-3 mb-4"></div>
+                <div id="guidingQuestionDisplay" class="mt-4 p-4 bg-indigo-50 rounded-md border border-indigo-200 min-h-[100px]">
+                    <p class="text-gray-500 italic">Click on a DA area above to see relevant guiding questions.</p>
+                </div>
+            </div>
+
+            <div id="problemFraming" class="case-study-tab bg-white p-6 rounded-b-lg rounded-tr-lg shadow-md" style="display: none;">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Problem Framing: Specific Analytical Questions</h3>
+                <p class="mb-4">A broad problem like "high cart abandonment" needs to be broken down into specific, measurable analytical questions. Explore example questions categorized by the 'who, what, when, where, why, and predictive' aspects of the problem.</p>
+                <div id="analyticalQuestionCategories" class="flex flex-wrap gap-3 mb-4"></div>
+                <ul id="analyticalQuestionList" class="list-disc pl-5 space-y-2 mt-4 min-h-[150px]">
+                     <p class="text-gray-500 italic">Select a category to view specific analytical questions.</p>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-indigo-800 text-indigo-100 text-center p-4 mt-auto">
+        <div class="flex flex-col items-center justify-center">
+            <img src="../faceprep-logo.png" alt="FACE Prep Campus Logo" class="h-10 mb-2">
+            <p>Copyright: FACE Prep Campus, 2025</p>
+        </div>
+    </footer>
+
+
+    <script>
+        const daData = {
+            "Marketing": [
+                "<strong>Customer Journey Mapping:</strong> Identifying touchpoints where customers engage and optimizing each step.",
+                "<strong>Predictive Lead Scoring:</strong> Ranking potential sales leads by their likelihood to convert.",
+                "<strong>Attribution Modeling:</strong> Determining which marketing channels contribute most to conversions.",
+                "<strong>Sentiment Analysis:</strong> Analyzing customer reviews and social media for brand perception insights."
+            ],
+            "Sales": [
+                "<strong>Sales Forecasting:</strong> Accurately predicting sales considering various factors.",
+                "<strong>Customer Churn Prediction:</strong> Identifying at-risk customers to enable proactive retention efforts.",
+                "<strong>Upselling/Cross-selling Recommendations:</strong> Based on purchase behavior and product affinities.",
+                "<strong>Sales Territory Optimization & Performance Analysis:</strong> Ensuring optimal sales rep assignment and identifying coaching areas."
+            ],
+            "Finance": [
+                "<strong>Risk Assessment:</strong> For credit, investments, market volatility, and asset bubbles.",
+                "<strong>Fraud Detection:</strong> Spotting anomalies in transactions indicating fraudulent activity.",
+                "<strong>Financial Forecasting:</strong> For revenue, expenses, and cash flow for robust planning.",
+                "<strong>Cost Optimization & Compliance Monitoring:</strong> Identifying inefficiencies and flagging regulatory violations."
+            ],
+            "Human Resources": [
+                "<strong>Talent Analytics:</strong> Optimizing hiring processes and predicting candidate success.",
+                "<strong>Employee Retention Analysis:</strong> Understanding reasons for turnover and improving job satisfaction.",
+                "<strong>Workforce Planning:</strong> Predicting future staffing needs based on data and forecasts.",
+                "<strong>Training Program Effectiveness & Skill Gap Analysis:</strong> Assessing training impact and identifying organizational skill needs."
+            ],
+            "Supply Chain & Logistics": [
+                "<strong>Demand Forecasting:</strong> Predicting product needs to optimize inventory and production.",
+                "<strong>Logistics Optimization:</strong> Finding efficient routes, transport modes, and warehouse locations.",
+                "<strong>Predictive Maintenance:</strong> For machinery/vehicles to prevent breakdowns.",
+                "<strong>Supplier Performance Analysis:</strong> Evaluating vendors on reliability, quality, and cost."
+            ],
+            "Healthcare": [
+                "<strong>Patient Outcome Prediction:</strong> Anticipating disease progression or treatment response.",
+                "<strong>Resource Allocation Optimization:</strong> Managing hospital bed availability, staffing, and equipment.",
+                "<strong>Public Health Surveillance:</strong> Tracking and predicting disease outbreaks.",
+                "<strong>Drug Discovery & Personalized Medicine:</strong> Analyzing molecular datasets and tailoring treatments."
+            ],
+            "Manufacturing": [
+                "<strong>Quality Control:</strong> Analyzing sensor data to detect defects in real-time.",
+                "<strong>Predictive Maintenance:</strong> Minimizing equipment downtime and extending asset lifespan.",
+                "<strong>Production Optimization:</strong> Fine-tuning machine settings, reducing energy use, and improving throughput."
+            ]
+        };
+
+        const problemsData = [
+            {
+                title: "Problem 1: Uncertainty and Risk",
+                solution: "DA helps by providing <strong>predictive insights</strong>, reducing guesswork in areas like market demand, customer behavior, and operational failures. Instead of asking \"What do we <em>think</em> will happen?\", DA helps answer \"What is <em>likely</em> to happen based on historical data and patterns?\""
+            },
+            {
+                title: "Problem 2: Inefficiency and Waste",
+                solution: "DA identifies <strong>bottlenecks, redundant steps, and resource misallocation</strong> (e.g., excess inventory, underutilized staff, suboptimal energy usage). It helps optimize workflows, reduce operational costs, and improve resource utilization."
+            },
+            {
+                title: "Problem 3: Lack of Customer Understanding",
+                solution: "DA provides a <strong>360-degree view of the customer</strong>, enabling personalized experiences, targeted marketing, and improved customer satisfaction and loyalty. It moves from \"Who are our customers?\" to \"Who are our <em>most valuable</em> customers, and what do they <em>truly</em> want?\""
+            },
+            {
+                title: "Problem 4: Slow Decision-Making",
+                solution: "DA enables <strong>faster, data-driven decisions</strong> by providing timely insights and automating routine analytical tasks. It shifts from \"Let's gather more opinions\" to \"Let's analyze the data and act.\""
+            },
+            {
+                title: "Problem 5: Missed Opportunities",
+                solution: "DA helps <strong>uncover hidden patterns and correlations</strong> that reveal new market opportunities, product ideas, or areas for competitive advantage. It helps answer \"What opportunities are we missing?\""
+            },
+            {
+                title: "Problem 6: Difficulty in Measuring Impact",
+                solution: "DA provides <strong>measurable outcomes and KPIs</strong>, allowing businesses to track performance, evaluate the effectiveness of initiatives, and demonstrate return on investment (ROI)."
+            }
+        ];
+
+        const shopEaseDiscussionPoints = [
+            { 
+                question: "Why is cart abandonment a critical problem for ShopEase?", 
+                answer: "Loss of revenue, wasted marketing effort, potential customer dissatisfaction." 
+            },
+            { 
+                question: "What are some immediate, non-data-driven reasons for cart abandonment?", 
+                answer: "High shipping costs, complicated checkout, lack of trust, just browsing, better price elsewhere." 
+            },
+            {
+                question: "How might this problem affect different departments within ShopEase?",
+                answer: "<ul><li class='ml-4 list-disc'><em>Marketing:</em> Wasted ad spend.</li><li class='ml-4 list-disc'><em>Sales:</em> Lost potential revenue.</li><li class='ml-4 list-disc'><em>Customer Service:</em> Inquiries about checkout issues.</li><li class='ml-4 list-disc'><em>Product Development:</em> Indicates website usability or product appeal issues.</li></ul>"
+            }
+        ];
+
+        const brainstormData = {
+            "Customer Segmentation": ["Could DA help us understand *who* is abandoning their carts?"],
+            "Website Analytics / Funnel Analysis": ["Could DA help us understand *when* or *where* in the checkout process they are abandoning?"],
+            "Survey Data Analysis / A/B Testing (Checkout)": ["Could DA help us understand *why* they are abandoning?"],
+            "Predictive Modeling": ["Could DA help us *predict* who will abandon, so we can intervene?"],
+            "A/B Testing (Offers) / Personalization": ["Could DA help us *optimize* our website or offers to reduce abandonment?"]
+        };
+        const expectedBrainstormAreas = ["Customer behavior analysis", "Website analytics", "Pricing analysis", "Marketing campaign effectiveness", "User experience (UX) research", "A/B testing", "Personalization"];
+
+
+        const analyticalQuestionsData = {
+            "Who": [
+                "What are the demographic characteristics (age, location, income level) of customers who abandon their carts compared to those who complete purchases?"
+            ],
+            "What": [
+                "Is there a correlation between the number of items in a cart and the likelihood of abandonment?",
+                "Do customers who use specific payment methods have higher or lower abandonment rates?",
+                "Does cart abandonment vary significantly by product category or price point?",
+                "What is the average value of abandoned carts?"
+            ],
+            "Where/When": [
+                "At what stage of the checkout process do most customers abandon their carts?"
+            ],
+            "Why/Where (Channels)": [ // Renamed for clarity
+                "Are there specific marketing channels that lead to higher abandonment rates?"
+            ],
+            "Behavioral Patterns": [
+                "Do customers who abandon carts return to the website later, and do they complete a purchase then?"
+            ],
+            "Predictive": [
+                "Can we predict which customers are most likely to abandon their carts based on their browsing behavior?"
+            ]
+        };
+
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-button').forEach(button => button.classList.remove('active'));
+            document.querySelector(`.nav-button[onclick="showSection('${sectionId}')"]`).classList.add('active');
+        }
+
+        function populateDAApplications() {
+            const buttonsContainer = document.getElementById('daFunctionButtons');
+            const detailsContainer = document.getElementById('daApplicationDetails');
+            Object.keys(daData).forEach(funcName => {
+                const button = document.createElement('button');
+                button.className = 'tab-button py-2 px-4 rounded-md text-sm sm:text-base';
+                button.textContent = funcName;
+                button.onclick = () => {
+                    detailsContainer.innerHTML = `<h3 class="text-xl font-semibold text-indigo-500 mb-3">${funcName} Applications</h3><ul class="list-disc pl-5 space-y-2">` + 
+                                               daData[funcName].map(item => `<li>${item}</li>`).join('') + 
+                                               `</ul>`;
+                    document.querySelectorAll('#daFunctionButtons .tab-button').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                };
+                buttonsContainer.appendChild(button);
+            });
+        }
+
+        function populateProblemsSolved() {
+            const problemListContainer = document.getElementById('problemList');
+            problemsData.forEach((problem, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'accordion-item bg-white p-4 rounded-lg shadow';
+                
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'accordion-header flex justify-between items-center';
+                headerDiv.innerHTML = `<h4 class="text-lg font-semibold text-indigo-600">${problem.title}</h4>
+                                       <span class="transform transition-transform duration-300 text-indigo-600">&#9662;</span>`; // Down arrow
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'accordion-content pt-3 border-t border-gray-200 mt-3';
+                contentDiv.innerHTML = `<p class="text-gray-700">${problem.solution}</p>`;
+                
+                headerDiv.onclick = () => {
+                    const currentlyOpen = document.querySelector('.accordion-item.open');
+                    if (currentlyOpen && currentlyOpen !== itemDiv) {
+                        currentlyOpen.classList.remove('open');
+                        currentlyOpen.querySelector('.accordion-header span').style.transform = 'rotate(0deg)';
+                    }
+                    itemDiv.classList.toggle('open');
+                    headerDiv.querySelector('span').style.transform = itemDiv.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+                };
+                
+                itemDiv.appendChild(headerDiv);
+                itemDiv.appendChild(contentDiv);
+                problemListContainer.appendChild(itemDiv);
+            });
+        }
+        
+        function populateShopEaseDiscussion() {
+            const container = document.getElementById('shopEaseDiscussion');
+            shopEaseDiscussionPoints.forEach(point => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'accordion-item bg-indigo-50 p-3 rounded-md border border-indigo-200';
+                
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'accordion-header flex justify-between items-center';
+                headerDiv.innerHTML = `<h5 class="font-medium text-indigo-700">${point.question}</h5>
+                                       <span class="transform transition-transform duration-300 text-indigo-700">&#9662;</span>`;
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'accordion-content pt-2 border-t border-indigo-100 mt-2';
+                contentDiv.innerHTML = `<p class="text-gray-700 text-sm">${point.answer}</p>`;
+                
+                headerDiv.onclick = () => {
+                    itemDiv.classList.toggle('open');
+                    headerDiv.querySelector('span').style.transform = itemDiv.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+                };
+                
+                itemDiv.appendChild(headerDiv);
+                itemDiv.appendChild(contentDiv);
+                container.appendChild(itemDiv);
+            });
+        }
+
+        function populateBrainstormDAAreas() {
+            const buttonsContainer = document.getElementById('daBrainstormAreas');
+            const displayContainer = document.getElementById('guidingQuestionDisplay');
+            
+            // Create buttons from brainstormData keys, which are more descriptive than expectedBrainstormAreas
+            Object.keys(brainstormData).forEach(areaKey => {
+                const button = document.createElement('button');
+                button.className = 'tab-button py-2 px-3 rounded-md text-xs sm:text-sm';
+                button.textContent = areaKey;
+                button.onclick = () => {
+                    const questions = brainstormData[areaKey];
+                    displayContainer.innerHTML = `<h5 class="font-semibold text-indigo-600 mb-2">Guiding Questions for: ${areaKey}</h5>
+                                                  <ul class="list-disc pl-5 space-y-1 text-sm">
+                                                    ${questions.map(q => `<li>${q}</li>`).join('')}
+                                                  </ul>`;
+                    document.querySelectorAll('#daBrainstormAreas .tab-button').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                };
+                buttonsContainer.appendChild(button);
+            });
+        }
+        
+        function populateAnalyticalQuestions() {
+            const categoriesContainer = document.getElementById('analyticalQuestionCategories');
+            const listContainer = document.getElementById('analyticalQuestionList');
+
+            Object.keys(analyticalQuestionsData).forEach(category => {
+                const button = document.createElement('button');
+                button.className = 'tab-button py-2 px-3 rounded-md text-xs sm:text-sm';
+                button.textContent = category;
+                button.onclick = () => {
+                    listContainer.innerHTML = analyticalQuestionsData[category].map(q => `<li>${q}</li>`).join('');
+                    document.querySelectorAll('#analyticalQuestionCategories .tab-button').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                };
+                categoriesContainer.appendChild(button);
+            });
+        }
+
+
+        function openCaseStudyTab(tabName) {
+            document.querySelectorAll('.case-study-tab').forEach(tab => tab.style.display = 'none');
+            document.getElementById(tabName).style.display = 'block';
+            document.querySelectorAll('#caseStudy .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`#caseStudy .tab-button[onclick="openCaseStudyTab('${tabName}')"]`).classList.add('active');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            populateDAApplications();
+            populateProblemsSolved();
+            populateShopEaseDiscussion();
+            populateBrainstormDAAreas();
+            populateAnalyticalQuestions();
+            showSection('overview'); // Default section
+            openCaseStudyTab('scenario'); // Default case study tab
+             // Set default active button for DA Applications if needed
+            if (document.querySelector('#daFunctionButtons .tab-button')) {
+                 // document.querySelector('#daFunctionButtons .tab-button').click(); // Optionally click the first one
+            }
+            // Set default active button for Brainstorm DA Areas
+            if (document.querySelector('#daBrainstormAreas .tab-button')) {
+                 // document.querySelector('#daBrainstormAreas .tab-button').click(); // Optionally click the first one
+            }
+            // Set default active button for Analytical Question Categories
+            if (document.querySelector('#analyticalQuestionCategories .tab-button')) {
+                // document.querySelector('#analyticalQuestionCategories .tab-button').click(); // Optionally click the first one
+            }
+        });
+    </script>
+</body>
+</html>

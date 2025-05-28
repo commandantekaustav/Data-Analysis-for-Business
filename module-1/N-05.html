@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to N-S5: Data Sources & Collection Methods</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Visualization & Content Choices:
+        - Overview Section: Text introduction to the importance of data. Goal: Inform. Method: HTML text. Justification: Sets the foundational context.
+        - Types of Data Section:
+            - Each data type (Structured, Unstructured, Semi-structured): Presented within an accordion. Content includes definition and examples. Goal: Inform, Explain. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Clearly distinguishes and explains different data formats.
+        - Internal Data Sources Section:
+            - Each source (CRM, ERP, Web/App, IoT, Surveys, HR): Presented within an accordion. Content includes explanation and examples. Goal: Inform, Explain. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Organizes and details common internal data origins.
+        - External Data Sources Section:
+            - Each source (Public, Commercial, Social Media, APIs): Presented within an accordion. Content includes explanation and examples. Goal: Inform, Explain. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Organizes and details common external data origins.
+        - Data Collection Methods Section:
+            - Each method (Manual, ETL, APIs, Web Scraping, Streaming): Presented within an accordion. Content includes explanation and examples. Goal: Inform, Explain. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Explains how data is acquired.
+        - Challenges in Data Collection Section: Text with bullet points. Goal: Inform. Method: HTML text. Justification: Highlights practical difficulties.
+        - E-commerce Case Study Section:
+            - Scenario: Text. Goal: Inform.
+            - Relevant Data Points: Bulleted list. Goal: Apply knowledge. Method: HTML text.
+            - Collection Methods: Bulleted list. Goal: Apply knowledge. Method: HTML text. Justification: Demonstrates practical application of concepts.
+        - NO SVG graphics used. NO Mermaid JS used. Chart.js/Plotly.js are not used as the N-S5 content is primarily conceptual and textual explanations of data types, sources, and collection methods, not quantitative data visualization. All visual elements are handled through HTML/CSS/Tailwind.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #0d9488; /* indigo-600 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3), 0 2px 4px -1px rgba(13, 148, 136, 0.2);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-item.open .accordion-content {
+            max-height: fit-content; /* Adjust dynamically with JS */
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800 leading-relaxed">
+
+    <header class="bg-indigo-700 text-white p-6 shadow-lg">
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold text-center">Interactive Guide to N-S5: Data Sources & Collection Methods</h1>
+            <p class="text-center text-indigo-100 mt-1">The Foundation of Analytics: Where Does Data Come From?</p>
+        </div>
+    </header>
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto flex flex-wrap justify-center space-x-2 sm:space-x-4 p-3">
+            <button class="nav-button active text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="overview">Overview</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="data-types">Types of Data</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="internal-sources">Internal Sources</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="external-sources">External Sources</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="collection-methods">Collection Methods</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="challenges">Challenges</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="ecommerce-case">E-commerce Case Study</button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <section id="overview" class="content-section active bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Overview: Data Sources & Collection Methods</h2>
+            <p class="mb-4">Welcome to this interactive guide for N-S5. In the world of Data Analytics, data is the raw material, the fuel that powers all insights and decisions. But where does this data come from, and how do we acquire it?</p>
+            <p>This session is crucial for understanding the foundational aspects of any data project: identifying the various types of data, recognizing their sources (both internal and external to an organization), and learning the common methods used to collect them. We'll also touch upon the practical challenges involved and apply these concepts to our ongoing e-commerce mini-case study. Use the navigation above to explore each topic in detail.</p>
+        </section>
+
+        <section id="data-types" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Understanding the Types of Data</h2>
+            <p class="mb-6">Data comes in various forms, each with its own characteristics that influence how it's stored, processed, and analyzed. Understanding these types is fundamental.</p>
+            
+            <div class="space-y-4">
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 rounded-t-md font-medium text-indigo-700 flex justify-between items-center">
+                        1. Structured Data
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>Definition:</strong> Highly organized data that conforms to a fixed schema (e.g., rows and columns in a database table). It's easy to store, manage, and query.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Examples:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Relational databases (SQL tables)</li>
+                            <li>Excel spreadsheets</li>
+                            <li>CSV files</li>
+                            <li>Transaction records (sales, inventory)</li>
+                            <li>Customer information (names, addresses)</li>
+                        </ul>
+                        <p class="mt-2 text-sm italic"><strong>Characteristics:</strong> Predefined data models, easy to search and analyze with traditional tools.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        2. Unstructured Data
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>Definition:</strong> Data that does not have a predefined data model or organization. It's often text-heavy and can be challenging to process and analyze using traditional methods.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Examples:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Text documents (Word, PDF)</li>
+                            <li>Emails, social media posts</li>
+                            <li>Audio files, video files</li>
+                            <li>Images</li>
+                            <li>Customer reviews, call center transcripts</li>
+                        </ul>
+                        <p class="mt-2 text-sm italic"><strong>Characteristics:</strong> No fixed schema, requires advanced techniques (e.g., Natural Language Processing) for analysis.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        3. Semi-structured Data
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>Definition:</strong> Data that does not conform to a formal relational data model but contains tags or other markers to separate semantic elements and enforce hierarchies of records and fields. It's a hybrid between structured and unstructured data.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Examples:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>JSON (JavaScript Object Notation) files</li>
+                            <li>XML (Extensible Markup Language) files</li>
+                            <li>Log files</li>
+                            <li>Sensor data</li>
+                        </ul>
+                        <p class="mt-2 text-sm italic"><strong>Characteristics:</strong> Flexible schema, often used in web applications and IoT. Easier to process than unstructured data, but less rigid than structured.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="internal-sources" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Internal Data Sources: Data from Within Your Organization</h2>
+            <p class="mb-6">Internal data is generated and collected by an organization's own operations and systems. It's often the most accessible and relevant data for understanding business performance.</p>
+            
+            <div class="space-y-4">
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 rounded-t-md font-medium text-indigo-700 flex justify-between items-center">
+                        1. CRM (Customer Relationship Management) Systems
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>What it is:</strong> Systems like Salesforce, HubSpot, or Zoho CRM that manage and analyze customer interactions and data throughout the customer lifecycle.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Examples of Data:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Customer demographics (name, contact info, company)</li>
+                            <li>Purchase history, service requests, communication logs</li>
+                            <li>Lead status, sales pipeline data</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        2. ERP (Enterprise Resource Planning) Systems
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>What it is:</strong> Integrated software systems (e.g., SAP, Oracle, Microsoft Dynamics) that manage core business processes across departments (finance, HR, manufacturing, supply chain).</p>
+                        <p class="font-semibold text-stone-700 mb-1">Examples of Data:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Financial data (general ledger, accounts payable/receivable)</li>
+                            <li>Inventory levels, production schedules, supply chain logistics</li>
+                            <li>Order management, procurement data</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        3. Web & Mobile Application Analytics
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>What it is:</strong> Data collected from user interactions with websites and mobile applications (e.g., Google Analytics, Adobe Analytics, Mixpanel).</p>
+                        <p class="font-semibold text-stone-700 mb-1">Examples of Data:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Page views, clicks, bounce rate, session duration</li>
+                            <li>Traffic sources, user paths, conversion funnels</li>
+                            <li>User demographics (inferred), device information</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        4. IoT (Internet of Things) Sensor Data
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>What it is:</strong> Data generated by connected devices, sensors, and machines (e.g., smart home devices, industrial sensors, wearables).</p>
+                        <p class="font-semibold text-stone-700 mb-1">Examples of Data:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Temperature, pressure, humidity readings</li>
+                            <li>Machine performance metrics (uptime, error rates)</li>
+                            <li>Location data, movement patterns</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        5. Customer Surveys & Feedback
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>What it is:</strong> Direct feedback collected from customers through surveys, feedback forms, reviews, and customer service interactions.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Examples of Data:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Customer Satisfaction (CSAT) scores, Net Promoter Scores (NPS)</li>
+                            <li>Qualitative comments, product reviews, support ticket descriptions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        6. HR (Human Resources) Systems
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>What it is:</strong> Systems managing employee-related data (e.g., Workday, SAP SuccessFactors).</p>
+                        <p class="font-semibold text-stone-700 mb-1">Examples of Data:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Employee demographics, tenure, compensation</li>
+                            <li>Performance reviews, training records, absenteeism</li>
+                            <li>Recruitment data (applicant tracking)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="external-sources" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">External Data Sources: Data from Outside Your Organization</h2>
+            <p class="mb-6">External data comes from sources outside the organization but can provide valuable context, market insights, and competitive intelligence.</p>
+            
+            <div class="space-y-4">
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 rounded-t-md font-medium text-indigo-700 flex justify-between items-center">
+                        1. Public Data Sources
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>What it is:</strong> Freely available data published by government agencies, international organizations, and research institutions.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Examples:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Government census data (demographics, economic indicators)</li>
+                            <li>Weather data, environmental data</li>
+                            <li>Public health statistics</li>
+                            <li>Open data portals (e.g., data.gov)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        2. Commercial Data Providers
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>What it is:</strong> Data purchased from specialized vendors who collect and aggregate data for specific industries or purposes.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Examples:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Market research reports (consumer behavior, industry trends)</li>
+                            <li>Financial market data (stock prices, company financials)</li>
+                            <li>Credit scores (from credit bureaus)</li>
+                            <li>Competitor pricing data</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        3. Social Media Data
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>What it is:</strong> Data generated by users on social media platforms (e.g., Twitter, Facebook, Instagram).</p>
+                        <p class="font-semibold text-stone-700 mb-1">Examples:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Posts, comments, likes, shares</li>
+                            <li>User demographics (inferred), sentiment towards brands/products</li>
+                            <li>Trending topics, hashtags</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        4. APIs (Application Programming Interfaces)
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>What it is:</strong> A set of rules and protocols for building and interacting with software applications. Many online services provide APIs to allow programmatic access to their data.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Examples:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Google Maps API (location data)</li>
+                            <li>Twitter API (public tweets)</li>
+                            <li>Weather APIs (real-time weather data)</li>
+                            <li>Financial data APIs (stock quotes)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="collection-methods" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Common Data Collection Methods</h2>
+            <p class="mb-6">Once data sources are identified, various methods are employed to extract and gather the data for analysis.</p>
+            
+            <div class="space-y-4">
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 rounded-t-md font-medium text-indigo-700 flex justify-between items-center">
+                        1. Manual Data Entry & Spreadsheets
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>Description:</strong> Data is manually entered into forms or spreadsheets. Common for small datasets, qualitative data, or initial data capture.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Pros:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Simple for small scale.</li>
+                            <li>Flexible for diverse data types.</li>
+                        </ul>
+                        <p class="font-semibold text-stone-700 mt-2 mb-1">Cons:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Prone to human error.</li>
+                            <li>Not scalable for large volumes.</li>
+                            <li>Time-consuming.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        2. ETL (Extract, Transform, Load) Tools
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>Description:</strong> A process in data warehousing that extracts data from source systems, transforms it into a consistent format, and loads it into a target system (e.g., a data warehouse or data lake). Used for large, complex datasets from multiple sources.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Tools:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Talend, Informatica, Microsoft SSIS, Apache NiFi.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        3. API Integration
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>Description:</strong> Programmatically connecting to external services (like social media platforms, payment gateways, weather services) to pull data directly using their provided APIs. This allows for automated, real-time or near real-time data collection.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Tools/Languages:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Python (with `requests` library), R, Postman.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        4. Web Scraping
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>Description:</strong> Automatically extracting data from websites using software. Used when no official API is available. Requires careful consideration of legal and ethical implications, and website terms of service.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Tools/Languages:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Python (with Beautiful Soup, Scrapy), R (with rvest).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        5. Streaming Data Collection
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700"><strong>Description:</strong> Collecting data continuously as it's generated, often in real-time. Crucial for applications requiring immediate insights (e.g., IoT, financial trading, real-time website analytics).</p>
+                        <p class="font-semibold text-stone-700 mb-1">Technologies:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Apache Kafka, Amazon Kinesis, Google Cloud Pub/Sub.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="challenges" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Challenges in Data Collection</h2>
+            <p class="mb-6">Collecting data is rarely a straightforward process. Several challenges can arise:</p>
+            <ul class="list-disc list-inside ml-4 space-y-2 text-stone-700">
+                <li><strong>Data Silos:</strong> Data is often stored in separate, incompatible systems across different departments, making integration difficult.</li>
+                <li><strong>Data Quality:</strong> Raw data can be messy, inconsistent, incomplete, or inaccurate, requiring significant cleaning efforts.</li>
+                <li><strong>Data Volume & Velocity:</strong> The sheer amount of data (volume) and the speed at which it's generated (velocity) can overwhelm traditional systems.</li>
+                <li><strong>Data Variety:</strong> Dealing with a mix of structured, unstructured, and semi-structured data requires diverse tools and techniques.</li>
+                <li><strong>Data Access & Permissions:</strong> Obtaining necessary permissions to access sensitive or proprietary data can be a lengthy process.</li>
+                <li><strong>Privacy & Security Concerns:</strong> Ensuring compliance with data privacy regulations (e.g., GDPR, CCPA) and protecting sensitive information is paramount.</li>
+                <li><strong>Technical Expertise:</strong> Collecting data from various sources often requires specialized technical skills (e.g., SQL, API programming, cloud platforms).</li>
+            </ul>
+        </section>
+
+        <section id="ecommerce-case" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">E-commerce Mini-Case Study: Data for Cart Abandonment</h2>
+            <p class="mb-6">Let's apply our understanding of data sources and collection methods to the "ShopEase" e-commerce company and its high cart abandonment problem.</p>
+
+            <h3 class="text-xl font-semibold text-indigo-600 mb-3">Scenario: ShopEase's High Cart Abandonment</h3>
+            <p class="mb-4 text-stone-700">ShopEase, an online retailer, is experiencing a high rate of shopping cart abandonment. They want to understand why customers are leaving items in their carts without completing a purchase, and what data they need to analyze this problem.</p>
+
+            <h3 class="text-xl font-semibold text-indigo-600 mb-3">Relevant Data Points (Internal Sources):</h3>
+            <ul class="list-disc list-inside ml-4 space-y-2 text-stone-700">
+                <li><strong>Website Analytics Data:</strong>
+                    <ul class="list-circle list-inside ml-6">
+                        <li>User clickstream data (pages visited, sequence of clicks, time spent on each page).</li>
+                        <li>Cart contents (items added, removed, quantity).</li>
+                        <li>Drop-off points in the checkout funnel.</li>
+                        <li>Device type, browser, location (inferred).</li>
+                    </ul>
+                </li>
+                <li><strong>Customer Transaction Data (from ERP/Sales DB):</strong>
+                    <ul class="list-circle list-inside ml-6">
+                        <li>Past purchase history (frequency, value, product categories).</li>
+                        <li>Customer ID (to link web activity to purchase history).</li>
+                        <li>Payment method used for completed purchases.</li>
+                        <li>Shipping addresses (to identify geographic patterns).</li>
+                    </ul>
+                </li>
+                <li><strong>Customer Demographics (from CRM/Customer Profiles):</strong>
+                    <ul class="list-circle list-inside ml-6">
+                        <li>Age, gender, loyalty program status.</li>
+                        <li>Customer segment (e.g., "new customer," "high-value customer").</li>
+                    </ul>
+                </li>
+                <li><strong>Customer Feedback (from Surveys/Support):</strong>
+                    <ul class="list-circle list-inside ml-6">
+                        <li>Exit survey responses (if implemented) asking why they abandoned.</li>
+                        <li>Customer service inquiries related to website issues or checkout problems.</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-indigo-600 mt-6 mb-3">Data Collection Methods for ShopEase:</h3>
+            <ul class="list-disc list-inside ml-4 space-y-2 text-stone-700">
+                <li><strong>Web Analytics Platform Integration:</strong> Using tools like Google Analytics or Adobe Analytics to automatically collect website clickstream and event data.</li>
+                <li><strong>Database Queries (SQL):</strong> Extracting customer transaction history and demographic data from internal CRM and ERP databases.</li>
+                <li><strong>API Integration:</strong> Potentially connecting to payment gateway APIs to get real-time payment status or external shipping APIs for delivery estimates.</li>
+                <li><strong>Survey Tools:</strong> Deploying pop-up surveys on the checkout page for immediate feedback from abandoning users.</li>
+                <li><strong>ETL Processes:</strong> To integrate data from disparate systems (website analytics, CRM, ERP) into a centralized data warehouse for comprehensive analysis.</li>
+            </ul>
+            <p class="mt-4 p-3 bg-indigo-50 border-l-4 border-indigo-600 text-indigo-700 rounded-md">
+                <strong>Key Takeaway:</strong> Solving a business problem like cart abandonment requires combining data from multiple internal and external sources, collected through various methods, to get a holistic view of customer behavior.
+            </p>
+        </section>
+    </main>
+
+    <footer class="bg-indigo-800 text-indigo-100 text-center p-4 mt-auto">
+        <div class="flex flex-col items-center justify-center">
+            <img src="../faceprep-logo.png" alt="FACE Prep Campus Logo" class="h-10 mb-2">
+            <p>Copyright: FACE Prep Campus, 2025</p>
+        </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const contentSections = document.querySelectorAll('.content-section');
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            function showSection(targetId) {
+                contentSections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                navButtons.forEach(button => {
+                    if (button.dataset.target === targetId) {
+                        button.classList.add('active', 'bg-indigo-600', 'text-white');
+                        button.classList.remove('text-indigo-700', 'hover:bg-indigo-50');
+                    } else {
+                        button.classList.remove('active', 'bg-indigo-600', 'text-white');
+                        button.classList.add('text-indigo-700', 'hover:bg-indigo-50');
+                    }
+                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    showSection(this.dataset.target);
+                });
+            });
+
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', function () {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('span');
+                    
+                    // Close other open accordions in the same group
+                    const parentSection = this.closest('section');
+                    parentSection.querySelectorAll('.accordion-item.open').forEach(openItem => {
+                        if (openItem !== this.parentElement) {
+                            const openContent = openItem.querySelector('.accordion-content');
+                            const openIcon = openItem.querySelector('.accordion-header span');
+                            openContent.style.maxHeight = null;
+                            openIcon.style.transform = 'rotate(0deg)';
+                            openItem.classList.remove('open');
+                        }
+                    });
+
+                    // Toggle the clicked accordion
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                        this.parentElement.classList.remove('open');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.style.transform = 'rotate(180deg)';
+                        this.parentElement.classList.add('open');
+                    }
+                });
+            });
+            
+            // Activate the first section by default
+            showSection('overview');
+        });
+    </script>
+
+</body>
+</html>

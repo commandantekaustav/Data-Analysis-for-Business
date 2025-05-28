@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to N-S13: Exploring Predictive Analytics Scenarios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Visualization & Content Choices:
+        - Overview Section: Text introduction. Goal: Inform. Method: HTML text. Justification: Sets context for the session's focus.
+        - Predictive Classification Activity:
+            - Questions presented as clickable buttons. On click, reveal detailed text explanation (classification, why, crucial data). Goal: Inform, Compare, Engage. Method: HTML, JS for click reveal. Interaction: Click to toggle visibility. Justification: Allows users to test understanding and get immediate feedback, mimicking the activity.
+        - Customer Churn Data Needs:
+            - Detailed HTML text with bullet points for internal and external data. Uses accordions for "Internal Data" and "External Data" categories. Goal: Inform, Organize. Method: HTML, JS for accordion. Interaction: Accordion expand/collapse. Justification: Presents detailed information in a structured, digestible way.
+        - Simplified Model Logic:
+            - HTML text explaining the scenario, steps, and rules. Uses clear headings and bullet points. Goal: Inform, Explain. Method: HTML text. Justification: Conceptual walkthrough, best presented as clear explanatory text.
+        - Introduction to Prescriptive Analytics:
+            - HTML text for purpose and relation. Uses accordions for "Common Conceptual Techniques" (Optimization, Simulation, Recommendation Systems, A/B Testing as decision tool). Goal: Inform, Explain, Organize. Method: HTML, JS for accordion. Interaction: Accordion expand/collapse. Justification: Presents new theoretical content in a structured, digestible manner.
+        - NO SVG graphics used. NO Mermaid JS used. Chart.js/Plotly.js are not used as the N-S13 content is primarily conceptual and textual explanations of analytical types, data requirements, and model logic, not data visualization. All visual elements are handled through HTML/CSS/Tailwind.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #0d9488; /* indigo-600 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3), 0 2px 4px -1px rgba(13, 148, 136, 0.2);
+        }
+        .question-explanation, .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .question-item.open .question-explanation, .accordion-item.open .accordion-content {
+            max-height: fit-content; /* Adjust dynamically with JS */
+        }
+        .question-explanation {
+            background-color: #f0fdfa; /* indigo-50 */
+            border-left: 4px solid #0d9488; /* indigo-600 */
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800 leading-relaxed">
+
+    <header class="bg-indigo-700 text-white p-6 shadow-lg">
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold text-center">Interactive Guide to N-S13: Exploring Predictive Analytics Scenarios</h1>
+            <p class="text-center text-indigo-100 mt-1">Anticipating the Future: From Data to Forecasts</p>
+        </div>
+    </header>
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto flex flex-wrap justify-center space-x-2 sm:space-x-4 p-3">
+            <button class="nav-button active text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="overview">Overview</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="predictive-classification">Predictive Classification</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="churn-data">Churn Data Needs</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="model-logic">Simplified Model Logic</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="prescriptive-intro">Prescriptive Analytics Intro</button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <section id="overview" class="content-section active bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Overview: Exploring Predictive Analytics Scenarios</h2>
+            <p class="mb-4">Welcome to this interactive guide for N-S13, where we deepen our understanding of **Predictive Analytics**. Building on our previous discussions about what happened (Descriptive Analytics) and the basic concepts of prediction, this session focuses on applying predictive thinking to real-world business scenarios.</p>
+            <p>This guide will challenge you to classify various business questions as predictive, delve into the specific data requirements for a common predictive problem like customer churn, and demystify the underlying logic of predictive models with a simplified example. Finally, we'll introduce the next level of analytical sophistication: Prescriptive Analytics. Use the navigation above to explore each topic in detail.</p>
+        </section>
+
+        <section id="predictive-classification" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Activity: Classify Business Questions as Predictive</h2>
+            <p class="mb-6">For each question below, determine if it can be answered primarily using *Predictive Analytics*. Click on the question to reveal the answer and a detailed explanation, including crucial data types.</p>
+            
+            <div class="space-y-4">
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        1. What is the likelihood that a new customer will make a second purchase within 30 days?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q1-exp">
+                        <p><strong>Classification:</strong> Predictive.</p>
+                        <p><strong>Why Predictive:</strong> This forecasts a future event (second purchase) and its probability, anticipating future customer behavior.</p>
+                        <p><strong>Crucial Data:</strong>
+                            <ul class="list-disc list-inside ml-4">
+                                <li><em>Internal:</em> New customer onboarding data (source, acquisition channel), initial purchase details (product category, amount), website browsing history post-first purchase, engagement with welcome emails.</li>
+                                <li><em>External:</em> Industry benchmarks for repeat purchase rates.</li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        2. How many units of our flagship product will we sell in the upcoming holiday season?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q2-exp">
+                        <p><strong>Classification:</strong> Predictive.</p>
+                        <p><strong>Why Predictive:</strong> This forecasts a future numerical value (sales volume) for a specific period, based on historical patterns and external factors.</p>
+                        <p><strong>Crucial Data:</strong>
+                            <ul class="list-disc list-inside ml-4">
+                                <li><em>Internal:</em> Historical daily/weekly sales data for the product (including past holiday seasons), promotional calendars, pricing changes, inventory levels.</li>
+                                <li><em>External:</em> Economic forecasts (consumer spending indices), competitor sales data (if available), relevant holiday shopping trends, weather patterns (if applicable to product).</li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        3. What was our average customer acquisition cost (CAC) last quarter?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q3-exp">
+                        <p><strong>Classification:</strong> Not Predictive (Descriptive).</p>
+                        <p><strong>Why Not Predictive:</strong> This summarizes a past performance metric. It describes a historical outcome, not a future one.</p>
+                        <p><strong>Data:</strong> Historical marketing spend, number of new customers acquired.</p>
+                    </div>
+                </div>
+
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        4. Is this incoming credit card transaction fraudulent?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q4-exp">
+                        <p><strong>Classification:</strong> Predictive.</p>
+                        <p><strong>Why Predictive:</strong> This predicts a binary outcome (fraudulent/not fraudulent) for a real-time event, classifying a transaction based on its characteristics to anticipate a potential risk.</p>
+                        <p><strong>Crucial Data:</strong>
+                            <ul class="list-disc list-inside ml-4">
+                                <li><em>Internal:</em> Transaction details (amount, time, location, merchant category), customer's historical transaction patterns, device ID, IP address, login history.</li>
+                                <li><em>External:</em> Known fraud blacklists, geographic risk scores.</li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        5. What is the most efficient delivery route for today's shipments to minimize fuel costs?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q5-exp">
+                        <p><strong>Classification:</strong> Not Predictive (Prescriptive).</p>
+                        <p><strong>Why Not Predictive:</strong> This suggests an optimal action to achieve a specific goal. It goes beyond forecasting to recommending a course of action.</p>
+                        <p><strong>Data:</strong> Delivery addresses, vehicle capacities, traffic data, road conditions, fuel prices.</p>
+                    </div>
+                </div>
+
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        6. Which marketing message should we send to a customer to maximize their likelihood of clicking on an offer?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q6-exp">
+                        <p><strong>Classification:</strong> Not Predictive (Prescriptive).</p>
+                        <p><strong>Why Not Predictive:</strong> This recommends a specific action. It's about advising on the *best action* based on predicted outcomes.</p>
+                        <p><strong>Data:</strong> Customer demographics, past interaction history, product preferences, historical A/B test results for different messages.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="churn-data" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Deep Dive: Data Needs for Customer Churn Prediction</h2>
+            <p class="mb-6">Customer churn (customers discontinuing service or purchases) is a classic business problem that predictive analytics excels at solving. Building an effective churn prediction model requires a rich, multi-faceted dataset. Let's explore the specific internal and external data points needed.</p>
+
+            <div class="space-y-4">
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 rounded-t-md font-medium text-indigo-700 flex justify-between items-center">
+                        Internal Data (from the company's own systems)
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300 space-y-3">
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Demographic Data:</strong> Age, gender, location (zip code), income level (if collected), marital status.</li>
+                            <li><strong>Account Information:</strong> Date of sign-up, contract type, service plan, subscription tier, tenure (how long they've been a customer).</li>
+                            <li><strong>Usage Data (Behavioral):</strong>
+                                <ul class="list-circle list-inside ml-4">
+                                    <li>Frequency (e.g., logins per week, calls made per month, pages visited per session).</li>
+                                    <li>Recency (how recently they used the product/service).</li>
+                                    <li>Monetary Value (Spend): Average monthly spend, total lifetime value, last purchase amount.</li>
+                                    <li>Feature Usage: Which specific features of a product/service they use, and how often.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Transactional Data:</strong> Purchase history (types of products bought, categories, returns, discounts used), payment history (on-time payments, late payments, payment method).</li>
+                            <li><strong>Customer Service Interactions:</strong> Number of support tickets, type of issues, resolution time, customer satisfaction scores (CSAT) after interactions, sentiment from call transcripts (if analyzed).</li>
+                            <li><strong>Marketing Engagement:</strong> Email open rates, click-through rates on marketing campaigns, responses to surveys.</li>
+                            <li><strong>Website/App Activity:</strong> Pages visited, time spent on site/app, bounce rate, specific actions taken (e.g., adding to cart, viewing help pages).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        External Data (from outside the company)
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300 space-y-3">
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Competitor Activity:</strong> Pricing changes, new product launches, promotional offers from competitors.</li>
+                            <li><strong>Economic Indicators:</strong> Local unemployment rates, inflation, consumer confidence index (can impact purchasing power and willingness to churn).</li>
+                            <li><strong>Social Media Trends/Sentiment:</strong> Broad sentiment about the industry or competitor brands.</li>
+                            <li><strong>Demographic Shifts:</strong> Changes in population density or age distribution in key service areas.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <p class="mt-6 p-3 bg-indigo-50 border-l-4 border-indigo-600 text-indigo-700 rounded-md">
+                <strong>Key Takeaway:</strong> The more comprehensive and granular the data, the better the model can learn patterns indicative of churn, leading to more accurate predictions and effective retention strategies.
+            </p>
+        </section>
+
+        <section id="model-logic" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Conceptual Demo: Simplified Predictive Model Logic (Rule-Based)</h2>
+            <p class="mb-6">To demystify predictive models, let's walk through a very simple rule-based example for predicting if a customer will 'churn' (leave our service) based on just two pieces of information: their `Monthly Spend` and their `Number of Customer Service Calls`.</p>
+
+            <div class="space-y-4 text-stone-700">
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-2">Scenario & Observation:</h3>
+                    <p class="mb-2">Imagine we have historical data for 100 customers, noting their `Monthly Spend`, `Number of Customer Service Calls`, and whether they `Churned` (Yes/No). We observe some simple patterns:</p>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li>Customers with *low monthly spend* AND *high number of calls* seem to churn often.</li>
+                        <li>Customers with *high monthly spend* AND *low number of calls* rarely churn.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-2">Formulating Simple Rules:</h3>
+                    <p class="mb-2">Based on these observations, we might create the following simplified rules:</p>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li><strong>Rule 1:</strong> `IF Monthly Spend < $50` AND `Number of Customer Service Calls > 3` THEN `Predict Churn = YES`</li>
+                        <li><strong>Rule 2:</strong> `IF Monthly Spend >= $50` AND `Number of Customer Service Calls <= 3` THEN `Predict Churn = NO`</li>
+                        <li><strong>Rule 3:</strong> `IF Monthly Spend < $50` AND `Number of Customer Service Calls <= 3` THEN `Predict Churn = NO` (e.g., they are low spend but low maintenance)</li>
+                        <li><strong>Rule 4:</strong> `IF Monthly Spend >= $50` AND `Number of Customer Service Calls > 3` THEN `Predict Churn = YES` (e.g., high spend but frustrated)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-2">Making a Prediction:</h3>
+                    <p>Now, if we have a *new* customer with a `Monthly Spend` of $40 and `5 Customer Service Calls`, which rule applies? Rule 1. So, we `Predict Churn = YES`.</p>
+                </div>
+                <div class="mt-6 p-4 bg-orange-50 border-l-4 border-orange-500 text-orange-700 rounded-md">
+                    <h4 class="font-semibold mb-2">Limitations of this Simplified Model:</h4>
+                    <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li><strong>Oversimplification:</strong> Real-world problems are far more complex, involving many more variables and nuanced relationships.</li>
+                        <li><strong>Manual Rule Creation:</strong> Manually creating and maintaining rules for complex scenarios is impossible and prone to human error.</li>
+                        <li><strong>Lack of Nuance:</strong> This model only gives a binary (yes/no) prediction, not a *probability* of churn, which is often more useful for business decisions.</li>
+                        <li><strong>Not Learning:</strong> These rules are fixed. Real predictive models *learn* from vast amounts of data and adapt to find complex patterns, often providing probabilities rather than just binary answers.</li>
+                    </ul>
+                    <p class="mt-2 text-sm">This simple rule-based example gives you a conceptual idea of how a predictive model makes a decision. In reality, machine learning algorithms automate the process of finding these complex rules and patterns from vast datasets.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="prescriptive-intro" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Introduction to Prescriptive Analytics: What Should We Do?</h2>
+            <p class="mb-6">We've progressed from understanding "what happened" (Descriptive) to forecasting "what could happen" (Predictive). Now, **Prescriptive Analytics** takes us to the next logical step: **"What *should* we do?"** It's not enough to know what will happen; businesses need to know the optimal course of action to achieve desired outcomes or mitigate predicted risks.</p>
+            <p class="mb-4">Prescriptive analytics moves beyond insights and forecasts to provide concrete, actionable recommendations. It's about influencing the future, not just predicting it.</p>
+
+            <div class="space-y-4">
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 rounded-t-md font-medium text-indigo-700 flex justify-between items-center">
+                        Purpose of Prescriptive Analytics
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300 space-y-3">
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Optimization:</strong> Finding the best possible solution or course of action given a set of objectives, constraints, and predicted outcomes.</li>
+                            <li><strong>Decision Automation:</strong> Automating complex decision-making processes that would otherwise require significant human effort and expertise.</li>
+                            <li><strong>Maximizing Outcomes:</strong> Guiding businesses towards decisions that maximize profit, minimize cost, improve efficiency, or enhance customer satisfaction.</li>
+                            <li><strong>Strategic Guidance:</strong> Providing clear, data-backed recommendations for strategic choices.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Relation to Descriptive and Predictive Analytics
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300 space-y-3">
+                        <p>Prescriptive analytics is entirely dependent on the insights generated by descriptive and predictive analytics. It forms the final, actionable layer in the analytical hierarchy.</p>
+                        <p class="font-semibold text-stone-700 mt-2">Descriptive &rarr; Predictive &rarr; Prescriptive Workflow:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Descriptive:</strong> "Our sales decreased by 10% last quarter." (What happened?)</li>
+                            <li><strong>Predictive:</strong> "Based on current trends, sales are predicted to decrease by another 5% next quarter if no action is taken." (What could happen?)</li>
+                            <li><strong>Prescriptive:</strong> "To prevent the predicted sales decline, we *should* launch a targeted discount campaign on Product X in Region Y, and increase our digital ad spend by 15% for the next month." (What should we do?)</li>
+                        </ul>
+                        <p class="mt-2">This sequential flow highlights how each type of analytics builds upon the previous one, adding increasing value and enabling more sophisticated decision-making.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Common Conceptual Techniques in Prescriptive Analytics
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300 space-y-3">
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>Optimization Algorithms:</strong> Find the best possible solution from a set of alternatives, given specific objectives and constraints (e.g., maximizing profit, minimizing cost, optimizing routes).</li>
+                            <li><strong>Simulation:</strong> Creating computer models to mimic real-world systems, allowing businesses to test different scenarios and "what-if" questions without real-world risk (e.g., simulating impact of new pricing).</li>
+                            <li><strong>Recommendation Systems (as a prescriptive output):</strong> While the *prediction* of what a user might like is predictive, the *action* of recommending a specific item or offer is prescriptive (e.g., Netflix recommendations, Amazon product suggestions).</li>
+                            <li><strong>A/B Testing (as a decision tool):</strong> The *decision* to implement the winning version across the entire audience, based on statistical evidence, is a prescriptive action.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-indigo-50 border-l-4 border-indigo-600 text-indigo-700 rounded-md">
+                    <h4 class="font-semibold mb-2">Value & Challenges of Prescriptive Analytics:</h4>
+                    <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li><strong>Higher Value:</strong> Offers the highest level of value by directly translating data insights into actionable strategies.</li>
+                        <li><strong>Complexity:</strong> Requires sophisticated models, often integrating machine learning, optimization, and simulation.</li>
+                        <li><strong>Data Demands:</strong> Demands very high-quality and often real-time data from multiple sources.</li>
+                        <li><strong>Integration:</strong> Needs seamless integration with operational systems for automated decision-making.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-indigo-800 text-indigo-100 text-center p-4 mt-auto">
+    <div class="flex flex-col items-center justify-center">
+        <img src="../faceprep-logo.png" alt="FACE Prep Campus Logo" class="h-10 mb-2">
+        <p>Copyright: FACE Prep Campus, 2025</p>
+    </div>
+</footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const contentSections = document.querySelectorAll('.content-section');
+            const questionButtons = document.querySelectorAll('.question-button');
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            function showSection(targetId) {
+                contentSections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                navButtons.forEach(button => {
+                    if (button.dataset.target === targetId) {
+                        button.classList.add('active', 'bg-indigo-600', 'text-white');
+                        button.classList.remove('text-indigo-700', 'hover:bg-indigo-50');
+                    } else {
+                        button.classList.remove('active', 'bg-indigo-600', 'text-white');
+                        button.classList.add('text-indigo-700', 'hover:bg-indigo-50');
+                    }
+                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    showSection(this.dataset.target);
+                });
+            });
+
+            questionButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const explanation = this.nextElementSibling;
+                    const icon = this.querySelector('span');
+                    
+                    // Close other open explanations in the same section
+                    const parentSection = this.closest('section');
+                    parentSection.querySelectorAll('.question-explanation').forEach(exp => {
+                        if (exp !== explanation) {
+                            exp.style.maxHeight = null; // Use maxHeight for smooth transition
+                            exp.style.display = 'none'; // Fallback for instant close
+                            exp.previousElementSibling.querySelector('span').style.transform = 'rotate(0deg)';
+                            exp.parentElement.classList.remove('open');
+                        }
+                    });
+
+                    // Toggle the clicked explanation
+                    if (explanation.style.display === 'block') {
+                        explanation.style.maxHeight = null;
+                        explanation.style.display = 'none';
+                        icon.style.transform = 'rotate(0deg)';
+                        this.parentElement.classList.remove('open');
+                    } else {
+                        explanation.style.display = 'block'; // Ensure it's block for scrollHeight
+                        explanation.style.maxHeight = explanation.scrollHeight + "px";
+                        icon.style.transform = 'rotate(180deg)';
+                        this.parentElement.classList.add('open');
+                    }
+                });
+            });
+
+             accordionHeaders.forEach(header => {
+                header.addEventListener('click', function () {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('span');
+                    
+                    // Close other open accordions in the same group
+                    const parentSection = this.closest('section');
+                    parentSection.querySelectorAll('.accordion-item.open').forEach(openItem => {
+                        if (openItem !== this.parentElement) {
+                            const openContent = openItem.querySelector('.accordion-content');
+                            const openIcon = openItem.querySelector('.accordion-header span');
+                            openContent.style.maxHeight = null;
+                            openIcon.style.transform = 'rotate(0deg)';
+                            openItem.classList.remove('open');
+                        }
+                    });
+
+                    // Toggle the clicked accordion
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                        this.parentElement.classList.remove('open');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.style.transform = 'rotate(180deg)';
+                        this.parentElement.classList.add('open');
+                    }
+                });
+            });
+            
+            // Activate the first section by default
+            showSection('overview');
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to N-S12: Descriptive & Predictive Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Visualization & Content Choices:
+        - Overview Section: Text introduction to the session. Goal: Inform. Method: HTML text. Justification: Sets the stage.
+        - Hands-on Descriptive Analytics:
+            - Description of Excel tasks (Overall Sales, Sales Trend, Sales by Category, Sales Distribution). Goal: Inform on practical application. Method: HTML text with bulleted lists. Justification: Explains the practical component, emphasizing interpretation.
+        - Predictive Analytics Deep Dive:
+            - Purpose of Predictive Analytics: Text. Goal: Inform.
+            - Common Conceptual Techniques: Accordion for each technique (Forecasting, Classification, Clustering), with detailed text explanation. Goal: Inform, Explain. Method: HTML, JS for accordion. Interaction: Click to expand. Justification: Breaks down complex theoretical concepts.
+            - Data Requirements for Predictive Analytics: Accordion with detailed text. Goal: Inform, Explain. Method: HTML, JS for accordion. Interaction: Click to expand. Justification: Highlights crucial data aspects.
+            - Connection to Prescriptive Analytics: Brief text teaser. Goal: Inform.
+        - NO SVG graphics used. NO Mermaid JS used. Chart.js/Plotly.js are not used as the N-S12 content is primarily conceptual and descriptive of activities (external Excel work) and theoretical explanations, not direct data visualization within the SPA itself. All visual elements are handled through HTML/CSS/Tailwind.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #0d9488; /* indigo-600 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3), 0 2px 4px -1px rgba(13, 148, 136, 0.2);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-item.open .accordion-content {
+            max-height: fit-content; /* Adjust dynamically with JS */
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800 leading-relaxed">
+
+    <header class="bg-indigo-700 text-white p-6 shadow-lg">
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold text-center">Interactive Guide to N-S12: Descriptive & Predictive Analytics</h1>
+            <p class="text-center text-indigo-100 mt-1">From Understanding the Past to Forecasting the Future</p>
+        </div>
+    </header>
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto flex flex-wrap justify-center space-x-2 sm:space-x-4 p-3">
+            <button class="nav-button active text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="overview">Overview</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="descriptive-hands-on">Hands-on Descriptive</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="predictive-intro">Predictive Analytics Deep Dive</button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <section id="overview" class="content-section active bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Overview: Hands-on Descriptive & Intro to Predictive</h2>
+            <p class="mb-4">Welcome to this interactive guide for N-S12. In our previous session, we formally introduced Descriptive Analytics, focusing on "what happened." Today, we'll solidify that understanding with a practical, hands-on exercise in Excel, allowing you to directly apply descriptive techniques and interpret the insights.</p>
+            <p>Following this practical application, we will shift our focus to the next level of analytical sophistication: **Predictive Analytics**. This section will provide a deep dive into its purpose, common conceptual techniques, and the crucial data requirements necessary to forecast future outcomes. Use the navigation above to explore each topic in detail.</p>
+        </section>
+
+        <section id="descriptive-hands-on" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Hands-on Descriptive Analytics with Excel</h2>
+            <p class="mb-6">This section outlines the practical exercise designed to give you direct experience in performing descriptive analytics using Microsoft Excel. You will work with a sales dataset to create various charts and summarize your findings, reinforcing the concepts learned in N-S11.</p>
+            
+            <h3 class="text-xl font-semibold text-indigo-600 mb-3">Your Tasks:</h3>
+            <p class="mb-4">You will be provided with a sales dataset in Excel. Your goal is to apply basic Excel functions and charting capabilities to answer specific descriptive business questions and then summarize your observations.</p>
+
+            <div class="space-y-4 text-stone-700">
+                <div>
+                    <h4 class="font-semibold text-lg text-indigo-700 mb-2">Task 1: Overall Sales Performance</h4>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li>Calculate the `Total Sales Revenue` for the entire dataset.</li>
+                        <li>Calculate the `Average Sales Amount per Transaction`.</li>
+                        <li>Identify the `Maximum` and `Minimum` `Sales Amount` in a single transaction.</li>
+                    </ul>
+                    <p class="mt-2 text-sm italic"><strong>Expected Outcome:</strong> A 1-2 sentence summary of these overall figures, providing a quick snapshot of the business's scale and transaction value range.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-indigo-700 mb-2">Task 2: Sales Trend Over Time</h4>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li>Create a **Line Graph** showing `Total Sales Revenue` per `Month` (or `Date`, if daily data is available).</li>
+                    </ul>
+                    <p class="mt-2 text-sm italic"><strong>Expected Outcome:</strong> A 2-3 sentence summary describing the trend observed in the line graph. Look for patterns like seasonality, growth, or decline (e.g., "Sales show an increasing trend with a peak in December, indicating seasonality").</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-indigo-700 mb-2">Task 3: Sales by Product Category</h4>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li>Create a **Bar Chart** showing `Total Sales Revenue` for each `Product Category`.</li>
+                    </ul>
+                    <p class="mt-2 text-sm italic"><strong>Expected Outcome:</strong> A 2-3 sentence summary highlighting the top-performing and lowest-performing product categories. This helps identify which products contribute most to revenue.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg text-indigo-700 mb-2">Task 4: Sales Distribution by Region</h4>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li>Create a **Pie Chart** (or another Bar Chart, if preferred, recalling the discussion on pie chart limitations from N-S11) showing the `Percentage of Total Sales` contributed by each `Region`.</li>
+                    </ul>
+                    <p class="mt-2 text-sm italic"><strong>Expected Outcome:</strong> A 1-2 sentence summary about regional sales distribution, indicating which regions are most dominant in terms of sales.</p>
+                </div>
+            </div>
+            <p class="mt-6 p-3 bg-indigo-50 border-l-4 border-indigo-600 text-indigo-700 rounded-md">
+                <strong>Key Learning:</strong> The goal of this exercise is not just to create charts, but to *understand what the charts are telling you* about the business. Focus on interpreting the visual insights and translating them into concise summaries.
+            </p>
+        </section>
+
+        <section id="predictive-intro" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Predictive Analytics: Purpose, Techniques & Data Requirements</h2>
+            <p class="mb-6">Having solidified our understanding of "what happened" with descriptive analytics, we now shift our focus to "what *could* happen." Predictive analytics uses historical data, statistical models, and machine learning techniques to forecast future outcomes or probabilities. The goal is to anticipate, rather than just react.</p>
+            
+            <div class="space-y-4">
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 rounded-t-md font-medium text-indigo-700 flex justify-between items-center">
+                        Purpose of Predictive Analytics
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Forecasting Future Outcomes:</strong> Estimating future values (e.g., sales, stock prices, customer demand).</li>
+                            <li><strong>Identifying Future Risks & Opportunities:</strong> Predicting potential problems (e.g., customer churn, equipment failure, fraud) or emerging trends.</li>
+                            <li><strong>Guiding Proactive Strategies:</strong> Enabling businesses to take action *before* events occur.</li>
+                            <li><strong>Optimizing Resource Allocation:</strong> Allocating resources more effectively based on anticipated needs.</li>
+                            <li><strong>Personalization:</strong> Tailoring offers and experiences based on predicted individual behavior.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Common Conceptual Techniques
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300 space-y-3">
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>1. Forecasting (for continuous values):</strong>
+                                <p class="mb-1"><strong>Concept:</strong> Predicting a future numerical value, often used for time-series data.</p>
+                                <p class="mb-1"><strong>Simple Example:</strong> Predicting next month's sales revenue based on past sales trends.</p>
+                                <p class="mb-1"><strong>Techniques (Conceptual):</strong> Time Series Models (analyzing trends, seasonality), Regression Analysis (predicting based on relationships between variables).</p>
+                            </li>
+                            <li><strong>2. Classification (for categorical outcomes):</strong>
+                                <p class="mb-1"><strong>Concept:</strong> Predicting which category or class an item belongs to (the outcome is a discrete label).</p>
+                                <p class="mb-1"><strong>Simple Example:</strong> Predicting whether a customer will "churn" (Yes/No) or "not churn."</p>
+                                <p class="mb-1"><strong>Techniques (Conceptual):</strong> Logistic Regression (for binary classification), Decision Trees (flowchart-like structure), k-Nearest Neighbors (classifies based on nearest data points), Naive Bayes (probabilistic classifier, often for text).</p>
+                            </li>
+                            <li><strong>3. Clustering (Unsupervised - briefly for context):</strong>
+                                <p class="mb-1"><strong>Concept:</strong> Grouping similar data points together without predefined categories. While primarily unsupervised, the *results* of clustering can inform predictive models (e.g., predicting behavior for a newly identified customer segment).</p>
+                                <p class="mb-1"><strong>Simple Example:</strong> Grouping customers into distinct segments based on their purchasing behavior.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Data Requirements for Predictive Analytics
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300 space-y-3">
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>Historical Data (Labeled Data for Supervised Learning):</strong> Paramount. Models learn from past examples where the outcome is known.</li>
+                            <li><strong>Features (Independent Variables):</strong> Input variables the model uses to make predictions (e.g., customer demographics, past purchase frequency for churn prediction).</li>
+                            <li><strong>Target Variable (Dependent Variable):</strong> The variable you are trying to predict (e.g., a binary variable for churned/not churned).</li>
+                            <li><strong>Sufficient Quantity:</strong> Predictive models often require large amounts of data to learn robust patterns.</li>
+                            <li><strong>High Quality:</strong> Data must be clean, consistent, and accurate. Errors or missing values lead to flawed predictions.</li>
+                            <li><strong>Relevance & Timeliness:</strong> Historical data must be relevant to the current context and recent enough to capture current trends.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-indigo-50 border-l-4 border-indigo-600 text-indigo-700 rounded-md">
+                    <h4 class="font-semibold mb-2">Connection to Prescriptive Analytics (Teaser):</h4>
+                    <p class="text-sm">Predictive analytics tells us *what will happen*. Prescriptive analytics then takes that prediction and tells us *what to do about it*. For example, if a predictive model says a customer is likely to churn, a prescriptive system might recommend a specific retention offer. This will be explored in N-S13 and N-S14.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-indigo-800 text-indigo-100 text-center p-4 mt-auto">
+    <div class="flex flex-col items-center justify-center">
+        <img src="../faceprep-logo.png" alt="FACE Prep Campus Logo" class="h-10 mb-2">
+        <p>Copyright: FACE Prep Campus, 2025</p>
+    </div>
+</footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const contentSections = document.querySelectorAll('.content-section');
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            function showSection(targetId) {
+                contentSections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                navButtons.forEach(button => {
+                    if (button.dataset.target === targetId) {
+                        button.classList.add('active', 'bg-indigo-600', 'text-white');
+                        button.classList.remove('text-indigo-700', 'hover:bg-indigo-50');
+                    } else {
+                        button.classList.remove('active', 'bg-indigo-600', 'text-white');
+                        button.classList.add('text-indigo-700', 'hover:bg-indigo-50');
+                    }
+                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    showSection(this.dataset.target);
+                });
+            });
+
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', function () {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('span');
+                    
+                    // Close other open accordions in the same group
+                    const parentSection = this.closest('section');
+                    parentSection.querySelectorAll('.accordion-item.open').forEach(openItem => {
+                        if (openItem !== this.parentElement) {
+                            const openContent = openItem.querySelector('.accordion-content');
+                            const openIcon = openItem.querySelector('.accordion-header span');
+                            openContent.style.maxHeight = null;
+                            openIcon.style.transform = 'rotate(0deg)';
+                            openItem.classList.remove('open');
+                        }
+                    });
+
+                    // Toggle the clicked accordion
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                        this.parentElement.classList.remove('open');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.style.transform = 'rotate(180deg)';
+                        this.parentElement.classList.add('open');
+                    }
+                });
+            });
+            
+            // Activate the first section by default
+            showSection('overview');
+        });
+    </script>
+
+</body>
+</html>

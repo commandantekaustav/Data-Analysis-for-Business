@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to N-S14: Prescriptive Analytics & Connecting Types</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Visualization & Content Choices:
+        - Overview Section: Text introduction. Goal: Inform. Method: HTML text. Justification: Sets context.
+        - Prescriptive Analytics Classification:
+            - Questions presented as clickable buttons.
+            - On click, reveal detailed text explanation (classification, why, data/techniques). Goal: Inform/Interact. Method: HTML, JS for click reveal. Interaction: Click to toggle visibility. Justification: Interactive learning and immediate feedback.
+        - Airline Pricing Scenario:
+            - Sub-sections for Descriptive, Predictive, Prescriptive. Each with question, data, insights, tools. Goal: Illustrate sequence. Method: HTML text. Justification: Clear breakdown of a complex real-world flow.
+        - Unifying Retail Example:
+            - Similar sub-sections for Descriptive, Predictive, Prescriptive within the retail context. Goal: Reinforce concept. Method: HTML text. Justification: Provides another concrete example for deeper understanding.
+        - Key Takeaways: Summary text on value hierarchy and iterative nature. Goal: Synthesize. Method: HTML text. Justification: Reinforces core concepts.
+        - NO SVG graphics used. NO Mermaid JS used. Chart.js is not used as the N-S14 content is primarily conceptual and textual explanations of analytical types and their relationships, not data visualization. All visual elements are handled through HTML/CSS/Tailwind.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #0d9488; /* indigo-600 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3), 0 2px 4px -1px rgba(13, 148, 136, 0.2);
+        }
+        .question-explanation {
+            display: none;
+            background-color: #f0fdfa; /* indigo-50 */
+            border-left: 4px solid #0d9488; /* indigo-600 */
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            border-radius: 0.25rem;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-item.open .accordion-content {
+            max-height: fit-content; /* Adjust dynamically with JS */
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800 leading-relaxed">
+
+    <header class="bg-indigo-700 text-white p-6 shadow-lg">
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold text-center">Interactive Guide to N-S14: Prescriptive Analytics & Connecting Types</h1>
+            <p class="text-center text-indigo-100 mt-1">From Prediction to Action: What Should We Do?</p>
+        </div>
+    </header>
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto flex flex-wrap justify-center space-x-2 sm:space-x-4 p-3">
+            <button class="nav-button active text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="overview">Overview</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="prescriptive-classification">Prescriptive Classification</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="airline-scenario">Airline Pricing Scenario</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="retail-example">Unifying Retail Example</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="key-takeaways">Key Takeaways</button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <section id="overview" class="content-section active bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Overview: Prescriptive Analytics & Connecting the Types</h2>
+            <p class="mb-4">Welcome to this interactive guide for N-S14, where we explore **Prescriptive Analytics** – the most advanced form of data analytics. Having understood what happened (Descriptive) and what could happen (Predictive), we now focus on **"What should we do?"** Prescriptive analytics moves beyond insights and forecasts to provide concrete, actionable recommendations, guiding businesses towards optimal decisions.</p>
+            <p>This guide will challenge you to classify prescriptive questions, then walk you through compelling real-world scenarios like airline pricing and retail promotions, demonstrating how Descriptive, Predictive, and Prescriptive analytics work together in a powerful, sequential flow. Understanding this interconnectedness is key to unlocking the full potential of data-driven decision-making. Use the navigation above to explore each topic in detail.</p>
+        </section>
+
+        <section id="prescriptive-classification" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Activity: Classify Questions as Prescriptive</h2>
+            <p class="mb-6">For each question below, determine if it can be answered primarily using *Prescriptive Analytics*. Click on the question to reveal the answer and explanation.</p>
+            
+            <div class="space-y-4">
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        1. What is the optimal staffing level for our customer support center during peak hours next week to minimize wait times while controlling labor costs?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q1-exp">
+                        <p><strong>Classification:</strong> Prescriptive.</p>
+                        <p><strong>Why Prescriptive:</strong> It seeks an *optimal action* (staffing level) to achieve a dual objective (minimize wait times, control costs) under constraints.</p>
+                        <p><strong>Data/Techniques:</strong> Historical call volume data (descriptive), predicted call volume (predictive), agent availability, skill sets, labor costs, service level agreements (SLAs). Involves **optimization algorithms** and potentially **simulation**.</p>
+                    </div>
+                </div>
+
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        2. What was the total number of customer complaints received last month, categorized by complaint type?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q2-exp">
+                        <p><strong>Classification:</strong> Not Prescriptive (Descriptive).</p>
+                        <p><strong>Why Not Prescriptive:</strong> It summarizes past events and categorizes historical data. It tells "what happened," not "what to do."</p>
+                        <p><strong>Data:</strong> Customer complaint logs.</p>
+                    </div>
+                </div>
+
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        3. Which specific marketing offer should we present to a customer who is predicted to churn, to maximize their retention probability?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q3-exp">
+                        <p><strong>Classification:</strong> Prescriptive.</p>
+                        <p><strong>Why Prescriptive:</strong> It recommends a *specific action* (marketing offer) based on a predicted outcome (churn probability) to achieve a desired goal (retention).</p>
+                        <p><strong>Data/Techniques:</strong> Customer demographics, usage history, past offer responses, predicted churn probability (from a predictive model). Involves **recommendation systems** and potentially **A/B testing** of different offers.</p>
+                    </div>
+                </div>
+
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        4. What is the probability that a new product launch will exceed its sales targets by 20%?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q4-exp">
+                        <p><strong>Classification:</strong> Not Prescriptive (Predictive).</p>
+                        <p><strong>Why Not Prescriptive:</strong> It forecasts a future probability or likelihood. It tells "what could happen," not "what to do."</p>
+                        <p><strong>Data:</strong> Historical product launch data, market trends, marketing spend, competitor activity.</p>
+                    </div>
+                </div>
+
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        5. What is the most efficient sequence of tasks for our manufacturing robots to complete to maximize daily production output?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q5-exp">
+                        <p><strong>Classification:</strong> Prescriptive.</p>
+                        <p><strong>Why Prescriptive:</strong> It determines the *best sequence of actions* (task order) to optimize a specific metric (production output).</p>
+                        <p><strong>Data/Techniques:</strong> Robot cycle times, task dependencies, machine availability, historical production data. Involves **scheduling and optimization algorithms**.</p>
+                    </div>
+                </div>
+
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        6. Based on current inventory and forecasted demand, how much raw material should we order from each supplier to minimize costs and avoid stockouts?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q6-exp">
+                        <p><strong>Classification:</strong> Prescriptive.</p>
+                        <p><strong>Why Prescriptive:</strong> It provides *actionable recommendations* (order quantities, supplier choice) to optimize inventory under given conditions.</p>
+                        <p><strong>Data/Techniques:</strong> Current inventory levels, demand forecasts (predictive), supplier lead times, raw material costs, storage costs, stockout costs. Involves **inventory optimization models** and **optimization algorithms**.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="airline-scenario" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Scenario Analysis: Airline Pricing - The Sequential Flow</h2>
+            <p class="mb-6">Let's explore how a major airline, 'SkyHigh Airlines,' uses data analytics to manage its flight ticket pricing (dynamic pricing or revenue management) by sequentially applying Descriptive, Predictive, and Prescriptive analytics.</p>
+
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-3">1. Descriptive Analytics: "What Happened?" (Understanding Past Performance)</h3>
+                    <p class="mb-2"><strong>Question:</strong> "What has been our historical booking behavior and revenue for Flight SH101 (e.g., from New York to London)?"</p>
+                    <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                        <li><strong>Data:</strong> Historical booking data (number of seats sold, booking date, price paid, passenger class, cancellation rates), historical flight occupancy rates, revenue per flight.</li>
+                        <li><strong>Insights:</strong>
+                            <ul class="list-circle list-inside ml-6 space-y-1">
+                                <li>"Flight SH101 typically sells out 80% of its economy seats 3 days before departure."</li>
+                                <li>"Average revenue per seat for business class on SH101 is $1,500."</li>
+                                <li>"Demand for SH101 is highest on Tuesdays and Fridays."</li>
+                                <li>"Cancellation rates are higher for bookings made more than 60 days in advance."</li>
+                            </ul>
+                        </li>
+                        <li><strong>Tools:</strong> Dashboards, reports, basic charts (line graphs for booking trends, bar charts for revenue by class).</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-3">2. Predictive Analytics: "What Could Happen?" (Forecasting Future Demand)</h3>
+                    <p class="mb-2"><strong>Question:</strong> "What is the likely demand for Flight SH101 next month, and what is the probability of it selling out at current prices?"</p>
+                    <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                        <li><strong>Data:</strong> Historical descriptive data, current booking trends for future flights, competitor pricing, holiday schedules, major events in destination cities, fuel prices, macroeconomic indicators.</li>
+                        <li><strong>Insights:</strong>
+                            <ul class="list-circle list-inside ml-6 space-y-1">
+                                <li>"Based on current trends and upcoming holidays, Flight SH101 is predicted to be 95% full next month."</li>
+                                <li>"There is a 70% probability that all business class seats will be sold out 7 days before departure."</li>
+                                <li>"Demand for economy seats is predicted to soften slightly due to a new competitor route."</li>
+                            </ul>
+                        </li>
+                        <li><strong>Tools:</strong> Statistical models (e.g., time series forecasting, regression), machine learning algorithms (e.g., classification models for predicting sell-out probability).</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-3">3. Prescriptive Analytics: "What Should We Do?" (Recommending Optimal Actions)</h3>
+                    <p class="mb-2"><strong>Question:</strong> "Given our predicted demand and current bookings, what is the *optimal price* for each remaining seat on Flight SH101 to maximize revenue?"</p>
+                    <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                        <li><strong>Data:</strong> All descriptive and predictive insights, current seat availability, competitor prices, historical price elasticity of demand, revenue targets, operational costs.</li>
+                        <li><strong>Insights/Recommendations:</strong>
+                            <ul class="list-circle list-inside ml-6 space-y-1">
+                                <li>"Increase the price of the remaining 10 business class seats by 15% immediately, as they are predicted to sell out."</li>
+                                <li>"Offer a 5% discount on economy seats booked within the next 48 hours to stimulate demand, as a competitor has introduced a new route."</li>
+                                <li>"Consider offering premium economy upgrades at a reduced rate to passengers who booked economy more than 30 days ago, to fill those seats."</li>
+                            </ul>
+                        </li>
+                        <li><strong>Tools:</strong> Complex optimization algorithms (e.g., linear programming, dynamic programming), simulation models, recommendation engines. These systems often automate price changes in real-time.</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="mt-6 p-3 bg-indigo-50 border-l-4 border-indigo-600 text-indigo-700 rounded-md">
+                <strong>Key Takeaway:</strong> This scenario clearly shows how understanding the past (descriptive) informs predictions about the future (predictive), which then drives specific, optimized actions (prescriptive), creating a powerful, integrated system for complex decision-making.
+            </p>
+        </section>
+
+        <section id="retail-example" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Unifying Example: Optimizing Retail Promotions</h2>
+            <p class="mb-6">Let's consider another example: a retail chain, "StyleMart," wants to optimize its weekly promotional offers to maximize sales and customer engagement, while also managing inventory effectively.</p>
+
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-3">1. Descriptive Analytics: "What Happened?" (Understanding Past Promotions)</h3>
+                    <p class="mb-2"><strong>Purpose:</strong> To understand how past promotions performed and what the current state of sales and inventory is.</p>
+                    <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                        <li><strong>Questions:</strong> "What were the total sales and profit margins for each product category during last month's 'Summer Sale'?", "Which promotional offers generated the highest revenue?", "What is the current inventory level for our top 10 best-selling items?"</li>
+                        <li><strong>Insights:</strong> StyleMart learns that "20% Off" promotions on denim historically drive the highest sales volume, but "Buy One Get One Free" on accessories yields higher profit margins. They also see that their current inventory of popular t-shirts is running low.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-3">2. Predictive Analytics: "What Could Happen?" (Forecasting Future Demand and Behavior)</h3>
+                    <p class="mb-2"><strong>Purpose:</strong> To forecast future demand for products and predict how customers will respond to different types of promotions.</p>
+                    <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                        <li><strong>Questions:</strong> "What is the forecasted demand for denim and accessories next quarter?", "Which customer segments are most likely to respond positively to a 'Buy One Get One Free' offer?", "What is the probability that our popular t-shirts will go out of stock next week?"</li>
+                        <li><strong>Insights:</strong> The predictive model forecasts strong demand for accessories next quarter, especially among younger demographics. It also predicts that a "Buy One Get One Free" offer will likely lead to a 30% increase in accessory sales among loyalty members. The model also warns that t-shirt stock will deplete in 5 days.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-3">3. Prescriptive Analytics: "What Should We Do?" (Recommending Optimal Promotional Strategy)</h3>
+                    <p class="mb-2"><strong>Purpose:</strong> To recommend the optimal promotional strategy for StyleMart to maximize sales and profit, considering inventory constraints and customer segments.</p>
+                    <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                        <li><strong>Questions:</strong> "Given the predicted demand and customer responsiveness, what specific promotional offers should StyleMart run next week on which products, and to which customer segments, to maximize overall revenue?", "What is the optimal reorder quantity for the popular t-shirts?"</li>
+                        <li><strong>Recommendations:</strong> "Launch a 'Buy One Get One Free' offer on accessories, targeted specifically via email to loyalty program members, starting this Friday." "Initiate a reorder for 5,000 units of the popular t-shirts immediately, selecting the express shipping option." "Run a '15% Off All Denim' promotion on social media and paid ads, targeting new potential customers, starting Monday."</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="mt-6 p-3 bg-indigo-50 border-l-4 border-indigo-600 text-indigo-700 rounded-md">
+                <strong>Impact:</strong> StyleMart implements these data-driven recommendations, leading to increased sales, optimized inventory, higher customer engagement, and ultimately, improved profitability. This example highlights the value hierarchy: Descriptive provides the *foundation*, Predictive offers *foresight*, and Prescriptive delivers *actionable intelligence*.
+            </p>
+        </section>
+
+        <section id="key-takeaways" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Key Takeaways: The Value and Interconnectedness</h2>
+            <p class="mb-4">The journey through Descriptive, Predictive, and Prescriptive analytics reveals a clear progression in complexity and value. Each type builds upon the last, creating a powerful, integrated system for data-driven decision-making.</p>
+
+            <h3 class="text-xl font-semibold text-indigo-600 mb-3">The Value Hierarchy:</h3>
+            <ul class="list-disc list-inside space-y-2 text-stone-700">
+                <li><strong>Descriptive Analytics:</strong> Answers "What happened?" Provides a foundational understanding of past events and current states. Essential for monitoring and reporting.</li>
+                <li><strong>Predictive Analytics:</strong> Answers "What could happen?" Uses historical data to forecast future outcomes or probabilities. Enables proactive strategies and risk assessment.</li>
+                <li><strong>Prescriptive Analytics:</strong> Answers "What should we do?" Not only predicts but also suggests optimal actions to achieve desired outcomes. Drives automation, optimization, and superior business results.</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-indigo-600 mt-6 mb-3">The Iterative Nature:</h3>
+            <p class="mb-2 text-stone-700">It's important to remember that the data analytics lifecycle is highly iterative. The results of prescriptive actions (e.g., sales from new promotions) become new descriptive data, which then feeds back into the predictive models, allowing for continuous learning and refinement of future strategies. This creates a powerful, self-improving cycle of data-driven decision-making.</p>
+            <p class="mt-4 p-3 bg-indigo-50 border-l-4 border-indigo-600 text-indigo-700 rounded-md">
+                <strong>Ultimately, a robust data analytics capability leverages all three types in synergy, providing a holistic view and actionable intelligence that allows businesses to not just understand and predict, but to actively shape their future.</strong>
+            </p>
+        </section>
+    </main>
+
+    <footer class="bg-indigo-800 text-indigo-100 text-center p-4 mt-auto">
+    <div class="flex flex-col items-center justify-center">
+        <img src="../faceprep-logo.png" alt="FACE Prep Campus Logo" class="h-10 mb-2">
+        <p>Copyright: FACE Prep Campus, 2025</p>
+    </div>
+</footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const contentSections = document.querySelectorAll('.content-section');
+            const questionButtons = document.querySelectorAll('.question-button');
+
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            function showSection(targetId) {
+                contentSections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                navButtons.forEach(button => {
+                    if (button.dataset.target === targetId) {
+                        button.classList.add('active', 'bg-indigo-600', 'text-white');
+                        button.classList.remove('text-indigo-700', 'hover:bg-indigo-50');
+                    } else {
+                        button.classList.remove('active', 'bg-indigo-600', 'text-white');
+                        button.classList.add('text-indigo-700', 'hover:bg-indigo-50');
+                    }
+                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    showSection(this.dataset.target);
+                });
+            });
+
+            questionButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const explanation = this.nextElementSibling;
+                    const icon = this.querySelector('span');
+
+                    // Close other open explanations in the same section
+                    const parentSection = this.closest('section');
+                    parentSection.querySelectorAll('.question-explanation').forEach(exp => {
+                        if (exp !== explanation) {
+                            exp.style.display = 'none';
+                            exp.previousElementSibling.querySelector('span').style.transform = 'rotate(0deg)';
+                        }
+                    });
+
+                    // Toggle the clicked explanation
+                    if (explanation.style.display === 'block') {
+                        explanation.style.display = 'none';
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        explanation.style.display = 'block';
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+            
+            // Activate the first section by default
+            showSection('overview');
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to N-S7: Marketing Analytics & Optimization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Visualization & Content Choices:
+        - Overview Section: Text introduction. Goal: Inform. Method: HTML text. Justification: Sets the context for the session.
+        - A/B Testing Deep Dive Section:
+            - "Beyond Basic Monitoring" text: Goal: Inform. Method: HTML text.
+            - A/B Testing Definition: Text. Goal: Inform. Method: HTML text.
+            - "Why A/B Test?": Accordion with detailed text. Goal: Inform, Organize. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Presents benefits clearly.
+            - "Key Components of an A/B Test": Accordion with detailed text. Goal: Inform, Organize. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Structured explanation of critical elements.
+            - "What can be A/B Tested in Marketing?": Bulleted list. Goal: Inform. Method: HTML text.
+            - "The A/B Testing Process (Simplified)": Accordion with detailed text. Goal: Inform, Organize. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Outlines the steps clearly.
+        - Campaign Optimization Discussion Section: Text with bullet points. Goal: Inform, Synthesize. Method: HTML text. Justification: Connects theory to previous case.
+        - A/B Test Design Activity Section: Text with bullet points for setup, scenario, instructions, and example. Goal: Inform, Guide. Method: HTML text. Justification: Explains the practical exercise.
+        - NO SVG graphics used. NO Mermaid JS used. Chart.js/Plotly.js are not used as the N-S7 content is primarily conceptual and textual explanations of marketing analytics techniques and activities, not direct data visualization within the SPA itself. All visual elements are handled through HTML/CSS/Tailwind.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #0d9488; /* indigo-600 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3), 0 2px 4px -1px rgba(13, 148, 136, 0.2);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-item.open .accordion-content {
+            max-height: fit-content; /* Adjust dynamically with JS */
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800 leading-relaxed">
+
+    <header class="bg-indigo-700 text-white p-6 shadow-lg">
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold text-center">Interactive Guide to N-S7: Marketing Analytics & Optimization</h1>
+            <p class="text-center text-indigo-100 mt-1">Driving Engagement & ROI with Data</p>
+        </div>
+    </header>
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto flex flex-wrap justify-center space-x-2 sm:space-x-4 p-3">
+            <button class="nav-button active text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="overview">Overview</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="ab-testing-dive">A/B Testing Deep Dive</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="campaign-discussion">Campaign Optimization Discussion</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="ab-test-activity">A/B Test Design Activity</button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <section id="overview" class="content-section active bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Overview: Exploring Marketing Analytics & Campaign Optimization</h2>
+            <p class="mb-4">Welcome to this interactive guide for N-S7. This session delves deeper into a specific, powerful marketing analytics technique: **A/B testing**. We'll understand its methodology and application in campaign optimization. Additionally, we'll discuss how data analytics can be used to continuously improve marketing campaigns and engage in a practical exercise to design a simple A/B test.</p>
+            <p>Understanding A/B testing is crucial for any data-driven marketer, as it provides empirical evidence for what truly resonates with your audience. Use the navigation above to explore each topic in detail.</p>
+        </section>
+
+        <section id="ab-testing-dive" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Deeper Dive into A/B Testing for Campaign Optimization</h2>
+            <p class="mb-6">Beyond simply monitoring campaign performance with KPIs, the true power of marketing analytics lies in its ability to *optimize* campaigns. This often involves making data-driven decisions about *what* to change and *how* those changes affect outcomes, leading us to the concept of experimentation.</p>
+            
+            <h3 class="text-xl font-semibold text-indigo-600 mb-3">A/B Testing: The Cornerstone of Marketing Optimization</h3>
+            <p class="mb-4 text-stone-700">A/B testing (also known as split testing) is a method of comparing two versions of a webpage, app feature, email, or advertisement (Version A and Version B) to see which one performs better against a specific goal. It's a controlled experiment where users are randomly assigned to one of the two versions, and their behavior is measured.</p>
+
+            <div class="space-y-4">
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 rounded-t-md font-medium text-indigo-700 flex justify-between items-center">
+                        Why A/B Test?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li><strong>Eliminates Guesswork:</strong> Provides empirical evidence for what resonates with your audience, moving beyond intuition.</li>
+                            <li><strong>Optimizes Conversion Rates:</strong> Small changes can lead to significant improvements in desired actions (e.g., sign-ups, purchases, clicks).</li>
+                            <li><strong>Reduces Risk:</strong> Allows testing on a small segment of your audience before rolling out major changes, minimizing potential negative impacts.</li>
+                            <li><strong>Continuous Improvement:</strong> Fosters a culture of continuous learning and optimization, where every element of a campaign can be refined.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Key Components of an A/B Test
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li><strong>Hypothesis:</strong> A clear statement about what you expect to happen and why (e.g., "Changing the CTA button color from blue to green will increase CTR because green is associated with 'go'").</li>
+                            <li><strong>Control (Version A):</strong> The original or current version of the element being tested.</li>
+                            <li><strong>Variant (Version B):</strong> The modified version with only *one* change from the control. (Crucial to change only one element at a time to isolate the impact).</li>
+                            <li><strong>Target Audience:</strong> A statistically significant segment of your audience that will be randomly split between the control and variant.</li>
+                            <li><strong>Metric (KPI):</strong> The specific, measurable outcome you are trying to improve (e.g., click-through rate, conversion rate, time on page). This is your dependent variable.</li>
+                            <li><strong>Statistical Significance:</strong> Ensuring that the observed difference between A and B is not due to random chance.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        What can be A/B Tested in Marketing?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li><strong>Website Elements:</strong> Headlines, images, button text/color/placement, forms, page layouts, calls-to-action (CTAs).</li>
+                            <li><strong>Email Marketing:</strong> Subject lines, sender names, email body copy, image usage, CTAs, personalization.</li>
+                            <li><strong>Advertisements:</strong> Ad copy, headlines, images/videos, ad formats, landing pages.</li>
+                            <li><strong>Product Descriptions:</strong> Length, tone, key selling points.</li>
+                            <li><strong>Pricing Displays:</strong> How prices are presented (e.g., showing savings, monthly vs. annual).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        The A/B Testing Process (Simplified)
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <ol class="list-decimal list-inside ml-4 space-y-1 text-stone-700">
+                            <li><strong>Identify a Problem/Opportunity:</strong> What needs improvement (e.g., low email open rates)?</li>
+                            <li><strong>Formulate a Hypothesis:</strong> What change do you propose, and what do you expect to happen?</li>
+                            <li><strong>Create Variants:</strong> Design Version A (control) and Version B (variant with one change).</li>
+                            <li><strong>Run the Experiment:</strong> Randomly show A to one group and B to another.</li>
+                            <li><strong>Collect Data:</strong> Track the chosen metric for both versions.</li>
+                            <li><strong>Analyze Results:</strong> Determine if there's a statistically significant difference.</li>
+                            <li><strong>Implement or Iterate:</strong> If B wins, implement it. If not, learn from it and test a new hypothesis.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="campaign-discussion" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Practical: Discussion - How DA Optimizes Campaigns</h2>
+            <p class="mb-6">Let's connect A/B testing to the "EcoWear" sustainable activewear launch campaign from N-S6. We discussed various KPIs there. Now, consider how Data Analytics could be used to *optimize* this campaign *after* it has launched.</p>
+            
+            <h3 class="text-xl font-semibold text-indigo-600 mb-3">Applying DA for Campaign Optimization:</h3>
+            <p class="mb-2 text-stone-700">Data Analytics provides continuous feedback to improve campaign effectiveness:</p>
+            <ul class="list-disc list-inside ml-4 space-y-2 text-stone-700">
+                <li>If the **email open rate is low**, you might A/B test different subject lines or sender names.</li>
+                <li>If **social media ads have a low click-through rate**, you could test different ad creatives, copy, or call-to-action buttons.</li>
+                <li>If **website visitors from the campaign aren't converting**, you might A/B test elements on the landing page like the headline, product images, testimonials, or the checkout button color.</li>
+                <li>You would use the **KPIs** (e.g., conversion rate, CTR) to decide *what* to optimize first, focusing on the weakest link or the metric with the most potential impact.</li>
+            </ul>
+            <p class="mt-4 p-3 bg-indigo-50 border-l-4 border-indigo-600 text-indigo-700 rounded-md">
+                <strong>Key Takeaway:</strong> DA transforms campaign management from a static launch to a dynamic, iterative process of continuous improvement.
+            </p>
+        </section>
+
+        <section id="ab-test-activity" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Practical: Group Exercise - Design a Simple A/B Test</h2>
+            <p class="mb-6">This exercise provides hands-on experience in designing a simple A/B test for a marketing email, applying the concepts we've just discussed.</p>
+
+            <h3 class="text-xl font-semibold text-indigo-600 mb-3">Scenario: EcoWear Marketing Email</h3>
+            <p class="mb-4 text-stone-700">EcoWear is sending out a promotional email to its existing customer base to announce the new sustainable activewear line. The goal of this email is to drive clicks to the product page on their website.</p>
+
+            <h3 class="text-xl font-semibold text-indigo-600 mb-3">Your Task: Design an A/B Test</h3>
+            <p class="mb-4 text-stone-700">For this marketing email, your group needs to design a simple A/B test. You must clearly define:</p>
+            <ol class="list-decimal list-inside ml-4 space-y-2 text-stone-700">
+                <li><strong>The specific element you want to test (and why).</strong></li>
+                <li><strong>Your Hypothesis (what you expect to happen).</strong></li>
+                <li><strong>Version A (Control) - what it looks like.</strong></li>
+                <li><strong>Version B (Variant) - what the *single* change is.</strong></li>
+                <li><strong>The primary KPI you will measure to determine success.</strong></li>
+                <li><strong>How you would determine the 'winner' (briefly, conceptually).</strong></li>
+            </ol>
+
+            <h3 class="text-xl font-semibold text-indigo-600 mt-6 mb-3">Example A/B Test Design (for reference):</h3>
+            <div class="p-4 bg-stone-50 border border-stone-200 rounded-md text-stone-700">
+                <p class="font-semibold mb-2"><strong>Element to Test:</strong> Email Subject Line</p>
+                <p class="font-semibold mb-2"><strong>Why:</strong> The subject line is crucial for getting people to open the email. A higher open rate means more people see the offer.</p>
+                <p class="font-semibold mb-2"><strong>Hypothesis:</strong> A more benefit-driven and intriguing subject line will lead to a higher email open rate.</p>
+                <p class="font-semibold mb-2"><strong>Version A (Control):</strong> "EcoWear: New Activewear Collection Is Here!"</p>
+                <p class="font-semibold mb-2"><strong>Version B (Variant):</strong> "Unlock Your Sustainable Style: Discover EcoWear's Latest!"</p>
+                <p class="font-semibold mb-2"><strong>Primary KPI:</strong> Email Open Rate (%)</p>
+                <p class="font-semibold mb-2"><strong>How to Determine Winner:</strong> The version (A or B) with the higher percentage of recipients who open the email will be considered the winner.</p>
+            </div>
+            <p class="mt-4 p-3 bg-indigo-50 border-l-4 border-indigo-600 text-indigo-700 rounded-md">
+                <strong>Key Learning:</strong> This exercise helps you apply the principles of controlled experimentation to a real-world marketing scenario, emphasizing the importance of isolating variables and defining clear success metrics.
+            </p>
+        </section>
+    </main>
+
+    <footer class="bg-indigo-800 text-indigo-100 text-center p-4 mt-auto">
+        <div class="flex flex-col items-center justify-center">
+            <img src="../faceprep-logo.png" alt="FACE Prep Campus Logo" class="h-10 mb-2">
+            <p>Copyright: FACE Prep Campus, 2025</p>
+        </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const contentSections = document.querySelectorAll('.content-section');
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            function showSection(targetId) {
+                contentSections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                navButtons.forEach(button => {
+                    if (button.dataset.target === targetId) {
+                        button.classList.add('active', 'bg-indigo-600', 'text-white');
+                        button.classList.remove('text-indigo-700', 'hover:bg-indigo-50');
+                    } else {
+                        button.classList.remove('active', 'bg-indigo-600', 'text-white');
+                        button.classList.add('text-indigo-700', 'hover:bg-indigo-50');
+                    }
+                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    showSection(this.dataset.target);
+                });
+            });
+
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', function () {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('span');
+                    
+                    // Close other open accordions in the same group
+                    const parentSection = this.closest('section');
+                    parentSection.querySelectorAll('.accordion-item.open').forEach(openItem => {
+                        if (openItem !== this.parentElement) {
+                            const openContent = openItem.querySelector('.accordion-content');
+                            const openIcon = openItem.querySelector('.accordion-header span');
+                            openContent.style.maxHeight = null;
+                            openIcon.style.transform = 'rotate(0deg)';
+                            openItem.classList.remove('open');
+                        }
+                    });
+
+                    // Toggle the clicked accordion
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                        this.parentElement.classList.remove('open');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.style.transform = 'rotate(180deg)';
+                        this.parentElement.classList.add('open');
+                    }
+                });
+            });
+            
+            // Activate the first section by default
+            showSection('overview');
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to N-S8: DA in Finance & Operations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Visualization & Content Choices:
+        - Overview Section: Text introduction. Goal: Inform. Method: HTML text. Justification: Sets the context for the session.
+        - DA in Finance Section:
+            - Introduction text. Goal: Inform.
+            - Each application (Fraud Detection, Credit Risk Assessment, Algorithmic Trading, FP&A, Compliance): Presented as an accordion item. Content within each accordion will be detailed text (How it works, Impact, Data points). Goal: Explain, Organize. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Breaks down complex topics, improves readability.
+        - DA in Operations Section:
+            - Introduction text. Goal: Inform.
+            - Each application (Supply Chain Optimization, Predictive Maintenance, Quality Control, Workforce Scheduling): Presented as an accordion item. Content within each accordion will be detailed text (How it works, Impact, Sub-components for Supply Chain). Goal: Explain, Organize. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Structured presentation of diverse operational uses.
+        - Case Study: Supply Chain Disruption Section:
+            - Scenario presentation text. Goal: Inform.
+            - Sub-sections for "Before," "During," "After" the disruption. Each will contain bullet points and explanatory text. Goal: Illustrate sequential application. Method: HTML text. Justification: Clear breakdown of a real-world problem's DA solutions over time.
+        - Activity: Risk Brainstorm Section:
+            - Scenario presentation text. Goal: Inform.
+            - Conceptual examples of risks and DA solutions (Risk, How DA Helps, Crucial Data) presented as distinct blocks. Goal: Apply knowledge, Inform. Method: HTML text (bullet points/paragraphs). Justification: Provides concrete examples for reflection.
+        - NO SVG graphics used. NO Mermaid JS used. Chart.js/Plotly.js are not used as the N-S8 content is primarily conceptual and textual explanations of applications and activities, not data visualization. All visual elements are handled through HTML/CSS/Tailwind.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #0d9488; /* indigo-600 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3), 0 2px 4px -1px rgba(13, 148, 136, 0.2);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-item.open .accordion-content {
+            max-height: fit-content; /* Adjust dynamically with JS */
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800 leading-relaxed">
+
+    <header class="bg-indigo-700 text-white p-6 shadow-lg">
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold text-center">Interactive Guide to N-S8: DA in Finance & Operations</h1>
+            <p class="text-center text-indigo-100 mt-1">Driving Efficiency & Mitigating Risk with Data</p>
+        </div>
+    </header>
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto flex flex-wrap justify-center space-x-2 sm:space-x-4 p-3">
+            <button class="nav-button active text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="overview">Overview</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="finance-da">DA in Finance</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="operations-da">DA in Operations</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="supply-chain-case">Supply Chain Case</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="risk-brainstorm">Risk Brainstorm</button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <section id="overview" class="content-section active bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Overview: DA in Finance & Operations - Use Cases</h2>
+            <p class="mb-4">Welcome to this interactive guide for N-S8. This session explores the specific and impactful applications of Data Analytics within the **Finance** and **Operations** functions. We'll uncover how DA drives efficiency, mitigates risk, and optimizes resource allocation in these critical areas of any business.</p>
+            <p>This guide will break down various use cases, from fraud detection to supply chain optimization, and provide practical scenarios to solidify your understanding. Use the navigation above to explore each topic in detail.</p>
+        </section>
+
+        <section id="finance-da" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Data Analytics in Finance: Ensuring Stability and Driving Growth</h2>
+            <p class="mb-6">Data Analytics is crucial in finance for managing risk, detecting fraud, and informing strategic financial decisions. It ensures stability and drives growth by providing deep insights into financial data.</p>
+            
+            <div class="space-y-4">
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 rounded-t-md font-medium text-indigo-700 flex justify-between items-center">
+                        Fraud Detection
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="font-semibold text-stone-700 mb-2">How it works:</p>
+                        <p class="mb-2 text-stone-700">DA systems employ sophisticated algorithms trained on historical data of legitimate and fraudulent transactions. They identify unusual patterns, anomalies, and deviations from typical behavior, such as geographic anomalies (card used in distant locations within minutes), unusual transaction size/frequency, or behavioral deviations (login from new device).</p>
+                        <p class="font-semibold text-stone-700 mt-2 mb-2">Impact:</p>
+                        <p>Real-time fraud detection minimizes financial losses, protects reputation, and ensures trust in financial systems, shifting from reactive investigation to proactive prevention.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Credit Risk Assessment
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="font-semibold text-stone-700 mb-2">How it works:</p>
+                        <p class="mb-2 text-stone-700">DA models analyze a vast array of data points to provide a comprehensive risk profile before lending money.</p>
+                        <p class="font-semibold text-stone-700 mt-2 mb-2">Data points:</p>
+                        <p class="mb-2 text-stone-700">Credit scores, income stability, employment history, debt-to-income ratio, historical repayment behavior, demographic information, and macroeconomic indicators.</p>
+                        <p class="font-semibold text-stone-700 mt-2 mb-2">Impact:</p>
+                        <p>Enables more accurate and fair lending decisions, reducing bad debt for lenders while providing access to credit for deserving borrowers. Allows for dynamic adjustment of interest rates based on individualized risk.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Algorithmic Trading
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="font-semibold text-stone-700 mb-2">How it works:</p>
+                        <p class="mb-2 text-stone-700">DA powers high-frequency trading algorithms that analyze market data (stock prices, trading volumes, news sentiment) in milliseconds to execute trades, identifying patterns and predicting price movements.</p>
+                        <p class="font-semibold text-stone-700 mt-2 mb-2">Impact:</p>
+                        <p>Enables rapid response to market changes, potentially generating higher returns, though it also introduces new forms of market risk.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Financial Planning & Analysis (FP&A)
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="font-semibold text-stone-700 mb-2">Impact:</p>
+                        <p>DA provides robust tools for forecasting revenues, expenses, and cash flows with greater accuracy. This supports more informed budgeting, resource allocation, and strategic investment decisions. It allows finance teams to simulate various scenarios (e.g., impact of a market downturn) and plan accordingly.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Compliance and Regulatory Reporting
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="font-semibold text-stone-700 mb-2">Impact:</p>
+                        <p>Financial institutions are heavily regulated. DA helps automate the collection, analysis, and reporting of data required for regulatory compliance, ensuring adherence to laws and avoiding penalties.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="operations-da" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Data Analytics in Operations: Optimizing Processes and Resources</h2>
+            <p class="mb-6">Data Analytics significantly enhances operational efficiency by optimizing processes, managing resources, and improving overall productivity across various functions.</p>
+            
+            <div class="space-y-4">
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 rounded-t-md font-medium text-indigo-700 flex justify-between items-center">
+                        Supply Chain Optimization
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="font-semibold text-stone-700 mb-2">How it works:</p>
+                        <p class="mb-2 text-stone-700">DA plays a pivotal role in ensuring products move efficiently from raw materials to the customer. This includes:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Demand Forecasting:</strong> Predicting future customer demand to optimize inventory and production.</li>
+                            <li><strong>Inventory Management:</strong> Optimizing inventory levels across warehouses to minimize costs and ensure availability.</li>
+                            <li><strong>Logistics & Route Optimization:</strong> Finding the most efficient delivery routes to reduce costs and delivery times.</li>
+                            <li><strong>Supplier Performance Analysis:</strong> Evaluating suppliers based on reliability, quality, and cost-effectiveness.</li>
+                        </ul>
+                        <p class="font-semibold text-stone-700 mt-2 mb-2">Impact:</p>
+                        <p>Leads to significant cost reductions, faster delivery times, improved customer satisfaction, and enhanced supply chain resilience against disruptions.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Predictive Maintenance
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="font-semibold text-stone-700 mb-2">How it works:</p>
+                        <p class="mb-2 text-stone-700">Instead of fixed maintenance schedules or waiting for equipment to break down, DA predicts when machinery is likely to fail. Sensors on equipment collect data (temperature, vibration, pressure, run-time), and DA models analyze this data for anomalies that precede failure.</p>
+                        <p class="font-semibold text-stone-700 mt-2 mb-2">Impact:</p>
+                        <p>Enables maintenance to be performed *just in time*, reducing costly unplanned downtime, extending asset lifespan, improving safety, and optimizing maintenance resource allocation. This is a shift from reactive to proactive maintenance.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Quality Control & Assurance
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="font-semibold text-stone-700 mb-2">How it works:</p>
+                        <p class="mb-2 text-stone-700">DA helps monitor and improve product quality throughout the manufacturing process. It analyzes sensor data from production lines, visual inspection data, and defect rates to identify the root causes of quality issues.</p>
+                        <p class="font-semibold text-stone-700 mt-2 mb-2">Impact:</p>
+                        <p>Reduces defects, improves product consistency, minimizes rework, and enhances customer satisfaction. It allows for real-time adjustments to production parameters.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Workforce Scheduling & Optimization
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="font-semibold text-stone-700 mb-2">How it works:</p>
+                        <p class="mb-2 text-stone-700">For businesses with fluctuating demand (e.g., retail, call centers, healthcare), DA optimizes staffing levels by analyzing historical demand patterns, employee availability, skill sets, and regulatory requirements to create efficient schedules.</p>
+                        <p class="font-semibold text-stone-700 mt-2 mb-2">Impact:</p>
+                        <p>Reduces labor costs (by avoiding overstaffing) and improves customer service (by ensuring adequate staffing during peak times).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="supply-chain-case" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Case Study: Supply Chain Disruption – How DA Helps</h2>
+            <p class="mb-6">Imagine a global electronics manufacturer, 'TechGlobal,' faces a major supply chain disruption due to a natural disaster affecting a critical component factory. Let's see how Data Analytics could have helped *before*, *during*, and *after* this event.</p>
+
+            <div class="space-y-6 text-stone-700">
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-3">Before the disruption (Proactive/Strategic DA):</h3>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li><strong>Risk Assessment:</strong> DA could analyze historical data on natural disasters, geopolitical stability, and supplier reliability to identify high-risk single points of failure in the supply chain.</li>
+                        <li><strong>Supplier Diversification:</strong> Insights from DA could have prompted TechGlobal to strategically diversify their supplier base, identifying alternative sources for critical components as a risk mitigation strategy.</li>
+                        <li><strong>Inventory Optimization:</strong> DA could have recommended maintaining strategic buffer stock for critical components sourced from high-risk areas.</li>
+                        <li><strong>Scenario Planning:</strong> DA models could simulate the impact of various disruptions (e.g., factory shutdown, shipping delays) on production and revenue, allowing TechGlobal to develop contingency plans.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-3">During the disruption (Reactive/Operational DA):</h3>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li><strong>Impact Assessment:</strong> DA could rapidly analyze inventory levels across all warehouses, identify which product lines are most affected, and quantify the immediate production shortfall.</li>
+                        <li><strong>Alternative Sourcing:</strong> DA could quickly identify and evaluate alternative suppliers based on their capacity, lead times, and historical reliability, facilitating faster recovery.</li>
+                        <li><strong>Customer Communication:</strong> DA could help segment customers based on order status and likelihood of delay, allowing for targeted and proactive communication to manage expectations.</li>
+                        <li><strong>Logistics Re-routing:</strong> If shipping lanes are affected, DA could identify alternative transportation routes or methods.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-3">After the disruption (Post-event Analysis & Future Prevention):</h3>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li><strong>Root Cause Analysis:</strong> DA could analyze all data related to the disruption to understand its full impact and identify areas for improvement in future supply chain design.</li>
+                        <li><strong>Performance Benchmarking:</strong> Compare actual recovery time and costs against planned contingencies to refine future strategies.</li>
+                        <li><strong>Policy Adjustment:</strong> Data from the disruption could inform new policies for supplier vetting, inventory levels, and disaster preparedness.</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="mt-6 p-3 bg-indigo-50 border-l-4 border-indigo-600 text-indigo-700 rounded-md">
+                <strong>Key Takeaway:</strong> Data Analytics transforms supply chain management from a reactive, crisis-driven function to a proactive, resilient, and optimized system.
+            </p>
+        </section>
+
+        <section id="risk-brainstorm" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Activity: "Risk Brainstorm" - Online Financial Service</h2>
+            <p class="mb-6">Consider a new online-only financial service that offers personal loans and investment products, aiming to be fully digital with minimal human interaction. Below are examples of significant risks that Data Analytics can help manage or mitigate in such a service.</p>
+
+            <div class="space-y-6 text-stone-700">
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-3">Risk 1: High Loan Default Rates</h3>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li><strong>How DA Helps:</strong> Credit risk assessment. DA models analyze applicant data (credit history, income, debt, employment stability, repayment patterns) to predict the likelihood of default. This allows the service to approve loans for creditworthy individuals and decline or offer different terms to high-risk applicants.</li>
+                        <li><strong>Crucial Data:</strong> Credit bureau data, applicant financial statements, bank transaction history, demographic information, historical loan repayment data from existing customers.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-3">Risk 2: Online Payment Fraud</h3>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li><strong>How DA Helps:</strong> Real-time fraud detection. DA systems monitor every transaction for suspicious patterns (e.g., unusually large transactions, multiple transactions in quick succession from different locations, new device logins, IP address reputation). Machine learning algorithms flag or block potentially fraudulent transactions instantly.</li>
+                        <li><strong>Crucial Data:</strong> Transaction details (amount, time, location, merchant), user login data, device fingerprints, IP addresses, historical fraud patterns, customer behavioral data.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-3">Risk 3: Cybersecurity Breaches / Data Theft</h3>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li><strong>How DA Helps:</strong> Security analytics. DA monitors network traffic, system logs, and user activity for anomalies that could indicate a cyberattack or insider threat. It can identify unusual access patterns, data exfiltration attempts, or malware activity.</li>
+                        <li><strong>Crucial Data:</strong> Network logs, server logs, user access logs, security event data, threat intelligence feeds.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-3">Risk 4: Regulatory Non-Compliance</h3>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li><strong>How DA Helps:</strong> Automated compliance monitoring. DA can continuously scan transactions and customer data to ensure adherence to financial regulations (e.g., Anti-Money Laundering (AML), Know Your Customer (KYC)). It can flag transactions or customer profiles that require further review.</li>
+                        <li><strong>Crucial Data:</strong> Transaction data, customer onboarding data, sanction lists, regulatory guidelines.</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="mt-6 p-3 bg-indigo-50 border-l-4 border-indigo-600 text-indigo-700 rounded-md">
+                <strong>Key Takeaway:</strong> Data Analytics provides powerful tools for proactive risk identification and mitigation across various financial and operational challenges, protecting assets and ensuring business continuity.
+            </p>
+        </section>
+    </main>
+
+    <footer class="bg-indigo-800 text-indigo-100 text-center p-4 mt-auto">
+        <div class="flex flex-col items-center justify-center">
+            <img src="../faceprep-logo.png" alt="FACE Prep Campus Logo" class="h-10 mb-2">
+            <p>Copyright: FACE Prep Campus, 2025</p>
+        </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const contentSections = document.querySelectorAll('.content-section');
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            function showSection(targetId) {
+                contentSections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                navButtons.forEach(button => {
+                    if (button.dataset.target === targetId) {
+                        button.classList.add('active', 'bg-indigo-600', 'text-white');
+                        button.classList.remove('text-indigo-700', 'hover:bg-indigo-50');
+                    } else {
+                        button.classList.remove('active', 'bg-indigo-600', 'text-white');
+                        button.classList.add('text-indigo-700', 'hover:bg-indigo-50');
+                    }
+                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    showSection(this.dataset.target);
+                });
+            });
+
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', function () {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('span');
+                    
+                    // Close other open accordions in the same group
+                    const parentSection = this.closest('section');
+                    parentSection.querySelectorAll('.accordion-item.open').forEach(openItem => {
+                        if (openItem !== this.parentElement) {
+                            const openContent = openItem.querySelector('.accordion-content');
+                            const openIcon = openItem.querySelector('.accordion-header span');
+                            openContent.style.maxHeight = null;
+                            openIcon.style.transform = 'rotate(0deg)';
+                            openItem.classList.remove('open');
+                        }
+                    });
+
+                    // Toggle the clicked accordion
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                        this.parentElement.classList.remove('open');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.style.transform = 'rotate(180deg)';
+                        this.parentElement.classList.add('open');
+                    }
+                });
+            });
+            
+            // Activate the first section by default
+            showSection('overview');
+        });
+    </script>
+
+</body>
+</html>

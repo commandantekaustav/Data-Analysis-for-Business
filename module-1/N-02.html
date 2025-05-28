@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S2: The Role of DA in Business & Evolution</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 2px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-button { background-color: #E0E7FF; color: #4338CA; border: 1px solid #C7D2FE; }
+        .tab-button.active { background-color: #4338CA; color: white; }
+        .tab-button:hover:not(.active) { background-color: #C7D2FE; }
+        .accordion-header { cursor: pointer; user-select: none; }
+        .accordion-content { display: none; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; }
+        .accordion-item.open .accordion-content { display: block; max-height: 2000px; /* Arbitrary large value */ padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .accordion-arrow { transition: transform 0.3s ease; }
+        .accordion-item.open .accordion-arrow { transform: rotate(180deg); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-3xl font-bold text-center text-indigo-700">N-S2: The Role of DA in Business & Evolution</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><button onclick="showSection('overview')" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">Overview</button></li>
+                    <li><button onclick="showSection('daInBusiness')" class="nav-button text-sm sm:text-base font-medium py-2 px-3">DA in Business</button></li>
+                    <li><button onclick="showSection('daEvolution')" class="nav-button text-sm sm:text-base font-medium py-2 px-3">DA Evolution</button></li>
+                    <li><button onclick="showSection('applyDa')" class="nav-button text-sm sm:text-base font-medium py-2 px-3">Apply DA</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="overview" class="content-section active">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Session Overview</h2>
+            <p class="section-intro">This interactive module explores the fundamental role of Data Analytics (DA) across various business functions and traces its significant evolution from traditional Business Intelligence (BI) to modern analytics and its integration with Artificial Intelligence (AI). You will gain a comprehensive understanding of DA's cross-functional impact and its trajectory within the business world.</p>
+        </section>
+
+        <section id="daInBusiness" class="content-section">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-4">How Data Analytics Supports Business Functions</h2>
+            <p class="section-intro">Data Analytics is not confined to a single department; it provides immense value across the entire organization. Select a business function below to see specific examples of how DA supports its operations.</p>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div id="functionButtons" class="flex flex-wrap justify-center gap-3 mb-6"></div>
+                <div id="functionDetails" class="mt-4 min-h-[150px]">
+                    <p class="text-gray-500 italic text-center">Select a business function above to view its DA applications.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="daEvolution" class="content-section">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Evolution from Traditional BI to Modern Analytics and AI</h2>
+            <p class="section-intro">The landscape of data analysis has evolved significantly. Explore the distinct characteristics and advancements at each stage: Traditional BI, Modern Data Analytics, and Integration with AI.</p>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="mb-6 flex flex-wrap justify-center gap-3">
+                    <button id="btnBI" class="tab-button py-2 px-4 rounded-md active" onclick="showEvolutionStage('bi')">Traditional Business Intelligence (BI)</button>
+                    <button id="btnModernDA" class="tab-button py-2 px-4 rounded-md" onclick="showEvolutionStage('modernDA')">Modern Data Analytics</button>
+                    <button id="btnAI" class="tab-button py-2 px-4 rounded-md" onclick="showEvolutionStage('ai')">Integration with AI</button>
+                </div>
+
+                <div id="biContent" class="evolution-content-block">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">Traditional Business Intelligence (BI)</h3>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                        <li><strong>Focus:</strong> Primarily descriptive analytics ("What happened?").</li>
+                        <li><strong>Tools:</strong> Reporting tools, dashboards, static reports.</li>
+                        <li><strong>Data:</strong> Often structured, from internal databases.</li>
+                        <li><strong>Goal:</strong> Monitoring past performance, understanding current state.</li>
+                        <li><strong>Limitations:</strong> Reactive, limited predictive capabilities, often required IT intervention for new reports.</li>
+                    </ul>
+                </div>
+                <div id="modernDAContent" class="evolution-content-block hidden">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">Modern Data Analytics</h3>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                        <li><strong>Focus:</strong> Extends beyond descriptive to predictive ("What could happen?") and prescriptive ("What should we do?").</li>
+                        <li><strong>Tools:</strong> Advanced statistical software, machine learning platforms, interactive visualization tools, programming languages (Python, R).</li>
+                        <li><strong>Data:</strong> Handles diverse data types (structured, unstructured, semi-structured) from various sources.</li>
+                        <li><strong>Goal:</strong> Proactive decision-making, competitive advantage, innovation.</li>
+                        <li><strong>Characteristics:</strong> More agile, self-service capabilities, real-time insights.</li>
+                    </ul>
+                </div>
+                <div id="aiContent" class="evolution-content-block hidden">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">Integration with Artificial Intelligence (AI)</h3>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                        <li><strong>AI as an enabler:</strong> AI (especially Machine Learning and Deep Learning) provides advanced algorithms for complex pattern recognition, automation, and predictive capabilities within DA.</li>
+                        <li><strong>Examples:</strong> AI-powered recommendation engines, natural language processing for text analysis, computer vision for image analysis.</li>
+                        <li><strong>Synergy:</strong> Modern DA often leverages AI techniques to extract deeper insights and automate decision-making processes.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="applyDa" class="content-section">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Apply Data Analytics: Practical Activities</h2>
+            <p class="section-intro">These activities help you apply your understanding of DA's business impact to specific industries and critically evaluate decision-making with and without DA.</p>
+            
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Activity: Business Impact Brainstorm</h3>
+                <p class="mb-4 text-gray-700">Explore specific ways Data Analytics can improve operations or customer experience within various industries. Click on an industry to see example ideas.</p>
+                <div id="industryBrainstorm" class="space-y-3 bg-white p-6 rounded-lg shadow-md"></div>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Scenario Analysis: Simple Business Decision</h3>
+                <p class="mb-4 text-gray-700">Imagine a small coffee shop chain considering opening a new branch with two potential locations. How would they decide, with and without data analytics?</p>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="mb-6 flex flex-wrap justify-center gap-3">
+                        <button id="btnWithoutDA" class="tab-button py-2 px-4 rounded-md active" onclick="showScenarioApproach('withoutDA')">Decision Without DA</button>
+                        <button id="btnWithDA" class="tab-button py-2 px-4 rounded-md" onclick="showScenarioApproach('withDA')">Decision With DA</button>
+                    </div>
+
+                    <div id="withoutDAContent" class="scenario-content-block">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">How might they decide without using Data Analytics?</h4>
+                        <ul class="list-disc pl-5 space-y-1 text-gray-600">
+                            <li><strong>Factors:</strong> Intuition, personal experience, gut feeling, anecdotal evidence, competitor presence (general observation), general foot traffic observation.</li>
+                            <li><strong>Risks:</strong> Suboptimal location choice, high failure rate, missed better opportunities, lack of objective justification for the decision.</li>
+                        </ul>
+                        <p class="mt-4 text-sm text-gray-500">This approach relies heavily on subjective judgment and limited, often anecdotal, information.</p>
+                    </div>
+                    <div id="withDAContent" class="scenario-content-block hidden">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">How could Data Analytics help them make a more informed decision?</h4>
+                        <ul class="list-disc pl-5 space-y-1 text-gray-600">
+                            <li><strong>Data Needed:</strong> Demographic data (age, income), competitor locations, local foot traffic data (e.g., from mobile apps/sensors), public transport routes, local business density, past sales data from existing stores, customer loyalty program data.</li>
+                            <li><strong>How to Use DA:</strong> Analyze these factors to identify high-potential areas, predict sales volume for each location, assess risk levels, understand customer demographics that align with their target market.</li>
+                        </ul>
+                        <p class="mt-4 text-sm text-gray-500">DA provides evidence-based insights, reducing guesswork and significantly improving the quality and potential success of the decision.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-indigo-800 text-indigo-100 text-center p-4 mt-auto">
+        <div class="flex flex-col items-center justify-center">
+            <img src="../faceprep-logo.png" alt="FACE Prep Campus Logo" class="h-10 mb-2">
+            <p>Copyright: FACE Prep Campus, 2025</p>
+        </div>
+    </footer>
+
+
+    <script>
+        const daApplications = {
+            "Marketing & Sales": [
+                "Customer Segmentation: Identifying distinct customer groups for targeted campaigns.",
+                "Personalization: Tailoring product recommendations and content.",
+                "Sales Forecasting: Predicting future sales trends to optimize inventory and staffing.",
+                "Campaign Performance: Measuring the effectiveness of marketing initiatives."
+            ],
+            "Finance": [
+                "Fraud Detection: Identifying unusual transaction patterns.",
+                "Risk Assessment: Evaluating creditworthiness and investment risks.",
+                "Financial Planning & Analysis (FP&A): Budgeting, forecasting, and performance analysis."
+            ],
+            "Operations & Supply Chain": [
+                "Predictive Maintenance: Anticipating equipment failures to reduce downtime.",
+                "Inventory Optimization: Ensuring optimal stock levels to meet demand and minimize costs.",
+                "Logistics Efficiency: Optimizing delivery routes and warehouse operations."
+            ],
+            "Human Resources (HR)": [
+                "Talent Analytics: Understanding employee performance, retention, and recruitment effectiveness.",
+                "Workforce Planning: Forecasting future staffing needs."
+            ],
+            "Product Development": [
+                "User Feedback Analysis: Deriving insights from customer reviews and usage data to improve products.",
+                "Market Trend Identification: Spotting emerging trends for new product opportunities."
+            ]
+        };
+
+        const industryBrainstormIdeas = {
+            "Retail": [
+                "Optimize store layout based on customer flow data.",
+                "Predict fashion trends using social media and sales data.",
+                "Personalize promotions and offers for individual customers.",
+                "Manage inventory levels to reduce overstocking and stockouts."
+            ],
+            "Banking": [
+                "Detect fraudulent transactions in real-time.",
+                "Assess loan risk for applicants more accurately.",
+                "Personalize financial advice and product recommendations.",
+                "Optimize ATM placement based on demographic and usage data."
+            ],
+            "Manufacturing": [
+                "Predictive maintenance for machinery to minimize downtime.",
+                "Real-time quality control using sensor data.",
+                "Supply chain optimization for efficiency and resilience.",
+                "Automated production scheduling based on demand forecasts."
+            ],
+            "Media": [
+                "Content recommendation engines for personalized user experience.",
+                "Audience segmentation for targeted advertising.",
+                "Predicting viral content trends.",
+                "Optimizing ad placement and pricing."
+            ],
+            "Education": [
+                "Personalized learning paths based on student performance.",
+                "Predicting student dropout rates for proactive intervention.",
+                "Optimizing resource allocation (e.g., classroom space, faculty).",
+                "Analyzing course effectiveness and student engagement."
+            ],
+            "Hospitality": [
+                "Dynamic pricing for hotel rooms and services based on demand.",
+                "Personalizing guest experiences and recommendations.",
+                "Predicting occupancy rates for optimal staffing.",
+                "Analyzing guest feedback for service improvement."
+            ]
+        };
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-button').forEach(button => button.classList.remove('active'));
+            document.querySelector(`.nav-button[onclick="showSection('${sectionId}')"]`).classList.add('active');
+        }
+
+        function populateBusinessFunctions() {
+            const buttonsContainer = document.getElementById('functionButtons');
+            const detailsContainer = document.getElementById('functionDetails');
+            Object.keys(daApplications).forEach(funcName => {
+                const button = document.createElement('button');
+                button.className = 'tab-button py-2 px-4 rounded-md text-sm sm:text-base';
+                button.textContent = funcName;
+                button.onclick = () => {
+                    detailsContainer.innerHTML = `
+                        <h3 class="text-xl font-semibold text-indigo-500 mb-3">${funcName}: DA Applications</h3>
+                        <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                            ${daApplications[funcName].map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    `;
+                    document.querySelectorAll('#functionButtons .tab-button').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                };
+                buttonsContainer.appendChild(button);
+            });
+             // Automatically select the first function on load
+            if (Object.keys(daApplications).length > 0) {
+                buttonsContainer.querySelector('.tab-button').click();
+            }
+        }
+
+        function showEvolutionStage(stageId) {
+            document.querySelectorAll('.evolution-content-block').forEach(block => block.classList.add('hidden'));
+            const contentBlock = document.getElementById(stageId + 'Content');
+            if (contentBlock) {
+                contentBlock.classList.remove('hidden');
+            } else {
+                console.error(`Error: Content block with ID ${stageId}Content not found.`);
+            }
+
+            document.querySelectorAll('#daEvolution .tab-button').forEach(btn => btn.classList.remove('active'));
+
+            let buttonId;
+            if (stageId === 'bi') {
+                buttonId = 'btnBI'; // Corrected ID for BI
+            } else if (stageId === 'modernDA') {
+                buttonId = 'btnModernDA';
+            } else if (stageId === 'ai') {
+                buttonId = 'btnAI'; // Corrected ID for AI
+            } else {
+                console.error(`Error: Unknown stageId: ${stageId}`);
+                return;
+            }
+
+            const activeButton = document.getElementById(buttonId);
+            if (activeButton) {
+                activeButton.classList.add('active');
+            } else {
+                console.error(`Error: Button with ID ${buttonId} not found.`);
+            }
+        }
+
+        function populateIndustryBrainstorm() {
+            const container = document.getElementById('industryBrainstorm');
+            Object.keys(industryBrainstormIdeas).forEach(industry => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'accordion-item border border-gray-200 rounded-md';
+                
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'accordion-header bg-indigo-50 p-3 flex justify-between items-center rounded-t-md hover:bg-indigo-100';
+                headerDiv.innerHTML = `<h4 class="font-medium text-indigo-700">${industry}</h4>
+                                       <span class="accordion-arrow text-indigo-700">&#9662;</span>`;
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'accordion-content px-3 pb-3 border-t border-gray-200 rounded-b-md';
+                contentDiv.innerHTML = `<ul class="list-disc pl-5 space-y-1 text-gray-700">${industryBrainstormIdeas[industry].map(idea => `<li>${idea}</li>`).join('')}</ul>`;
+                
+                headerDiv.onclick = () => {
+                    itemDiv.classList.toggle('open');
+                };
+                
+                itemDiv.appendChild(headerDiv);
+                itemDiv.appendChild(contentDiv);
+                container.appendChild(itemDiv);
+            });
+        }
+
+        function showScenarioApproach(approachId) {
+            document.querySelectorAll('.scenario-content-block').forEach(block => block.classList.add('hidden'));
+            document.getElementById(approachId + 'Content').classList.remove('hidden');
+            document.querySelectorAll('#applyDa .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn' + approachId.charAt(0).toUpperCase() + approachId.slice(1)).classList.add('active');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            populateBusinessFunctions();
+            showEvolutionStage('bi'); // Default active for evolution
+            populateIndustryBrainstorm();
+            showScenarioApproach('withoutDA'); // Default active for scenario
+            showSection('overview'); // Default initial section
+        });
+    </script>
+</body>
+</html>

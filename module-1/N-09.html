@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to N-S9: Operational Analytics & HR/Healthcare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Visualization & Content Choices:
+        - Overview Section: Text introduction. Goal: Inform. Method: HTML text. Justification: Sets the context for the session.
+        - Operational Analytics (Inventory Optimization):
+            - Introduction, Challenge, Goal: HTML text. Goal: Inform.
+            - How DA Drives Optimization: Accordion for each technique (Demand Forecasting, Lead Time Analysis, Safety Stock, Reorder Points, Segmentation, Supplier Performance). Goal: Explain, Organize. Method: HTML, JS for accordion. Interaction: Click to expand. Justification: Breaks down complex processes.
+            - Impact: HTML text. Goal: Inform.
+        - HR Analytics:
+            - Introduction: HTML text. Goal: Inform.
+            - Talent Analytics Applications: Accordion for each application (Recruitment, Retention, Performance, Workforce Planning, DEI). Goal: Explain, Organize. Method: HTML, JS for accordion. Interaction: Click to expand. Justification: Structured presentation of diverse HR applications.
+            - Impact: HTML text. Goal: Inform.
+        - Healthcare Analytics:
+            - Introduction: HTML text. Goal: Inform.
+            - Applications: Accordion for each application (Patient Outcomes, Disease Prediction, Hospital Ops, Drug Discovery, Fraud). Goal: Explain, Organize. Method: HTML, JS for accordion. Interaction: Click to expand. Justification: Organizes varied healthcare DA uses.
+            - Impact: HTML text. Goal: Inform.
+        - Practical Activities:
+            - Tool Demo (Inventory Optimization): Text describing the conceptual steps. Goal: Inform on practical application.
+            - Group Activity Prep: Text describing the task, guiding questions, and examples. Goal: Inform on upcoming activity.
+        - NO SVG graphics used. NO Mermaid JS used. Chart.js/Plotly.js are not used as the N-S9 content is primarily conceptual and textual explanations of applications and activities (external Excel/Python work), not direct data visualization within the SPA itself. All visual elements are handled through HTML/CSS/Tailwind.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #0d9488; /* indigo-600 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3), 0 2px 4px -1px rgba(13, 148, 136, 0.2);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-item.open .accordion-content {
+            max-height: fit-content; /* Adjust dynamically with JS */
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800 leading-relaxed">
+
+    <header class="bg-indigo-700 text-white p-6 shadow-lg">
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold text-center">Interactive Guide to N-S9: Operational Analytics & HR/Healthcare</h1>
+            <p class="text-center text-indigo-100 mt-1">Deep Dives: Optimizing Operations & Empowering People</p>
+        </div>
+    </header>
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto flex flex-wrap justify-center space-x-2 sm:space-x-4 p-3">
+            <button class="nav-button active text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="overview">Overview</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="operational-analytics">Operational Analytics</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="hr-analytics">HR Analytics</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="healthcare-analytics">Healthcare Analytics</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="practical-activities">Practical Activities</button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <section id="overview" class="content-section active bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Overview: Deep Dive into Operational Analytics & HR/Healthcare</h2>
+            <p class="mb-4">Welcome to this interactive guide for N-S9. This session provides a deeper understanding of a key operational analytics concept—**Inventory Optimization**—and introduces the transformative applications of Data Analytics in **Human Resources** and **Healthcare**. We'll explore how DA drives efficiency, empowers people, and improves critical services in these diverse domains.</p>
+            <p>This guide will break down complex applications into digestible sections, allowing you to explore specific techniques and their impacts. You'll also find details on upcoming practical activities. Use the navigation above to explore each topic in detail.</p>
+        </section>
+
+        <section id="operational-analytics" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Deep Dive into Operational Analytics: Inventory Optimization</h2>
+            <p class="mb-6">Inventory optimization is a prime example of operational analytics, aiming to find the "just right" balance of stock to meet demand without excessive costs or stockouts.</p>
+            
+            <div class="space-y-4">
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 rounded-t-md font-medium text-indigo-700 flex justify-between items-center">
+                        The Challenge & Goal of Inventory
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700">For many businesses (retail, manufacturing, e-commerce), inventory is a double-edged sword:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li><strong>Too much inventory:</strong> Ties up capital, incurs storage costs, risks obsolescence, and can lead to waste.</li>
+                            <li><strong>Too little inventory (stockouts):</strong> Leads to lost sales, frustrated customers, and potential damage to brand reputation.</li>
+                        </ul>
+                        <p class="mt-2 text-stone-700">The goal of Inventory Optimization is to find the "just right" balance – having enough stock to meet customer demand without holding excessive quantities, thereby minimizing costs and maximizing customer satisfaction.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        How Data Analytics Drives Inventory Optimization
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300 space-y-3">
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>1. Accurate Demand Forecasting:</strong> Uses historical sales, promotions, seasonality, economic indicators, and external factors (weather, social media trends) to predict future demand for each product.</li>
+                            <li><strong>2. Lead Time Analysis:</strong> Analyzes the time it takes for suppliers to deliver goods, identifying variations and uncertainties for realistic planning.</li>
+                            <li><strong>3. Safety Stock Calculation:</strong> Determines the optimal "safety stock" (extra inventory) to guard against unexpected demand spikes or supply delays, based on demand and lead time variability.</li>
+                            <li><strong>4. Optimal Reorder Points & Quantities:</strong> Algorithms calculate when to reorder and how much to order to minimize holding and ordering costs, based on forecasted demand, lead times, and safety stock.</li>
+                            <li><strong>5. Inventory Segmentation:</strong> Classifies inventory based on sales velocity, profitability, and demand variability (e.g., A/B/C classification) for differentiated management strategies.</li>
+                            <li><strong>6. Supplier Performance Monitoring:</strong> Continuously analyzes supplier reliability (on-time delivery, quality) to factor into ordering decisions and identify supply chain risks.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Impact of DA in Inventory Optimization
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="text-stone-700">Data Analytics in inventory optimization leads to significant cost reductions, minimizes stockouts, improves cash flow, enhances supply chain responsiveness, and ultimately boosts profitability and customer satisfaction.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="hr-analytics" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Data Analytics in Human Resources (HR): Unleashing People Potential</h2>
+            <p class="mb-6">HR is a rich area for Data Analytics, often referred to as **Talent Analytics** or **People Analytics**. It involves applying DA to HR data to improve decision-making related to recruitment, retention, performance, and workforce planning.</p>
+            
+            <div class="space-y-4">
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 rounded-t-md font-medium text-indigo-700 flex justify-between items-center">
+                        Key Applications of Talent Analytics
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300 space-y-3">
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>Recruitment Optimization:</strong> Analyzing data from job applications, interviews, and onboarding to identify the most effective sourcing channels, predict candidate success, and reduce time-to-hire.</li>
+                            <li><strong>Employee Retention & Churn Prediction:</strong> Identifying factors that contribute to employee turnover (e.g., compensation, manager quality, workload, career development opportunities). DA models can predict which employees are at risk of leaving, allowing HR to intervene proactively.</li>
+                            <li><strong>Performance Management:</strong> Analyzing performance review data, training completion, and project success rates to identify high-performing teams, skill gaps, and the effectiveness of training programs.</li>
+                            <li><strong>Workforce Planning:</strong> Forecasting future talent needs based on business growth projections, attrition rates, and skill requirements, ensuring the organization has the right people with the right skills at the right time.</li>
+                            <li><strong>Diversity, Equity, and Inclusion (DEI):</strong> Analyzing demographic data to identify biases in hiring, promotion, or compensation, and to measure the effectiveness of DEI initiatives.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Impact of DA in HR
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="text-stone-700">Data Analytics in HR improves hiring quality, reduces employee turnover costs, boosts employee engagement and productivity, and ensures strategic alignment of the workforce with business objectives.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="healthcare-analytics" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Data Analytics in Healthcare: Improving Patient Outcomes and Efficiency</h2>
+            <p class="mb-6">Data Analytics is transforming the healthcare sector by improving patient care, optimizing operations, and accelerating medical research.</p>
+            
+            <div class="space-y-4">
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 rounded-t-md font-medium text-indigo-700 flex justify-between items-center">
+                        Key Applications of DA in Healthcare
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300 space-y-3">
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>Patient Outcomes & Predictive Diagnostics:</strong> Analyzing patient data (medical history, lab results, imaging, genomics) to predict disease onset, progression, or response to treatments, enabling earlier intervention and personalized medicine.</li>
+                            <li><strong>Disease Prediction & Epidemiology:</strong> Analyzing population health data to identify patterns in disease outbreaks, predict their spread, and inform public health interventions.</li>
+                            <li><strong>Hospital Operations Optimization:</strong> Improving efficiency within healthcare facilities by optimizing patient flow, scheduling appointments, managing bed availability, and allocating staff resources, reducing wait times.</li>
+                            <li><strong>Drug Discovery & Development:</strong> Analyzing complex biological and chemical data to accelerate the discovery of new drugs and understand their efficacy and side effects.</li>
+                            <li><strong>Fraud, Waste, and Abuse Detection:</strong> Identifying fraudulent claims or wasteful spending patterns within healthcare systems to ensure resources are used effectively.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Impact of DA in Healthcare
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="text-stone-700">Data Analytics in healthcare leads to better patient care, more efficient healthcare delivery, reduced costs, and significant advancements in medical research and public health.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="practical-activities" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Practical Activities: Tool Demo & Group Activity Prep</h2>
+            <p class="mb-6">This section outlines the practical activities for the session, including a conceptual demonstration of inventory optimization and preparation for an upcoming group activity.</p>
+
+            <h3 class="text-xl font-semibold text-indigo-600 mb-3">Tool Demo (Conceptual): Simple Inventory Optimization Example</h3>
+            <p class="mb-4 text-stone-700">This demonstration aims to illustrate the theoretical concepts of inventory optimization with a practical, albeit simplified, example using historical sales data. Imagine a small bakery needing to decide how many loaves of popular bread to bake daily to minimize waste and lost sales.</p>
+            <p class="font-semibold text-stone-700 mb-2">Conceptual Demo Steps (using Excel/Python):</p>
+            <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                <li><strong>Data Setup:</strong> Show a simple dataset with columns like `Date`, `Daily Sales (Loaves)`, `Promotions (Yes/No)`, `Day of Week`.</li>
+                <li><strong>Basic Statistics:</strong> Calculate `Average`, `Median`, `Max`, `Min` for `Daily Sales`.</li>
+                <li><strong>Visualization:</strong> Create a simple line chart of `Daily Sales` over time to visualize trends or seasonality.</li>
+                <li><strong>Simple Analysis:</strong> Use basic functions (e.g., `AVERAGEIF` in Excel or `groupby` in Python Pandas) to see if sales are higher on weekends or during promotions.</li>
+                <li><strong>Conceptual Discussion:</strong> Discuss how this basic analysis, along with a buffer (safety stock), could inform daily baking decisions.</li>
+            </ul>
+            <p class="mt-4 p-3 bg-indigo-50 border-l-4 border-indigo-600 text-indigo-700 rounded-md">
+                <strong>Key Learning:</strong> Even simple historical data and basic analytical techniques can provide valuable insights for operational decisions like inventory management, laying the groundwork for more complex forecasting.
+            </p>
+
+            <h3 class="text-xl font-semibold text-indigo-600 mt-8 mb-3">Group Activity Prep: Pick an Industry and Brainstorm DA Applications</h3>
+            <p class="mb-4 text-stone-700">This activity serves as preparation for the Group Presentations in N-S10. Your task is to:</p>
+            <ul class="list-disc list-inside ml-4 space-y-2 text-stone-700">
+                <li><strong>1. Choose one industry</strong> that we haven't extensively covered as a primary example today (e.g., Education, Hospitality, Sports, Government, Non-profit, Real Estate, or a specific niche like 'Fashion Retail').</li>
+                <li><strong>2. Brainstorm at least two distinct Data Analytics applications</strong> within that chosen industry.</li>
+                <li><strong>3. For each application, be prepared to briefly explain:</strong>
+                    <ul class="list-circle list-inside ml-6 space-y-1">
+                        <li>The business problem it addresses.</li>
+                        <li>How DA would be applied (conceptually).</li>
+                        <li>The business value/impact of using DA for this application.</li>
+                    </ul>
+                </li>
+            </ul>
+            <p class="font-semibold text-stone-700 mt-4 mb-2">Examples of potential ideas (for inspiration):</p>
+            <ul class="list-disc list-inside ml-4 space-y-2 text-stone-700">
+                <li><strong>Education:</strong>
+                    <ul class="list-circle list-inside ml-6 space-y-1">
+                        <li>*Student Performance Prediction:* Identify students at risk of falling behind to provide early intervention.</li>
+                        <li>*Course Curriculum Optimization:* Analyze student enrollment, job market demand, and alumni success to design relevant courses.</li>
+                    </ul>
+                </li>
+                <li><strong>Hospitality (Hotels):</strong>
+                    <ul class="list-circle list-inside ml-6 space-y-1">
+                        <li>*Dynamic Room Pricing:* Adjust room rates in real-time based on demand, competitor pricing, and seasonality.</li>
+                        <li>*Guest Experience Personalization:* Tailor recommendations for services or offers based on guest preferences and past stays.</li>
+                    </ul>
+                </li>
+            </ul>
+            <p class="mt-4 p-3 bg-indigo-50 border-l-4 border-indigo-600 text-indigo-700 rounded-md">
+                <strong>Purpose:</strong> This activity allows you to apply your understanding of DA's business impact to specific industries and prepare for your presentation in the next session.
+            </p>
+        </section>
+    </main>
+
+    <footer class="bg-indigo-800 text-indigo-100 text-center p-4 mt-auto">
+        <div class="flex flex-col items-center justify-center">
+            <img src="../faceprep-logo.png" alt="FACE Prep Campus Logo" class="h-10 mb-2">
+            <p>Copyright: FACE Prep Campus, 2025</p>
+        </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const contentSections = document.querySelectorAll('.content-section');
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            function showSection(targetId) {
+                contentSections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                navButtons.forEach(button => {
+                    if (button.dataset.target === targetId) {
+                        button.classList.add('active', 'bg-indigo-600', 'text-white');
+                        button.classList.remove('text-indigo-700', 'hover:bg-indigo-50');
+                    } else {
+                        button.classList.remove('active', 'bg-indigo-600', 'text-white');
+                        button.classList.add('text-indigo-700', 'hover:bg-indigo-50');
+                    }
+                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    showSection(this.dataset.target);
+                });
+            });
+
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', function () {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('span');
+                    
+                    // Close other open accordions in the same group
+                    const parentSection = this.closest('section');
+                    parentSection.querySelectorAll('.accordion-item.open').forEach(openItem => {
+                        if (openItem !== this.parentElement) {
+                            const openContent = openItem.querySelector('.accordion-content');
+                            const openIcon = openItem.querySelector('.accordion-header span');
+                            openContent.style.maxHeight = null;
+                            openIcon.style.transform = 'rotate(0deg)';
+                            openItem.classList.remove('open');
+                        }
+                    });
+
+                    // Toggle the clicked accordion
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                        this.parentElement.classList.remove('open');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.style.transform = 'rotate(180deg)';
+                        this.parentElement.classList.add('open');
+                    }
+                });
+            });
+            
+            // Activate the first section by default
+            showSection('overview');
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to N-S11: Descriptive Analytics in Depth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Visualization & Content Choices:
+        - Overview Section: Text introduction. Goal: Inform. Method: HTML text. Justification: Sets the foundational context for descriptive analytics.
+        - Purpose & Techniques Section:
+            - Purpose: Text explanation. Goal: Inform. Method: HTML text.
+            - Common Techniques: Accordion for each (Data Aggregation, Reporting, Dashboards, Basic Data Visualization). Content within each accordion will be detailed text. Goal: Organize/Inform. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Breaks down complex topics, improves readability.
+        - Typical Questions Answered Section:
+            - Accordion for the list of questions, categorized by business function. Goal: Inform, Illustrate. Method: HTML, JS for accordion. Justification: Provides clear examples of descriptive questions.
+        - Practical Activities Section:
+            - Classify Business Questions: Questions presented as clickable buttons. On click, reveal detailed text explanation (classification, why, data needed). Goal: Inform, Engage, Test Understanding. Method: HTML, JS for click reveal. Interaction: Click to toggle visibility. Justification: Interactive learning and immediate feedback, mimicking the in-class activity.
+            - Tool Demo (Excel): Text explaining the conceptual steps for creating charts. Goal: Inform on practical application. Method: HTML text. Justification: Describes the external demo.
+        - NO SVG graphics used. NO Mermaid JS used. Chart.js/Plotly.js are not used as the N-S11 content is primarily conceptual and descriptive of activities (external Excel work) and theoretical explanations, not direct data visualization within the SPA itself. All visual elements are handled through HTML/CSS/Tailwind.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #0d9488; /* indigo-600 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3), 0 2px 4px -1px rgba(13, 148, 136, 0.2);
+        }
+        .accordion-content, .question-explanation {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-item.open .accordion-content, .question-item.open .question-explanation {
+            max-height: fit-content; /* Adjust dynamically with JS */
+        }
+        .question-explanation {
+            background-color: #f0fdfa; /* indigo-50 */
+            border-left: 4px solid #0d9488; /* indigo-600 */
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800 leading-relaxed">
+
+    <header class="bg-indigo-700 text-white p-6 shadow-lg">
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold text-center">Interactive Guide to N-S11: Descriptive Analytics in Depth</h1>
+            <p class="text-center text-indigo-100 mt-1">Understanding the Past: Concepts, Techniques & Tools</p>
+        </div>
+    </header>
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto flex flex-wrap justify-center space-x-2 sm:space-x-4 p-3">
+            <button class="nav-button active text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="overview">Overview</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="purpose-techniques">Purpose & Techniques</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="typical-questions">Typical Questions</button>
+            <button class="nav-button text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 rounded-md font-medium text-indigo-700 hover:bg-indigo-50" data-target="practical-activities">Practical Activities</button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <section id="overview" class="content-section active bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Overview: Descriptive Analytics in Depth</h2>
+            <p class="mb-4">Welcome to this interactive guide for N-S11. In our previous session, we introduced the three types of analytics, with Descriptive Analytics as the foundational layer, answering "what happened." This session delves deeper into Descriptive Analytics, exploring its core purpose, common techniques, and the types of business questions it effectively addresses.</p>
+            <p>Understanding descriptive analytics is crucial for anyone working with data, as it forms the bedrock for all more advanced analyses. This guide will provide detailed explanations and interactive elements to solidify your grasp of these fundamental concepts. Use the navigation above to explore each topic in detail.</p>
+        </section>
+
+        <section id="purpose-techniques" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Purpose & Common Techniques of Descriptive Analytics</h2>
+            <p class="mb-6">Descriptive Analytics is the bedrock of any data-driven strategy. Its primary function is to summarize and describe historical data to understand past events and current situations. Before we can predict or prescribe, we must first clearly understand our current and past state.</p>
+            
+            <div class="space-y-4">
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 rounded-t-md font-medium text-indigo-700 flex justify-between items-center">
+                        Core Purpose of Descriptive Analytics
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li><strong>Summarization:</strong> Condensing large volumes of raw data into digestible, meaningful summaries.</li>
+                            <li><strong>Pattern Identification:</strong> Uncovering recurring trends, cycles, or anomalies within historical data.</li>
+                            <li><strong>Performance Monitoring:</strong> Tracking Key Performance Indicators (KPIs) over time to assess business health.</li>
+                            <li><strong>Contextualization:</strong> Providing the necessary context for more advanced analytics.</li>
+                            <li><strong>Communication:</strong> Presenting complex data in an understandable format to stakeholders.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Common Technique 1: Data Aggregation
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700">This involves collecting and summarizing data from various sources into a single, comprehensive format. It's the process of turning raw, granular data points into meaningful summaries.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Examples:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Calculating the <strong>sum</strong> of sales for a product line over a quarter.</li>
+                            <li>Determining the <strong>average</strong> customer age in a segment.</li>
+                            <li>Counting the <strong>number</strong> of website visitors from a region.</li>
+                            <li>Finding the <strong>maximum</strong> and <strong>minimum</strong> values for a given metric.</li>
+                        </ul>
+                        <p class="mt-2 text-sm italic"><strong>Importance:</strong> Aggregation reduces complexity and highlights overall trends, making large datasets manageable and interpretable.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Common Technique 2: Reporting
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700">The structured presentation of aggregated and summarized data. Reports can be static (e.g., a PDF) or dynamic.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Characteristics:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Typically focuses on a predefined set of metrics.</li>
+                            <li>Often generated regularly (daily, weekly, monthly).</li>
+                            <li>Answers specific, recurring business questions.</li>
+                        </ul>
+                        <p class="font-semibold text-stone-700 mt-2 mb-1">Examples:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Monthly sales reports.</li>
+                            <li>Quarterly financial statements.</li>
+                            <li>Weekly website traffic reports.</li>
+                        </ul>
+                        <p class="mt-2 text-sm italic"><strong>Value:</strong> Provides a consistent view of performance over time, essential for tracking progress against targets.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Common Technique 3: Dashboards
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700">Interactive visual displays that consolidate and present key metrics and information in an easily digestible format. Designed for quick monitoring and exploration.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Characteristics:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Often real-time or near real-time.</li>
+                            <li>Highly visual and interactive (allowing users to filter, drill down).</li>
+                        </ul>
+                        <p class="font-semibold text-stone-700 mt-2 mb-1">Components:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Charts, graphs, gauges, tables, scorecards.</li>
+                        </ul>
+                        <p class="font-semibold text-stone-700 mt-2 mb-1">Examples:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>Sales performance dashboards.</li>
+                            <li>Marketing campaign dashboards.</li>
+                            <li>Operational efficiency dashboards.</li>
+                        </ul>
+                        <p class="mt-2 text-sm italic"><strong>Value:</strong> Enables rapid identification of trends, anomalies, and performance gaps, empowering timely, informed decisions.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Common Technique 4: Basic Data Visualization
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <p class="mb-2 text-stone-700">The graphical representation of data to make it easier to understand and interpret patterns, trends, and outliers.</p>
+                        <p class="font-semibold text-stone-700 mb-1">Common Chart Types:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li><strong>Bar Charts:</strong> Comparing discrete categories (e.g., sales by product category).</li>
+                            <li><strong>Line Graphs:</strong> Showing trends over time (e.g., website traffic over months).</li>
+                            <li><strong>Pie Charts:</strong> Displaying parts of a whole (use sparingly, as they can be misleading for comparison).</li>
+                            <li><strong>Scatter Plots:</strong> Showing relationships between two numerical variables (e.g., marketing spend vs. sales).</li>
+                        </ul>
+                        <p class="mt-2 text-sm italic"><strong>Value:</strong> Makes data accessible and understandable, revealing insights that might be hidden in raw numbers.</p>
+                    </div>
+                </div>
+            </div>
+            <p class="mt-6 p-3 bg-orange-50 border-l-4 border-orange-500 text-orange-700 rounded-md">
+                <strong>Limitations:</strong> While foundational, descriptive analytics only tells you *what* happened. It doesn't explain *why* it happened, nor does it predict *what will happen* or *what you should do*. These require more advanced analytical techniques.
+            </p>
+        </section>
+
+        <section id="typical-questions" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Typical Business Questions Answered by Descriptive Analytics</h2>
+            <p class="mb-6">Descriptive analytics provides crucial insights across various business functions. Here are examples of questions it can answer:</p>
+            
+            <div class="space-y-4">
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 rounded-t-md font-medium text-indigo-700 flex justify-between items-center">
+                        Sales & Marketing Questions
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>What were our total sales revenue and profit last quarter?</li>
+                            <li>Which product categories generated the most revenue last month?</li>
+                            <li>How many new customers did we acquire last year, and from which channels?</li>
+                            <li>What is the average order value of our online customers?</li>
+                            <li>Which marketing campaigns had the highest click-through rates?</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Finance Questions
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>What are our current expenses broken down by department?</li>
+                            <li>How has our cash flow changed over the past six months?</li>
+                            <li>What is the average outstanding balance of our accounts receivable?</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Operations & Supply Chain Questions
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>How many units did our factory produce last week?</li>
+                            <li>What is the average delivery time for our products?</li>
+                            <li>Which suppliers had the most on-time deliveries last quarter?</li>
+                            <li>What is our current inventory level for Product X?</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Human Resources Questions
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>What is our employee turnover rate for the past year?</li>
+                            <li>What is the average tenure of employees in different departments?</li>
+                            <li>How many employees completed mandatory training last quarter?</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item border border-stone-300 rounded-md">
+                    <button class="accordion-header w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        Customer Service Questions
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-300">
+                        <ul class="list-disc list-inside ml-4 space-y-1 text-stone-700">
+                            <li>What is the average call handling time for our support agents?</li>
+                            <li>What are the most common types of customer complaints?</li>
+                            <li>What is our average customer satisfaction (CSAT) score?</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="practical-activities" class="content-section bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Practical Activities: Classify & Tool Demo</h2>
+            <p class="mb-6">This section outlines two practical activities: classifying business questions to reinforce descriptive analytics understanding, and a conceptual demonstration of creating simple descriptive charts in Excel.</p>
+
+            <h3 class="text-xl font-semibold text-indigo-600 mb-3">Activity: Classify Business Questions as Descriptive</h3>
+            <p class="mb-4">For each question below, determine if it can be answered primarily using *Descriptive Analytics*. Click on the question to reveal the classification and explanation.</p>
+            
+            <div class="space-y-4">
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        1. What was our total revenue from online sales in the last fiscal year?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q1-exp-practical">
+                        <p><strong>Classification:</strong> Descriptive.</p>
+                        <p><strong>Why:</strong> It summarizes a past event (revenue) over a defined period. It answers "what happened."</p>
+                        <p><strong>Data Needed:</strong> Historical sales transaction data, categorized by sales channel and fiscal year.</p>
+                    </div>
+                </div>
+
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        2. Which marketing channel yielded the highest return on investment (ROI) last quarter?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q2-exp-practical">
+                        <p><strong>Classification:</strong> Descriptive.</p>
+                        <p><strong>Why:</strong> It analyzes past performance data (marketing spend and associated revenue/conversions) to describe which channel was most effective historically. It answers "what happened."</p>
+                        <p><strong>Data Needed:</strong> Marketing campaign spend data by channel, revenue/conversion data attributed to each channel for the last quarter.</p>
+                    </div>
+                </div>
+
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        3. Will our customer churn rate increase next month?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q3-exp-practical">
+                        <p><strong>Classification:</strong> Not Descriptive (Predictive).</p>
+                        <p><strong>Why:</strong> It asks about a future outcome or probability. It answers "what could happen."</p>
+                        <p><strong>Data Needed:</strong> Historical customer churn data, customer behavior data, demographic data, market trends.</p>
+                    </div>
+                </div>
+
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        4. What is the average customer satisfaction score for our new product line?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q4-exp-practical">
+                        <p><strong>Classification:</strong> Descriptive.</p>
+                        <p><strong>Why:</strong> It summarizes a past or current metric (satisfaction score) for a specific product. It answers "what is happening."</p>
+                        <p><strong>Data Needed:</strong> Customer survey responses, product reviews, or customer service interaction ratings for the new product line.</p>
+                    </div>
+                </div>
+
+                <div class="question-item border border-stone-300 rounded-md">
+                    <button class="question-button w-full text-left p-4 bg-stone-50 hover:bg-stone-200 font-medium text-indigo-700 flex justify-between items-center">
+                        5. How can we optimize our supply chain to reduce delivery times by 15%?
+                        <span class="transform transition-transform duration-300 ">▼</span>
+                    </button>
+                    <div class="question-explanation" id="q5-exp-practical">
+                        <p><strong>Classification:</strong> Not Descriptive (Prescriptive).</p>
+                        <p><strong>Why:</strong> It asks for an optimal action or recommendation to achieve a specific future goal. It answers "what should we do."</p>
+                        <p><strong>Data Needed:</strong> Historical delivery times, route data, warehouse locations, traffic data, operational costs, and potentially predictive models for traffic/demand.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold text-indigo-600 mt-8 mb-3">Tool Demo (Conceptual): Creating Simple Descriptive Charts in Excel</h3>
+            <p class="mb-4">While this guide is interactive, the actual Excel demo is an external activity. Here, we outline the conceptual steps for using Excel, a widely accessible tool, to perform basic descriptive analytics and create visualizations from a small, clean sales dataset.</p>
+            <div class="space-y-4 text-stone-700">
+                <div>
+                    <h4 class="font-semibold text-lg text-indigo-700 mb-2">Conceptual Steps for Excel Demo:</h4>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li><strong>Data Overview:</strong> Open the Excel file. Understand columns (`Date`, `Product Category`, `Region`, `Sales Amount`, `Units Sold`). Use basic functions like `SUM`, `AVERAGE`, `COUNT` for quick summaries.</li>
+                        <li><strong>Creating a Bar Chart (Sales by Product Category):</strong>
+                            <ul class="list-circle list-inside ml-6">
+                                <li>Select `Product Category` and `Sales Amount` columns.</li>
+                                <li>Go to `Insert` &rarr; `Recommended Charts` or `Bar Chart`.</li>
+                                <li>Add chart title, axis labels, and data labels.</li>
+                                <li><strong>Interpretation:</strong> Observe which categories have the highest/lowest sales.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Creating a Line Graph (Sales Trend Over Time):</strong>
+                            <ul class="list-circle list-inside ml-6">
+                                <li>Select `Date` and `Sales Amount` columns.</li>
+                                <li>Go to `Insert` &rarr; `Line Chart`.</li>
+                                <li>Format axes for dates.</li>
+                                <li><strong>Interpretation:</strong> Identify trends (upward/downward), seasonality, or significant fluctuations over time.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Creating a Pie Chart (Sales Distribution by Region - *with caution*):</strong>
+                            <ul class="list-circle list-inside ml-6">
+                                <li>Select `Region` and `Sales Amount` columns.</li>
+                                <li>Go to `Insert` &rarr; `Pie Chart`.</li>
+                                <li><strong>Important Note:</strong> Remember the limitations of pie charts for comparing many segments. Bar charts are often better for this.</li>
+                                <li><strong>Interpretation:</strong> Understand the proportion of sales contributed by each region.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Bonus (Conceptual): Using PivotTables for Aggregation:</strong> Briefly explain how PivotTables can quickly aggregate data (e.g., `Sales Amount` by `Region` and `Product Category`) and change aggregation types (sum, average).</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="mt-6 p-3 bg-indigo-50 border-l-4 border-indigo-600 text-indigo-700 rounded-md">
+                <strong>Key Takeaway:</strong> Excel is a powerful and accessible tool for basic descriptive analytics and visualization. Understanding how to use these fundamental features is crucial for any aspiring data analyst to quickly extract and communicate insights from data.
+            </p>
+        </section>
+    </main>
+
+    <footer class="bg-indigo-800 text-indigo-100 text-center p-4 mt-auto">
+    <div class="flex flex-col items-center justify-center">
+        <img src="../faceprep-logo.png" alt="FACE Prep Campus Logo" class="h-10 mb-2">
+        <p>Copyright: FACE Prep Campus, 2025</p>
+    </div>
+</footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const contentSections = document.querySelectorAll('.content-section');
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            const questionButtons = document.querySelectorAll('.question-button');
+
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            function showSection(targetId) {
+                contentSections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                navButtons.forEach(button => {
+                    if (button.dataset.target === targetId) {
+                        button.classList.add('active', 'bg-indigo-600', 'text-white');
+                        button.classList.remove('text-indigo-700', 'hover:bg-indigo-50');
+                    } else {
+                        button.classList.remove('active', 'bg-indigo-600', 'text-white');
+                        button.classList.add('text-indigo-700', 'hover:bg-indigo-50');
+                    }
+                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    showSection(this.dataset.target);
+                });
+            });
+
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', function () {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('span');
+                    
+                    // Close other open accordions in the same group
+                    const parentSection = this.closest('section');
+                    parentSection.querySelectorAll('.accordion-item.open').forEach(openItem => {
+                        if (openItem !== this.parentElement) {
+                            const openContent = openItem.querySelector('.accordion-content');
+                            const openIcon = openItem.querySelector('.accordion-header span');
+                            openContent.style.maxHeight = null;
+                            openIcon.style.transform = 'rotate(0deg)';
+                            openItem.classList.remove('open');
+                        }
+                    });
+
+                    // Toggle the clicked accordion
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                        this.parentElement.classList.remove('open');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.style.transform = 'rotate(180deg)';
+                        this.parentElement.classList.add('open');
+                    }
+                });
+            });
+
+            questionButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const explanation = this.nextElementSibling;
+                    const icon = this.querySelector('span');
+                    
+                    // Close other open explanations in the same section
+                    const parentSection = this.closest('section');
+                    parentSection.querySelectorAll('.question-item.open .question-explanation').forEach(exp => {
+                        if (exp !== explanation) {
+                            exp.style.maxHeight = null;
+                            exp.previousElementSibling.querySelector('span').style.transform = 'rotate(0deg)';
+                            exp.parentElement.classList.remove('open');
+                        }
+                    });
+
+                    // Toggle the clicked explanation
+                    if (explanation.style.maxHeight) {
+                        explanation.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                        this.parentElement.classList.remove('open');
+                    } else {
+                        explanation.style.display = 'block'; // Ensure it's block for scrollHeight
+                        explanation.style.maxHeight = explanation.scrollHeight + "px";
+                        icon.style.transform = 'rotate(180deg)';
+                        this.parentElement.classList.add('open');
+                    }
+                });
+            });
+            
+            // Activate the first section by default
+            showSection('overview');
+        });
+    </script>
+
+</body>
+</html>

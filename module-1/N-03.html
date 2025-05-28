@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S3: DA for Strategic & Operational Decision Support</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices: 
+        - Overview: Report Info: Session objective. Goal: Inform. Viz/Method: HTML/Tailwind text.
+        - Decision Types: Report Info: Definitions & Interplay. Goal: Inform. Viz/Method: HTML/Tailwind styled text blocks, interactive toggle/tabs for Strategic/Operational comparison.
+        - Key DA Support Areas: Report Info: 4 areas, each with Strat/Op apps, Insights, Implications. Goal: Organize/Inform. Viz/Method: HTML/Tailwind/JS for area selection buttons. Content for each area displayed in formatted text blocks, with accordions for Strat/Op applications. Interaction: Click to select area, click to expand details. Justification: Manages dense information effectively.
+        - Value Proposition: Report Info: Summary of DA's impact. Goal: Inform. Viz/Method: HTML/Tailwind text.
+        - Decision Matrix Activity: Report Info: Instructions & example. Goal: Educate/Guide. Viz/Method: HTML/Tailwind for instructions; example in an expandable accordion.
+        - Analytics Tool Types: Report Info: Spreadsheets, BI, Code (Role, Strengths, Limits). Goal: Inform/Organize. Viz/Method: HTML/Tailwind/JS accordion for each tool type. Interaction: Click to expand/collapse. Justification: Clear comparison of tools.
+        CONFIRMATION: No charts used (Chart.js/Plotly.js not needed as report is conceptual/textual).
+     -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 2px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-button { background-color: #E0E7FF; color: #4338CA; border: 1px solid #C7D2FE; }
+        .tab-button.active { background-color: #4338CA; color: white; }
+        .tab-button:hover:not(.active) { background-color: #C7D2FE; }
+        .accordion-header { cursor: pointer; user-select: none; }
+        .accordion-content { display: none; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; }
+        .accordion-item.open .accordion-content { display: block; max-height: 2000px; /* Adjust as needed */ padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .accordion-arrow { transition: transform 0.3s ease; }
+        .accordion-item.open .accordion-arrow { transform: rotate(180deg); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-3xl font-bold text-center text-indigo-700">N-S3: DA for Strategic & Operational Decision Support</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><button onclick="showSection('overview')" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">Overview</button></li>
+                    <li><button onclick="showSection('decisionTypes')" class="nav-button text-sm sm:text-base font-medium py-2 px-3">Decision Types</button></li>
+                    <li><button onclick="showSection('daSupportAreas')" class="nav-button text-sm sm:text-base font-medium py-2 px-3">DA Support Areas</button></li>
+                    <li><button onclick="showSection('valueProposition')" class="nav-button text-sm sm:text-base font-medium py-2 px-3">Value Proposition</button></li>
+                    <li><button onclick="showSection('decisionMatrixActivity')" class="nav-button text-sm sm:text-base font-medium py-2 px-3">Decision Matrix</button></li>
+                    <li><button onclick="showSection('toolTypes')" class="nav-button text-sm sm:text-base font-medium py-2 px-3">Tool Types</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="overview" class="content-section active">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Session Overview</h2>
+            <p class="section-intro">This interactive module explores how Data Analytics (DA) provides crucial support for both strategic and operational decision-making. We will delve into key application areas, understand the types of insights DA offers, and briefly touch upon the tools that enable these analyses. The goal is to equip you with a clear understanding of DA's transformative role in modern organizations.</p>
+        </section>
+
+        <section id="decisionTypes" class="content-section">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Strategic vs. Operational Decisions</h2>
+            <p class="section-intro">Understanding the distinction and interplay between strategic and operational decisions is fundamental to appreciating DA's diverse applications. Explore each type below.</p>
+            
+            <div class="mb-6">
+                <button id="btnStrategic" class="tab-button py-2 px-4 rounded-t-lg active" onclick="showDecisionContent('strategic')">Strategic Decisions</button>
+                <button id="btnOperational" class="tab-button py-2 px-4 rounded-t-lg" onclick="showDecisionContent('operational')">Operational Decisions</button>
+                <button id="btnInterplay" class="tab-button py-2 px-4 rounded-t-lg" onclick="showDecisionContent('interplay')">The Interplay</button>
+            </div>
+
+            <div id="strategicContent" class="decision-content-block bg-white p-6 rounded-b-lg rounded-tr-lg shadow-md">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Strategic Decisions: A Deeper Dive</h3>
+                <p class="mb-3">These are the long-term, high-stakes choices that define an organization's mission, vision, and overall direction. They involve significant resource allocation, set competitive positioning, and often have irreversible consequences.</p>
+                <p class="mb-3">Data Analytics supports strategic decisions by providing a panoramic view of market trends, competitive landscapes, emerging technologies, and potential future scenarios. For instance, deciding to enter a new geographical market, launching a completely new product line, or acquiring another company are strategic moves.</p>
+                <p>DA helps by analyzing market size, customer demographics, competitor performance, regulatory environments, and potential return on investment, moving beyond mere intuition to data-backed foresight.</p>
+            </div>
+            <div id="operationalContent" class="decision-content-block bg-white p-6 rounded-b-lg rounded-tr-lg shadow-md" style="display:none;">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Operational Decisions: A Deeper Dive</h3>
+                <p class="mb-3">In contrast, operational decisions are the day-to-day choices that ensure the smooth and efficient functioning of the business. These are often repetitive, focused on optimizing existing processes, and have a more immediate impact.</p>
+                <p class="mb-3">Examples include managing inventory levels, optimizing staffing schedules, responding to customer service inquiries, or adjusting production lines.</p>
+                <p>Data Analytics is invaluable here for identifying bottlenecks, predicting immediate needs, optimizing resource allocation, and ensuring processes run as efficiently as possible. For example, using DA to predict peak call center times allows for optimal staff scheduling, reducing customer wait times and improving satisfaction.</p>
+            </div>
+            <div id="interplayContent" class="decision-content-block bg-white p-6 rounded-b-lg rounded-tr-lg shadow-md" style="display:none;">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">The Interplay</h3>
+                <p class="mb-3">It's crucial to understand that strategic and operational decisions are not isolated. Strategic decisions often dictate the parameters for operational ones, and insights gained from operational analytics can inform and refine strategic directions.</p>
+                <p>DA acts as a bridge, providing both the high-level intelligence for long-term planning and the granular detail for daily execution, ensuring alignment across all levels of the organization.</p>
+            </div>
+        </section>
+
+        <section id="daSupportAreas" class="content-section">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Key Areas of DA Decision Support</h2>
+            <p class="section-intro">Data Analytics provides powerful decision support across various critical business functions. Select an area below to explore its strategic and operational applications, the insights DA provides, and the implications for businesses.</p>
+            <div id="daAreaButtons" class="flex flex-wrap gap-3 mb-6"></div>
+            <div id="daAreaDetails" class="mt-6 bg-white p-6 rounded-lg shadow-md min-h-[300px]">
+                <p class="text-gray-500 italic">Select a support area above to view details.</p>
+            </div>
+        </section>
+
+        <section id="valueProposition" class="content-section">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-4">The Value Proposition: Transformative Power of DA</h2>
+            <p class="section-intro">Data Analytics fundamentally reshapes how organizations make decisions, leading to tangible benefits and a stronger competitive edge.</p>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <p class="mb-4">Data Analytics fundamentally transforms decision-making. It shifts an organization from a reactive stance, where decisions are made in response to events and often based on intuition or historical precedent, to a proactive, forward-looking approach.</p>
+                <p class="mb-4">The transition from "intuitive" to "evidence-based" means that choices are supported by quantifiable data and rigorous analysis, leading to more objective, defensible, and ultimately more successful outcomes.</p>
+                <p>This transformation translates directly into tangible benefits: enhanced competitive advantage through deeper market understanding, increased profitability through optimized operations and targeted customer engagement, and improved sustainability by mitigating risks and fostering continuous innovation. DA empowers businesses to not just survive but thrive in an increasingly complex and data-rich global economy.</p>
+            </div>
+        </section>
+
+        <section id="decisionMatrixActivity" class="content-section">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Activity: The "Decision Matrix"</h2>
+            <p class="section-intro">This activity helps solidify understanding of how DA supports specific decisions. While designed for pair work, you can use this framework for self-reflection.</p>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Instructions</h3>
+                <p class="mb-2">1. Choose <strong>one</strong> of the four key areas of DA decision support discussed: Customer Understanding, Operational Efficiency, Risk Management, or New Product Development.</p>
+                <p class="mb-2">2. For your chosen area, identify and list <strong>three specific strategic or operational decisions</strong> that Data Analytics can significantly help with.</p>
+                <p class="mb-4">3. For each decision, clearly articulate the <strong>key insights</strong> that Data Analytics would need to provide to make that decision effectively.</p>
+                
+                <div class="accordion-item border border-gray-200 rounded-md">
+                    <div class="accordion-header bg-gray-100 p-3 flex justify-between items-center rounded-t-md hover:bg-gray-200" onclick="toggleAccordion(this.parentElement)">
+                        <h4 class="font-medium text-indigo-600">Show Example (Risk Management)</h4>
+                        <span class="accordion-arrow text-indigo-600">&#9662;</span>
+                    </div>
+                    <div class="accordion-content p-4 border-t border-gray-200 rounded-b-md">
+                        <p class="mb-2"><strong>Area:</strong> Risk Management</p>
+                        <p class="mb-1"><strong>Decision 1 (Strategic):</strong> "Should our bank expand its lending portfolio into a new, high-growth but potentially volatile sector (e.g., fintech startups)?"</p>
+                        <p class="ml-4 mb-2"><em>Needed Insights:</em> Historical default rates in similar sectors, economic indicators for the new sector, regulatory changes, risk profiles of potential borrowers, impact on the bank's overall risk exposure.</p>
+                        
+                        <p class="mb-1"><strong>Decision 2 (Operational):</strong> "Which incoming online transactions should be flagged for immediate human review due to potential fraud?"</p>
+                        <p class="ml-4 mb-2"><em>Needed Insights:</em> Transaction amount, location, frequency, historical spending patterns of the user, common fraud patterns, device information, IP address reputation.</p>
+
+                        <p class="mb-1"><strong>Decision 3 (Operational):</strong> "How often should we perform maintenance on our fleet of delivery vehicles to minimize breakdowns and maximize uptime?"</p>
+                        <p class="ml-4"><em>Needed Insights:</em> Vehicle mileage, age, type, historical breakdown data, sensor data (engine temperature, oil pressure), weather conditions, route intensity.</p>
+                    </div>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">Consider: Why is DA critical for these decisions? What are the consequences of deciding without data? Are there ethical considerations for the data insights needed?</p>
+            </div>
+        </section>
+
+        <section id="toolTypes" class="content-section">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Brief Overview of Different Analytics Tool Types</h2>
+            <p class="section-intro">Understanding the diverse tools available for data analytics is key. The choice depends on the task's complexity, data volume, required analytical depth, and the audience for the insights. Often, a combination of tools is used.</p>
+            <div id="analyticsToolsList" class="space-y-4"></div>
+        </section>
+
+    </main>
+
+    <footer class="bg-indigo-800 text-indigo-100 text-center p-4 mt-auto">
+        <div class="flex flex-col items-center justify-center">
+            <img src="../faceprep-logo.png" alt="FACE Prep Campus Logo" class="h-10 mb-2">
+            <p>Copyright: FACE Prep Campus, 2025</p>
+        </div>
+    </footer>
+
+
+    <script>
+        const daSupportData = {
+            "Customer Understanding & Experience": {
+                strategic: "Define ideal customer profiles, understand customer lifetime value (CLTV), shape CRM strategy, identify unmet needs for product shifts.",
+                operational: "Hyper-personalize marketing, optimize customer service routing, precise churn prediction, effective product recommendations.",
+                insights: "Detailed demographics, purchase history, browsing behavior, multi-touchpoint interactions, sentiment analysis.",
+                implications: "Without DA: Generic marketing, inefficient service, high attrition. With DA: Stronger relationships, higher retention, increased revenue."
+            },
+            "Operational Efficiency & Process Optimization": {
+                strategic: "Redesign supply chains for resilience, optimize global manufacturing for cost, identify large-scale automation opportunities.",
+                operational: "Reduce waste, improve production schedules, optimize logistics routes, manage energy consumption.",
+                insights: "Granular process data, real-time sensor data, production logs, resource utilization metrics, defect rates.",
+                implications: "Without DA: Higher costs, bottlenecks, waste, slow market response. With DA: Lean operations, cost savings, improved quality, agility."
+            },
+            "Risk Management & Fraud Detection": {
+                strategic: "Assess market risks for new ventures, develop cybersecurity strategies, set insurance premiums, adjust loan portfolios based on macro-economic indicators.",
+                operational: "Detect real-time fraudulent transactions, identify credit risks, predict equipment failure.",
+                insights: "Transaction data, historical fraud patterns, credit scores, machine sensor data, security logs.",
+                implications: "Without DA: Reactive risk management, financial losses, reputational damage. With DA: Proactive risk identification, asset protection, business continuity."
+            },
+            "New Product Development & Innovation": {
+                strategic: "Identify market gaps, predict demand for new features/products, assess viability of ideas (e.g., using social media trends, search data).",
+                operational: "A/B test new features, analyze user adoption rates, dynamically optimize pricing.",
+                insights: "Market research, customer feedback, competitor analysis, product usage data, sales trends.",
+                implications: "Without DA: Hit-or-miss product development, costly failures. With DA: Targeted, customer-centric innovation, faster time-to-market, increased profitability."
+            }
+        };
+
+        const analyticsToolsData = [
+            {
+                name: "Spreadsheets (e.g., Microsoft Excel, Google Sheets)",
+                role: "Entry point for data analysis. Good for organizing small-medium datasets, basic calculations, fundamental charts. Used for initial exploration and simple reporting.",
+                strengths: "Universally accessible, intuitive, easy for basic manipulation, quick ad-hoc analysis, good for small team collaboration.",
+                limitations: "Not for large datasets (performance issues), limited automation, version control difficult, prone to manual errors, lacks robust statistical/ML functions."
+            },
+            {
+                name: "Business Intelligence (BI) Tools (e.g., Tableau, Power BI, Qlik Sense)",
+                role: "Designed for interactive data visualization, dashboard creation, reporting. Empowers business users to explore data, monitor KPIs, identify trends without extensive coding.",
+                strengths: "Highly visual, intuitive drag-and-drop, dynamic dashboards, data storytelling, strong data source connectivity, basic data blending.",
+                limitations: "Less flexible for complex data cleaning or advanced stats/ML. Primarily for 'what happened/is happening', less 'why/what will happen'. Custom algorithm development generally not possible."
+            },
+            {
+                name: "Programming Languages (e.g., Python, R)",
+                role: "Workhorses for advanced data manipulation, statistical analysis, ML model development, custom visualizations. Unparalleled flexibility and power for complex tasks.",
+                strengths: "Extremely flexible for large/complex data, extensive libraries (SciPy, Scikit-learn, Matplotlib), full automation of workflows, ideal for research and novel solutions.",
+                limitations: "Steeper learning curve (coding skills needed), initial setup can be more involved, sharing interactive results with non-technical users might require additional tools."
+            }
+        ];
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-button').forEach(button => button.classList.remove('active'));
+            document.querySelector(`.nav-button[onclick="showSection('${sectionId}')"]`).classList.add('active');
+        }
+
+        function showDecisionContent(decisionType) {
+            document.querySelectorAll('.decision-content-block').forEach(block => block.style.display = 'none');
+            document.getElementById(decisionType + 'Content').style.display = 'block';
+            document.querySelectorAll('#decisionTypes .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn' + decisionType.charAt(0).toUpperCase() + decisionType.slice(1)).classList.add('active');
+        }
+
+        function populateDASupportAreas() {
+            const buttonsContainer = document.getElementById('daAreaButtons');
+            const detailsContainer = document.getElementById('daAreaDetails');
+            Object.keys(daSupportData).forEach(areaName => {
+                const button = document.createElement('button');
+                button.className = 'tab-button py-2 px-4 rounded-md text-sm';
+                button.textContent = areaName;
+                button.onclick = () => {
+                    const data = daSupportData[areaName];
+                    detailsContainer.innerHTML = `
+                        <h3 class="text-xl font-semibold text-indigo-500 mb-3">${areaName}</h3>
+                        <div class="space-y-4">
+                            ${createAccordionItemHTML("Strategic Applications", data.strategic, areaName.replace(/\s+/g, '') + "Strategic")}
+                            ${createAccordionItemHTML("Operational Applications", data.operational, areaName.replace(/\s+/g, '') + "Operational")}
+                            <div><h4 class="text-lg font-medium text-gray-700 mt-3 mb-1">Needed Insights:</h4><p class="text-gray-600">${data.insights}</p></div>
+                            <div><h4 class="text-lg font-medium text-gray-700 mt-3 mb-1">Implications:</h4><p class="text-gray-600">${data.implications}</p></div>
+                        </div>
+                    `;
+                    document.querySelectorAll('#daAreaButtons .tab-button').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    // Re-attach event listeners for newly created accordions
+                    detailsContainer.querySelectorAll('.accordion-header').forEach(header => {
+                        header.onclick = () => toggleAccordion(header.parentElement);
+                    });
+                };
+                buttonsContainer.appendChild(button);
+            });
+        }
+
+        function createAccordionItemHTML(title, content, idSuffix) {
+            return `
+                <div class="accordion-item border border-gray-200 rounded-md">
+                    <div class="accordion-header bg-indigo-50 p-3 flex justify-between items-center rounded-t-md hover:bg-indigo-100" id="header-${idSuffix}">
+                        <h4 class="font-medium text-indigo-700">${title}</h4>
+                        <span class="accordion-arrow text-indigo-700">&#9662;</span>
+                    </div>
+                    <div class="accordion-content px-3 pb-3 border-t border-gray-200 rounded-b-md">
+                        <p class="text-gray-600">${content}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function toggleAccordion(itemElement) {
+            itemElement.classList.toggle('open');
+        }
+
+        function populateAnalyticsTools() {
+            const toolsContainer = document.getElementById('analyticsToolsList');
+            analyticsToolsData.forEach(tool => {
+                const toolHTML = `
+                    <div class="accordion-item bg-white shadow rounded-lg">
+                        <div class="accordion-header p-4 flex justify-between items-center hover:bg-gray-50" onclick="toggleAccordion(this.parentElement)">
+                            <h3 class="text-xl font-semibold text-indigo-600">${tool.name}</h3>
+                            <span class="accordion-arrow text-indigo-600 text-2xl">&#9662;</span>
+                        </div>
+                        <div class="accordion-content px-4 pb-4 border-t border-gray-200">
+                            <div class="mt-2">
+                                <h4 class="font-semibold text-gray-700">Role:</h4>
+                                <p class="text-gray-600">${tool.role}</p>
+                            </div>
+                            <div class="mt-3">
+                                <h4 class="font-semibold text-gray-700">Strengths:</h4>
+                                <p class="text-gray-600">${tool.strengths}</p>
+                            </div>
+                            <div class="mt-3">
+                                <h4 class="font-semibold text-gray-700">Limitations:</h4>
+                                <p class="text-gray-600">${tool.limitations}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                toolsContainer.innerHTML += toolHTML;
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            populateDASupportAreas();
+            populateAnalyticsTools();
+            showSection('overview'); // Default section
+            showDecisionContent('strategic'); // Default decision type tab
+
+            // Add event listeners for accordions not dynamically created within DA Support Areas
+            document.querySelectorAll('#decisionMatrixActivity .accordion-header, #analyticsToolsList .accordion-header').forEach(header => {
+                 header.onclick = () => toggleAccordion(header.parentElement);
+            });
+        });
+    </script>
+</body>
+</html>
