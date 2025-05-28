@@ -5,23 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Guide to N-S5: Data Sources & Collection Methods</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Visualization & Content Choices:
-        - Overview Section: Text introduction to the importance of data. Goal: Inform. Method: HTML text. Justification: Sets the foundational context.
-        - Types of Data Section:
-            - Each data type (Structured, Unstructured, Semi-structured): Presented within an accordion. Content includes definition and examples. Goal: Inform, Explain. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Clearly distinguishes and explains different data formats.
-        - Internal Data Sources Section:
-            - Each source (CRM, ERP, Web/App, IoT, Surveys, HR): Presented within an accordion. Content includes explanation and examples. Goal: Inform, Explain. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Organizes and details common internal data origins.
-        - External Data Sources Section:
-            - Each source (Public, Commercial, Social Media, APIs): Presented within an accordion. Content includes explanation and examples. Goal: Inform, Explain. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Organizes and details common external data origins.
-        - Data Collection Methods Section:
-            - Each method (Manual, ETL, APIs, Web Scraping, Streaming): Presented within an accordion. Content includes explanation and examples. Goal: Inform, Explain. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Explains how data is acquired.
-        - Challenges in Data Collection Section: Text with bullet points. Goal: Inform. Method: HTML text. Justification: Highlights practical difficulties.
-        - E-commerce Case Study Section:
-            - Scenario: Text. Goal: Inform.
-            - Relevant Data Points: Bulleted list. Goal: Apply knowledge. Method: HTML text.
-            - Collection Methods: Bulleted list. Goal: Apply knowledge. Method: HTML text. Justification: Demonstrates practical application of concepts.
-        - NO SVG graphics used. NO Mermaid JS used. Chart.js/Plotly.js are not used as the N-S5 content is primarily conceptual and textual explanations of data types, sources, and collection methods, not quantitative data visualization. All visual elements are handled through HTML/CSS/Tailwind.
-    -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script>
+  const firebaseConfig = {
+      apiKey: "AIzaSyBYpdqQdZuAtlftAAUeHRcDA1rcVRBpC1U",
+      authDomain: "data-analytics-for-busin-8456c.firebaseapp.com",
+      projectId: "data-analytics-for-busin-8456c",
+      storageBucket: "data-analytics-for-busin-8456c.firebasestorage.app",
+      messagingSenderId: "169770255188",
+      appId: "1:169770255188:web:87389e4f66f656aa14fec1",
+      measurementId: "G-XNY6S2DZ74"
+    };
+  firebase.initializeApp(firebaseConfig);
+
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (!user) {
+      window.location.href = "/login.html"; // redirect to login if not signed in
+    }
+  });
+</script>
+    
     <style>
         body {
             font-family: 'Inter', sans-serif;

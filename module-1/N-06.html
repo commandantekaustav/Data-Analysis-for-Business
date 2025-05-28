@@ -5,20 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Guide to N-S6: Marketing Analytics & KPIs</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Visualization & Content Choices:
-        - Overview Section: Text introduction. Goal: Inform. Method: HTML text. Justification: Sets the context for the session.
-        - Marketing Analytics Deep Dive Section:
-            - Purpose: Text. Goal: Inform.
-            - Data Sources: Accordion with detailed text. Goal: Inform, Organize. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Structured presentation of data origins.
-            - Common Applications: Accordion with detailed text. Goal: Inform, Organize. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Breaks down complex applications.
-        - Key Performance Indicators (KPIs) Section:
-            - Introduction to KPIs: Text. Goal: Inform.
-            - KPI Categories (Website/Digital, Email Marketing, Social Media, Advertising, Customer Acquisition/Retention): Each as an accordion, with bulleted lists of specific KPIs and their definitions. Goal: Inform, Organize. Method: HTML, JS for accordion. Interaction: Click to expand/collapse. Justification: Provides a clear, organized reference for KPIs.
-        - Practical Case Study: EcoWear Launch Campaign:
-            - Scenario: Text. Goal: Inform.
-            - Interactive KPI Selection: A section where users can select a marketing channel (e.g., "Website," "Email," "Social Media") from a dropdown or buttons, and relevant KPIs for that channel are displayed (from the data defined in JS). Goal: Engage, Apply Knowledge. Method: HTML, JS for dynamic content update. Interaction: Select channel to display KPIs. Justification: Allows practical application and exploration of KPIs in context.
-        - NO SVG graphics used. NO Mermaid JS used. Chart.js/Plotly.js are not used as the N-S6 content is primarily conceptual and textual explanations of marketing analytics and KPIs, not direct data visualization within the SPA itself. All visual elements are handled through HTML/CSS/Tailwind.
-    -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script>
+  const firebaseConfig = {
+      apiKey: "AIzaSyBYpdqQdZuAtlftAAUeHRcDA1rcVRBpC1U",
+      authDomain: "data-analytics-for-busin-8456c.firebaseapp.com",
+      projectId: "data-analytics-for-busin-8456c",
+      storageBucket: "data-analytics-for-busin-8456c.firebasestorage.app",
+      messagingSenderId: "169770255188",
+      appId: "1:169770255188:web:87389e4f66f656aa14fec1",
+      measurementId: "G-XNY6S2DZ74"
+    };
+  firebase.initializeApp(firebaseConfig);
+
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (!user) {
+      window.location.href = "/login.html"; // redirect to login if not signed in
+    }
+  });
+</script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
