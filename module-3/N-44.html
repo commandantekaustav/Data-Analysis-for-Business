@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S44: Univariate & Bivariate Analysis Techniques in EDA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .chart-container { position: relative; height: 350px; width: 100%; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+        .chart-description { margin-top: 1rem; font-size: 0.9rem; color: #555; text-align: center; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S44: Univariate & Bivariate Analysis Techniques in EDA</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Univariate & Bivariate Analysis Techniques in EDA</h2>
+            <p class="section-intro">Exploratory Data Analysis (EDA) involves examining data from various angles. Univariate analysis focuses on understanding individual variables, while bivariate analysis explores the relationships between pairs of variables. These techniques are fundamental for uncovering insights, preparing data for modeling, and validating assumptions.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Univariate Analysis Techniques</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Univariate analysis is the simplest form of analyzing data. It involves examining a single variable at a time to describe its characteristics, distribution, and central tendency. The choice of technique depends on whether the variable is numerical or categorical.</p>
+                
+                <h4 class="text-lg font-medium text-gray-800 mb-2">For Numerical Data:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Histograms:</strong> Show the frequency distribution of a continuous variable. They help identify the shape of the distribution (e.g., normal, skewed), modes, and potential outliers.</li>
+                    <li><strong>Box Plots:</strong> Provide a visual summary of the five-number summary (minimum, first quartile (Q1), median, third quartile (Q3), and maximum) and highlight outliers. Excellent for quickly assessing spread and skewness.</li>
+                    <li><strong>Density Plots (KDE plots):</strong> Similar to histograms but smooth the distribution using kernel density estimation, providing a continuous curve.</li>
+                    <li><strong>Descriptive Statistics:</strong> Calculate mean, median, mode, standard deviation, variance, range, skewness, and kurtosis to numerically summarize the variable's central tendency, spread, and shape.</li>
+                </ul>
+
+                <h4 class="text-lg font-medium text-gray-800 mb-2">For Categorical Data:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Bar Charts / Count Plots:</strong> Display the frequency or count of each category. Useful for comparing the popularity or prevalence of different categories.</li>
+                    <li><strong>Frequency Tables:</strong> Tabular representation showing the count and/or percentage of observations for each category.</li>
+                    <li><strong>Pie Charts:</strong> Show the proportion of each category relative to the whole (use with caution for too many categories).</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Univariate analysis is the first step to understanding your data, providing a foundational view of each variable before exploring relationships.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Bivariate Analysis Techniques</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Bivariate analysis involves examining the relationship between two variables. This helps in understanding how changes in one variable might correspond to changes in another, identifying potential correlations, and preparing for predictive modeling.</p>
+                
+                <h4 class="text-lg font-medium text-gray-800 mb-2">1. Numerical vs. Numerical Variables:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Scatter Plots:</strong> The most common and effective way to visualize the relationship between two continuous variables. They show the pattern of points, indicating the direction (positive, negative, no correlation) and strength of the relationship (linear, non-linear, clusters).</li>
+                    <li><strong>Correlation Matrices:</strong> A table showing the correlation coefficients between multiple pairs of numerical variables. Often visualized as a heatmap for easier interpretation. (More on this in N-S45).</li>
+                    <li><strong>Line Plots:</strong> If one of the numerical variables is time-based, a line plot can show the trend of one variable over time, potentially with another variable on a secondary axis or as different lines.</li>
+                </ul>
+
+                <h4 class="text-lg font-medium text-gray-800 mb-2">2. Categorical vs. Numerical Variables:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Box Plots by Category:</strong> Create separate box plots for the numerical variable, grouped by each category of the categorical variable. This allows for easy comparison of distributions (median, spread, outliers) across groups.</li>
+                    <li><strong>Violin Plots:</strong> Similar to box plots but also show the density distribution of the data, providing a richer view of the shape of the distribution within each category.</li>
+                    <li><strong>Grouped Bar Charts:</strong> If you want to compare the mean (or sum) of a numerical variable across different categories.</li>
+                    <li><strong>Histograms by Category:</strong> Plotting separate histograms for a numerical variable for each category can reveal differences in distribution shapes.</li>
+                </ul>
+
+                <h4 class="text-lg font-medium text-gray-800 mb-2">3. Categorical vs. Categorical Variables:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Stacked Bar Charts:</strong> Show the composition of one categorical variable within each category of another.</li>
+                    <li><strong>Grouped Bar Charts:</strong> Display the counts or percentages of one categorical variable, grouped by another.</li>
+                    <li><strong>Contingency Tables (Cross-tabulations):</strong> Tabular representation showing the frequency distribution of two categorical variables simultaneously. Often used with heatmaps for visualization.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Bivariate analysis moves beyond individual variable understanding to uncover how variables interact, which is crucial for building predictive models and deriving actionable insights.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Hands-on (Python) - Univariate & Bivariate Analysis</h2>
+            <p class="section-intro">In this hands-on session, you will apply univariate and bivariate analysis techniques using Python's Pandas and Seaborn libraries. We'll continue with a simulated customer dataset to explore individual variable distributions and relationships between pairs of variables.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Conceptual Dataset: Customer Demographics and Spending</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">We'll use a slightly extended version of our hypothetical customer dataset, including `Age`, `MonthlySpend`, `Gender`, and `ProductCategory`.</p>
+                <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code>
+CustomerID,Age,MonthlySpend,Gender,ProductCategory
+1,28,150.75,Female,Electronics
+2,45,220.50,Male,Apparel
+3,34,90.20,Female,Home Goods
+4,52,310.00,Male,Electronics
+5,22,65.80,Female,Apparel
+... (more data)
+                    </code></pre>
+                </div>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Task 1: Univariate Analysis on Different Variables</h4>
+                <p class="mb-4 text-gray-700">Explore the distributions of `MonthlySpend` (numerical) and `ProductCategory` (categorical).</p>
+                <p class="mb-4 text-gray-700"><strong>Conceptual Python Code:</strong></p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code class="language-python">
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Simulate a DataFrame (similar to N-S43)
+np.random.seed(43) # new seed for this session
+data = {
+    'CustomerID': range(1, 101),
+    'Age': np.random.randint(18, 65, 100),
+    'MonthlySpend': np.random.normal(150, 50, 100).round(2),
+    'Gender': np.random.choice(['Male', 'Female'], 100),
+    'ProductCategory': np.random.choice(['Electronics', 'Apparel', 'Home Goods', 'Books'], 100)
+}
+df_customers_eda = pd.DataFrame(data)
+
+print("--- Univariate Analysis: Histogram of Monthly Spend ---")
+# plt.figure(figsize=(8, 5))
+# sns.histplot(df_customers_eda['MonthlySpend'], bins=15, kde=True)
+# plt.title('Distribution of Monthly Spend')
+# plt.xlabel('Monthly Spend ($)')
+# plt.ylabel('Frequency')
+# plt.show()
+
+print("\n--- Univariate Analysis: Count Plot of ProductCategory ---")
+# plt.figure(figsize=(8, 5))
+# sns.countplot(x='ProductCategory', data=df_customers_eda, order=df_customers_eda['ProductCategory'].value_counts().index)
+# plt.title('Distribution of Product Categories')
+# plt.xlabel('Product Category')
+# plt.ylabel('Count')
+# plt.xticks(rotation=45, ha='right')
+# plt.tight_layout()
+# plt.show()
+                    </code></pre>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="chart-container">
+                        <canvas id="monthlySpendHist"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="productCategoryCount"></canvas>
+                    </div>
+                </div>
+                <p class="chart-description"><em>Simulated Histogram of Monthly Spend and Count Plot of Product Category.</em></p>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Task 2: Create Scatter Plots for Bivariate Analysis (Numerical vs. Numerical)</h4>
+                <p class="mb-4 text-gray-700">Visualize the relationship between `Age` and `MonthlySpend`. Look for patterns, clusters, or trends.</p>
+                <p class="mb-4 text-gray-700"><strong>Conceptual Python Code:</strong></p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code class="language-python">
+print("\n--- Bivariate Analysis: Scatter Plot of Age vs. Monthly Spend ---")
+# plt.figure(figsize=(8, 6))
+# sns.scatterplot(x='Age', y='MonthlySpend', data=df_customers_eda, hue='Gender', style='ProductCategory') # Add hue/style for more insights
+# plt.title('Monthly Spend vs. Customer Age')
+# plt.xlabel('Customer Age')
+# plt.ylabel('Monthly Spend ($)')
+# plt.legend(title='Gender')
+# plt.show()
+                    </code></pre>
+                </div>
+                <div class="chart-container">
+                    <canvas id="ageSpendScatter"></canvas>
+                </div>
+                <p class="chart-description"><em>Simulated Scatter Plot: Monthly Spend vs. Customer Age.</em></p>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Task 3: Bivariate Analysis (Categorical vs. Numerical) - Box Plot by Category</h4>
+                <p class="mb-4 text-gray-700">Compare the distribution of `MonthlySpend` across different `ProductCategory` groups using box plots.</p>
+                <p class="mb-4 text-gray-700"><strong>Conceptual Python Code:</strong></p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code class="language-python">
+print("\n--- Bivariate Analysis: Box Plot of Monthly Spend by ProductCategory ---")
+# plt.figure(figsize=(10, 6))
+# sns.boxplot(x='ProductCategory', y='MonthlySpend', data=df_customers_eda)
+# plt.title('Monthly Spend Distribution by Product Category')
+# plt.xlabel('Product Category')
+# plt.ylabel('Monthly Spend ($)')
+# plt.xticks(rotation=45, ha='right')
+# plt.tight_layout()
+# plt.show()
+                    </code></pre>
+                </div>
+                <div class="chart-container">
+                    <canvas id="spendByCategoryBoxPlot"></canvas>
+                </div>
+                <p class="chart-description"><em>Simulated Box Plot: Monthly Spend Distribution by Product Category.</em></p>
+                <p class="mt-4 text-sm text-gray-600">These hands-on exercises help you practice using Python to perform fundamental EDA, revealing insights about individual variables and their relationships. This understanding is vital for effective data cleaning, feature engineering, and model building.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('nav a').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelector(this.getAttribute('href')).scrollInView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Simulated Data for Chart.js
+        const simulatedData = {
+            ages: Array.from({length: 100}, () => Math.floor(Math.random() * (65 - 18 + 1)) + 18),
+            monthlySpends: Array.from({length: 100}, () => parseFloat((Math.random() * 250 + 50).toFixed(2))), // Spend between 50 and 300
+            genders: Array.from({length: 100}, () => Math.random() > 0.5 ? 'Male' : 'Female'),
+            productCategories: Array.from({length: 100}, () => ['Electronics', 'Apparel', 'Home Goods', 'Books'][Math.floor(Math.random() * 4)])
+        };
+
+        // For scatter plot, combine age and spend
+        const ageSpendData = simulatedData.ages.map((age, i) => ({
+            x: age,
+            y: simulatedData.monthlySpends[i],
+            gender: simulatedData.genders[i],
+            category: simulatedData.productCategories[i]
+        }));
+
+        // Function to create bins for histogram
+        function createHistogramBins(data, binWidth) {
+            const min = Math.min(...data);
+            const max = Math.max(...data);
+            const bins = [];
+            for (let i = min; i <= max + binWidth; i += binWidth) {
+                bins.push(i);
+            }
+            const labels = bins.slice(0, -1).map((val, i) => `${val}-${bins[i+1]}`);
+            const counts = new Array(bins.length - 1).fill(0);
+
+            data.forEach(value => {
+                for (let i = 0; i < bins.length - 1; i++) {
+                    if (value >= bins[i] && (value < bins[i+1] || (i === bins.length - 2 && value === max))) {
+                        counts[i]++;
+                        break;
+                    }
+                }
+            });
+            return { labels, counts };
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chart 1: Monthly Spend Histogram
+            const monthlySpendBins = createHistogramBins(simulatedData.monthlySpends, 20);
+            const monthlySpendHistCtx = document.getElementById('monthlySpendHist').getContext('2d');
+            new Chart(monthlySpendHistCtx, {
+                type: 'bar',
+                data: {
+                    labels: monthlySpendBins.labels,
+                    datasets: [{
+                        label: 'Frequency',
+                        data: monthlySpendBins.counts,
+                        backgroundColor: 'rgba(67, 56, 202, 0.8)',
+                        borderColor: 'rgba(67, 56, 202, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Distribution of Monthly Spend',
+                            font: { size: 14 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Monthly Spend ($)' },
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Frequency' }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Product Category Count Plot
+            const categoryCounts = simulatedData.productCategories.reduce((acc, cat) => {
+                acc[cat] = (acc[cat] || 0) + 1;
+                return acc;
+            }, {});
+            const sortedCategories = Object.keys(categoryCounts).sort((a, b) => categoryCounts[b] - categoryCounts[a]);
+
+            const productCategoryCountCtx = document.getElementById('productCategoryCount').getContext('2d');
+            new Chart(productCategoryCountCtx, {
+                type: 'bar',
+                data: {
+                    labels: sortedCategories,
+                    datasets: [{
+                        label: 'Count',
+                        data: sortedCategories.map(cat => categoryCounts[cat]),
+                        backgroundColor: 'rgba(245, 158, 11, 0.8)', // Amber
+                        borderColor: 'rgba(245, 158, 11, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Distribution of Product Categories',
+                            font: { size: 14 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Product Category' },
+                            ticks: { autoSkip: false, maxRotation: 45, minRotation: 45 }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Count' }
+                        }
+                    }
+                }
+            });
+
+            // Chart 3: Age vs. Monthly Spend Scatter Plot
+            const ageSpendScatterCtx = document.getElementById('ageSpendScatter').getContext('2d');
+            new Chart(ageSpendScatterCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Customer Spend',
+                        data: ageSpendData.map(d => ({ x: d.x, y: d.y })),
+                        backgroundColor: ageSpendData.map(d => d.gender === 'Male' ? 'rgba(54, 162, 235, 0.6)' : 'rgba(255, 99, 132, 0.6)'),
+                        borderColor: ageSpendData.map(d => d.gender === 'Male' ? 'rgba(54, 162, 235, 1)' : 'rgba(255, 99, 132, 1)'),
+                        borderWidth: 1,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }, // Legend handled by custom drawing or external text
+                        title: {
+                            display: true,
+                            text: 'Monthly Spend vs. Customer Age (Colored by Gender)',
+                            font: { size: 14 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const dataPoint = ageSpendData[context.dataIndex];
+                                    return `Age: ${dataPoint.x}, Spend: $${dataPoint.y.toFixed(2)}, Gender: ${dataPoint.gender}, Category: ${dataPoint.category}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Customer Age' },
+                            beginAtZero: false
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Monthly Spend ($)' }
+                        }
+                    }
+                }
+            });
+
+            // Chart 4: Monthly Spend by Product Category Box Plot (simulated with bars)
+            // For a true box plot, a dedicated library or custom drawing would be needed.
+            // This is a conceptual representation using stacked bars to show quartiles.
+            const spendByCategoryCtx = document.getElementById('spendByCategoryBoxPlot').getContext('2d');
+            
+            const categories = ['Electronics', 'Apparel', 'Home Goods', 'Books'];
+            const boxPlotData = categories.map(cat => {
+                const filteredSpends = simulatedData.monthlySpends.filter((_, i) => simulatedData.productCategories[i] === cat);
+                if (filteredSpends.length === 0) return { min: 0, q1: 0, median: 0, q3: 0, max: 0 };
+                
+                filteredSpends.sort((a, b) => a - b);
+                const q1 = filteredSpends[Math.floor(filteredSpends.length * 0.25)];
+                const median = filteredSpends.length % 2 === 0 ? (filteredSpends[Math.floor(filteredSpends.length * 0.5) - 1] + filteredSpends[Math.floor(filteredSpends.length * 0.5)]) / 2 : filteredSpends[Math.floor(filteredSpends.length * 0.5)];
+                const q3 = filteredSpends[Math.floor(filteredSpends.length * 0.75)];
+                const min = filteredSpends[0];
+                const max = filteredSpends[filteredSpends.length - 1];
+                return { min, q1, median, q3, max };
+            });
+
+            new Chart(spendByCategoryCtx, {
+                type: 'bar',
+                data: {
+                    labels: categories,
+                    datasets: [
+                        {
+                            label: 'Min',
+                            data: boxPlotData.map(d => d.min),
+                            backgroundColor: 'rgba(100, 100, 100, 0.2)', // Light grey for min to Q1
+                            stack: 'categorySpend'
+                        },
+                        {
+                            label: 'Q1-Median',
+                            data: boxPlotData.map(d => d.median - d.q1),
+                            backgroundColor: 'rgba(67, 56, 202, 0.6)', // Indigo for Q1 to Median
+                            stack: 'categorySpend'
+                        },
+                        {
+                            label: 'Median-Q3',
+                            data: boxPlotData.map(d => d.q3 - d.median),
+                            backgroundColor: 'rgba(245, 158, 11, 0.6)', // Amber for Median to Q3
+                            stack: 'categorySpend'
+                        },
+                        {
+                            label: 'Max',
+                            data: boxPlotData.map(d => d.max - d.q3),
+                            backgroundColor: 'rgba(100, 100, 100, 0.2)', // Light grey for Q3 to Max
+                            stack: 'categorySpend'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Monthly Spend Distribution by Product Category (Conceptual Box Plot)',
+                            font: { size: 14 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const categoryIndex = context.dataIndex;
+                                    const data = boxPlotData[categoryIndex];
+                                    return [
+                                        `Min: $${data.min.toFixed(2)}`,
+                                        `Q1: $${data.q1.toFixed(2)}`,
+                                        `Median: $${data.median.toFixed(2)}`,
+                                        `Q3: $${data.q3.toFixed(2)}`,
+                                        `Max: $${data.max.toFixed(2)}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            title: { display: true, text: 'Product Category' },
+                            ticks: { autoSkip: false, maxRotation: 45, minRotation: 45 }
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            title: { display: true, text: 'Monthly Spend ($)' }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

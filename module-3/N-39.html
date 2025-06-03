@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S39: Overview of Visualization Tools - Tableau, Power BI, Python</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .chart-container { position: relative; height: 350px; width: 100%; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+        .chart-description { margin-top: 1rem; font-size: 0.9rem; color: #555; text-align: center; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S39: Overview of Visualization Tools - Tableau, Power BI, Python</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Overview of Visualization Tools - Tableau, Power BI, Python</h2>
+            <p class="section-intro">Choosing the right data visualization tool is crucial for efficiency and impact. While Excel is a good starting point, professional analytics often relies on more specialized tools. This session will compare the strengths and weaknesses of three leading platforms: Tableau, Microsoft Power BI, and Python's powerful visualization libraries.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. Tableau</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Tableau is a leading interactive data visualization tool that helps users see and understand their data quickly. It's known for its intuitive drag-and-drop interface and ability to create beautiful, interactive dashboards.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Strengths:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Ease of Use:</strong> Highly intuitive drag-and-drop interface makes it accessible for business users with minimal coding.</li>
+                            <li><strong>Stunning Visualizations:</strong> Produces visually appealing and highly interactive charts and dashboards.</li>
+                            <li><strong>Rapid Prototyping:</strong> Allows for quick exploration and iteration of data visualizations.</li>
+                            <li><strong>Strong Community & Resources:</strong> Large user base, extensive online tutorials, and active forums.</li>
+                            <li><strong>Data Connectivity:</strong> Connects to a wide variety of data sources, from spreadsheets to cloud databases.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Weaknesses:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Cost:</strong> Can be expensive, especially for enterprise-wide deployments, as it's a proprietary software.</li>
+                            <li><strong>Less Granular Control:</strong> While highly visual, it offers less fine-grained control over customization compared to coding-based tools.</li>
+                            <li><strong>Limited ETL Capabilities:</strong> Data preparation features are present but less robust than dedicated ETL tools or Power BI's Power Query.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. Microsoft Power BI</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Power BI is a business intelligence tool from Microsoft that allows users to connect to various data sources, transform data, and create interactive reports and dashboards. It's particularly strong for organizations already invested in the Microsoft ecosystem.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Strengths:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Cost-Effective:</strong> Often included with Microsoft 365 subscriptions, making it a cost-effective choice for many businesses.</li>
+                            <li><strong>Strong ETL (Power Query):</strong> Excellent built-in data transformation and cleaning capabilities, allowing for robust data preparation.</li>
+                            <li><strong>Microsoft Ecosystem Integration:</strong> Seamlessly integrates with Excel, Azure, SQL Server, and other Microsoft products.</li>
+                            <li><strong>DAX (Data Analysis Expressions):</strong> Powerful formula language for creating complex calculations and custom measures.</li>
+                            <li><strong>Regular Updates:</strong> Microsoft continuously adds new features and improvements.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Weaknesses:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Visual Design:</strong> While capable, some argue it's less aesthetically refined out-of-the-box compared to Tableau for certain complex designs.</li>
+                            <li><strong>Learning Curve (DAX):</strong> While the drag-and-drop is easy, mastering DAX for advanced calculations can have a steeper learning curve.</li>
+                            <li><strong>Performance with Very Large Datasets:</strong> Can sometimes struggle with extremely large, unoptimized datasets.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. Python (Matplotlib, Seaborn, Plotly)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Python, with its rich ecosystem of libraries, offers unparalleled flexibility and control for data visualization. It's the choice for data scientists and analysts who need custom solutions, advanced statistical plots, or integration with machine learning workflows.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Matplotlib:</strong> The foundational plotting library for Python. Provides extensive control over every aspect of a plot.
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Strengths:</strong> Highly customizable, widely used, good for static plots.</li>
+                            <li><strong>Weaknesses:</strong> Can be verbose for simple plots, less aesthetically pleasing by default.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Seaborn:</strong> Built on top of Matplotlib, provides a high-level interface for drawing attractive and informative statistical graphics.
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Strengths:</strong> Easier to create complex statistical plots, beautiful default styles, integrates well with Pandas DataFrames.</li>
+                            <li><strong>Weaknesses:</strong> Less granular control than Matplotlib for very specific customizations.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Plotly:</strong> An open-source graphing library that allows for interactive, web-based visualizations.
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Strengths:</strong> Interactive plots (zoom, pan, hover), can be embedded in web applications (e.g., Dash), supports a wide range of chart types.</li>
+                            <li><strong>Weaknesses:</strong> Can be more complex than Matplotlib/Seaborn for simple plots.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Overall Python Strengths:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Full Control & Customization:</strong> Code-based approach offers ultimate flexibility.</li>
+                            <li><strong>Integration with Data Science Workflow:</strong> Seamlessly combines data cleaning, analysis, modeling, and visualization.</li>
+                            <li><strong>Automation & Reproducibility:</strong> Scripts ensure consistent and repeatable visualization generation.</li>
+                            <li><strong>Open-Source & Free:</strong> No licensing costs.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Overall Python Weaknesses:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Steeper Learning Curve:</strong> Requires coding knowledge.</li>
+                            <li><strong>Slower for Rapid Exploration:</strong> Not as quick for ad-hoc visual data exploration as drag-and-drop BI tools.</li>
+                            <li><strong>Deployment Complexity:</strong> Sharing interactive dashboards can be more complex than publishing to a BI service.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">The choice of tool often depends on the user's skill set, the complexity of the data, the specific visualization needs, and the organizational ecosystem. Often, analysts use a combination of these tools in their workflow.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Demo (Python - Matplotlib/Seaborn) & Activity</h2>
+            <p class="section-intro">This practical session will demonstrate basic plotting using Python's Matplotlib and Seaborn libraries. While we'll simulate the output using Chart.js for this web environment, the conceptual Python code will show you how to generate these common statistical plots. You'll then have an activity to recreate a familiar Excel chart using Python's approach.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Demo: Basic Plotting with Python (Matplotlib/Seaborn)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">We'll use a hypothetical dataset of customer ages and their spending habits to illustrate a histogram and a scatter plot. These are fundamental plots for understanding distributions and relationships.</p>
+                
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Hypothetical Data Structure:</h4>
+                <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code>
+CustomerID,Age,MonthlySpend
+1,25,120
+2,34,180
+3,29,150
+4,45,220
+5,50,250
+... (more data)
+                    </code></pre>
+                </div>
+
+                <h4 class="text-lg font-medium text-gray-800 mb-2">1. Histogram: Distribution of Customer Ages</h4>
+                <p class="mb-4 text-gray-700"><strong>Conceptual Python Code:</strong></p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code class="language-python">
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np # For generating dummy data
+
+# Create a dummy DataFrame (simulating data loading)
+np.random.seed(42) # for reproducibility
+customer_data = {
+    'CustomerID': range(1, 101),
+    'Age': np.random.randint(18, 70, 100),
+    'MonthlySpend': np.random.normal(150, 50, 100)
+}
+df_customers = pd.DataFrame(customer_data)
+
+# Create a histogram using Seaborn
+# plt.figure(figsize=(10, 6))
+# sns.histplot(df_customers['Age'], bins=10, kde=True) # kde=True adds a density curve
+# plt.title('Distribution of Customer Ages')
+# plt.xlabel('Age')
+# plt.ylabel('Frequency')
+# plt.show()
+                    </code></pre>
+                </div>
+                <div class="chart-container">
+                    <canvas id="ageHistogram"></canvas>
+                </div>
+                <p class="chart-description"><em>Simulated Histogram: Distribution of Customer Ages.</em></p>
+
+                <h4 class="text-lg font-medium text-gray-800 mb-2">2. Scatter Plot: Monthly Spend vs. Age</h4>
+                <p class="mb-4 text-gray-700"><strong>Conceptual Python Code:</strong></p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code class="language-python">
+# Create a scatter plot using Seaborn
+# plt.figure(figsize=(10, 6))
+# sns.scatterplot(x='Age', y='MonthlySpend', data=df_customers)
+# plt.title('Monthly Spend vs. Customer Age')
+# plt.xlabel('Customer Age')
+# plt.ylabel('Monthly Spend ($)')
+# plt.show()
+                    </code></pre>
+                </div>
+                <div class="chart-container">
+                    <canvas id="spendAgeScatter"></canvas>
+                </div>
+                <p class="chart-description"><em>Simulated Scatter Plot: Monthly Spend vs. Customer Age.</em></p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Activity: Recreate an Excel Chart in Python</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">In N-S37, we created a simple bar chart in Excel showing "Monthly Sales." Your task now is to conceptually recreate that same chart using Python's Matplotlib/Seaborn approach. Think about the data structure and the plotting function you would use.</p>
+                
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Original Excel Chart Data: Monthly Sales</h4>
+                <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code>
+Month   | Sales (in thousands)
+--------|-------------------
+Jan     | 150
+Feb     | 170
+Mar     | 160
+Apr     | 190
+May     | 200
+                    </code></pre>
+                </div>
+
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Your Conceptual Python Code (Think about it, then reveal):</h4>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code class="language-python">
+# import pandas as pd
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+
+# # 1. Create a Pandas DataFrame from the data
+# monthly_sales_data = {
+#     'Month': ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+#     'Sales': [150, 170, 160, 190, 200]
+# }
+# df_monthly_sales = pd.DataFrame(monthly_sales_data)
+
+# # 2. Create the bar chart using Seaborn or Matplotlib
+# # plt.figure(figsize=(8, 5))
+# # sns.barplot(x='Month', y='Sales', data=df_monthly_sales, palette='viridis') # Using Seaborn
+# # # Or using Matplotlib directly:
+# # # plt.bar(df_monthly_sales['Month'], df_monthly_sales['Sales'], color='skyblue')
+# # plt.title('Monthly Sales Comparison (Python)')
+# # plt.xlabel('Month')
+# # plt.ylabel('Sales (Thousands)')
+# # plt.show()
+                    </code></pre>
+                </div>
+                <div class="chart-container">
+                    <canvas id="excelRecreationBarChart"></canvas>
+                </div>
+                <p class="chart-description"><em>Simulated Bar Chart: Monthly Sales Comparison (Recreated in Python style).</em></p>
+
+                <p class="mt-4 text-sm text-gray-600">This activity helps bridge the gap between GUI-based tools like Excel and code-based tools like Python. While the initial setup might take a bit more code, Python offers unparalleled flexibility and reproducibility for your visualizations.</p>
+                <p class="mt-4 text-sm text-gray-600"><strong>(Assessment: Mini Project component starts)</strong> As you progress, consider how these Python visualization skills can be applied to your mini-project data. Think about the types of plots that would best convey your project's insights.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('nav a').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Data for Chart.js demos simulating Python plots
+        // Data for Histogram (Customer Ages)
+        const customerAges = Array.from({length: 100}, () => Math.floor(Math.random() * (70 - 18 + 1)) + 18);
+        
+        // Function to create bins for histogram
+        function createHistogramBins(data, binWidth) {
+            const min = Math.min(...data);
+            const max = Math.max(...data);
+            const bins = [];
+            for (let i = min; i <= max; i += binWidth) {
+                bins.push(i);
+            }
+            const labels = bins.slice(0, -1).map((val, i) => `${val}-${bins[i+1]}`);
+            const counts = new Array(bins.length - 1).fill(0);
+
+            data.forEach(value => {
+                for (let i = 0; i < bins.length - 1; i++) {
+                    if (value >= bins[i] && (value < bins[i+1] || (i === bins.length - 2 && value === bins[i+1]))) {
+                        counts[i]++;
+                        break;
+                    }
+                }
+            });
+            return { labels, counts };
+        }
+
+        const ageBins = createHistogramBins(customerAges, 5); // 5-year bins
+
+        // Data for Scatter Plot (Monthly Spend vs. Age)
+        const scatterData = Array.from({length: 100}, (_, i) => ({
+            age: customerAges[i],
+            monthlySpend: Math.random() * 100 + 100 + (customerAges[i] * 0.5) // Simulate some correlation
+        }));
+
+        // Data for Excel Recreation Bar Chart
+        const monthlySalesData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+            sales: [150, 170, 160, 190, 200]
+        };
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Histogram of Customer Ages
+            const ageHistCtx = document.getElementById('ageHistogram').getContext('2d');
+            new Chart(ageHistCtx, {
+                type: 'bar',
+                data: {
+                    labels: ageBins.labels,
+                    datasets: [{
+                        label: 'Frequency',
+                        data: ageBins.counts,
+                        backgroundColor: 'rgba(67, 56, 202, 0.8)',
+                        borderColor: 'rgba(67, 56, 202, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Distribution of Customer Ages',
+                            font: { size: 14 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Age Range' },
+                            grid: { display: false } // Hide grid lines for a cleaner histogram look
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Frequency' }
+                        }
+                    }
+                }
+            });
+
+            // Scatter Plot of Monthly Spend vs. Age
+            const spendAgeScatterCtx = document.getElementById('spendAgeScatter').getContext('2d');
+            new Chart(spendAgeScatterCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Customer Spend',
+                        data: scatterData.map(d => ({ x: d.age, y: d.monthlySpend })),
+                        backgroundColor: 'rgba(245, 158, 11, 0.8)', // Amber
+                        borderColor: 'rgba(245, 158, 11, 1)',
+                        borderWidth: 1,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Monthly Spend vs. Customer Age',
+                            font: { size: 14 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Customer Age' },
+                            beginAtZero: false // Ages don't start at 0
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Monthly Spend ($)' }
+                        }
+                    }
+                }
+            });
+
+            // Excel Recreation Bar Chart
+            const excelRecreationCtx = document.getElementById('excelRecreationBarChart').getContext('2d');
+            new Chart(excelRecreationCtx, {
+                type: 'bar',
+                data: {
+                    labels: monthlySalesData.labels,
+                    datasets: [{
+                        label: 'Sales (in thousands)',
+                        data: monthlySalesData.sales,
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)', // Teal
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true, position: 'top' },
+                        title: {
+                            display: true,
+                            text: 'Monthly Sales Comparison (Python Style)',
+                            font: { size: 14 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Month' }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Sales (Thousands)' }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

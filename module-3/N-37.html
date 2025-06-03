@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S37: Principles of Effective Visualization & Common Chart Types</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .chart-container { position: relative; height: 350px; width: 100%; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+        .chart-description { margin-top: 1rem; font-size: 0.9rem; color: #555; text-align: center; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S37: Principles of Effective Visualization & Common Chart Types</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Principles of Effective Visualization & Common Chart Types</h2>
+            <p class="section-intro">Data visualization is the graphical representation of information and data. By using visual elements like charts, graphs, and maps, data visualization tools provide an accessible way to see and understand trends, outliers, and patterns in data. In the world of business analytics, it transforms complex datasets into actionable insights, making data understandable for diverse audiences.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Why Visualize Data?</h3>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Simplify Complex Data:</strong> Human brains process visual information much faster than raw numbers or text.</li>
+                    <li><strong>Identify Patterns & Trends:</strong> Spot correlations, trends, and anomalies that might be hidden in tables.</li>
+                    <li><strong>Communicate Insights Effectively:</strong> Make data-driven arguments more persuasive and memorable for stakeholders.</li>
+                    <li><strong>Faster Decision Making:</strong> Quickly grasp key information to make informed business decisions.</li>
+                    <li><strong>Explore Data:</strong> Aid in Exploratory Data Analysis (EDA) by providing a quick overview of data distribution and relationships.</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Principles of Effective Visualization (Tufte, Few)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Pioneers like Edward Tufte and Stephen Few have laid down foundational principles for creating effective and honest data visualizations. Their core ideas revolve around maximizing the data-ink ratio, avoiding chartjunk, and ensuring clarity and accuracy.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Maximize Data-Ink Ratio (Tufte):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Data-ink:</strong> The ink used to display data itself (e.g., bars in a bar chart, points in a scatter plot).</li>
+                            <li><strong>Non-data-ink:</strong> Ink used for labels, axes, grid lines, borders, etc.</li>
+                            <li><strong>Principle:</strong> Remove unnecessary non-data-ink and redundant data-ink to minimize clutter and focus on the data. Less is often more.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Avoid Chartjunk (Tufte):</strong> Any unnecessary or distracting visual elements that do not convey information, or worse, obscure it. Examples include excessive ornamentation, heavy grid lines, or overly complex backgrounds.</li>
+                    <li><strong>Clarity & Accuracy (Few):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Show the Data Clearly:</strong> Ensure scales are appropriate, labels are legible, and comparisons are easy to make.</li>
+                            <li><strong>Tell the Truth:</strong> Avoid distorting data (e.g., truncated axes, improper scaling) that could mislead the audience.</li>
+                            <li><strong>Serve a Clear Purpose:</strong> Every visualization should have a specific message or question it aims to answer.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Choose the Right Chart Type:</strong> Different data types and analytical questions call for different chart types. Misusing a chart type can obscure insights.</li>
+                    <li><strong>Simplicity:</strong> Aim for straightforward designs that convey the message without unnecessary complexity.</li>
+                    <li><strong>Consistency:</strong> Use consistent colors, fonts, and styles across multiple visualizations in a report or dashboard.</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Common Chart Types & When to Use Them</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Understanding when to use each chart type is fundamental to effective data visualization.</p>
+                
+                <div class="mb-6">
+                    <h4 class="text-lg font-medium text-gray-800 mb-2">1. Bar Chart</h4>
+                    <p class="text-gray-700"><strong>Purpose:</strong> Compare categories or show changes over time (discrete intervals).</p>
+                    <p class="text-gray-700"><strong>When to Use:</strong> Comparing sales across different product lines, showing monthly website visitors, comparing performance of different regions.</p>
+                    <p class="text-gray-700"><strong>Key Features:</strong> Rectangular bars with lengths proportional to the values they represent. Can be vertical or horizontal.</p>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-lg font-medium text-gray-800 mb-2">2. Line Chart</h4>
+                    <p class="text-gray-700"><strong>Purpose:</strong> Show trends and changes over continuous time or ordered categories.</p>
+                    <p class="text-gray-700"><strong>When to Use:</strong> Tracking stock prices over days, showing website traffic over hours, visualizing temperature changes over a year.</p>
+                    <p class="text-gray-700"><strong>Key Features:</strong> Points connected by lines, representing values at specific intervals. Excellent for showing relationships between two variables over time.</p>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-lg font-medium text-gray-800 mb-2">3. Pie Chart</h4>
+                    <p class="text-gray-700"><strong>Purpose:</strong> Show parts of a whole (composition).</p>
+                    <p class="text-gray-700"><strong>When to Use:</strong> Displaying market share percentages, breakdown of expenses by category, demographic distribution (e.g., age groups in a survey).</p>
+                    <p class="text-gray-700"><strong>Key Features:</strong> A circular graph divided into slices, where each slice represents a proportion of the whole. Generally, use with a small number of categories (ideally 2-5).</p>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-lg font-medium text-gray-800 mb-2">4. Scatter Plot</h4>
+                    <p class="text-gray-700"><strong>Purpose:</strong> Show the relationship or correlation between two numerical variables.</p>
+                    <p class="text-gray-700"><strong>When to Use:</strong> Investigating if advertising spend correlates with sales, studying the relationship between employee experience and salary, examining customer age versus spending habits.</p>
+                    <p class="text-gray-700"><strong>Key Features:</strong> Individual data points plotted on a two-dimensional graph. The pattern of the points indicates the type and strength of the relationship (positive, negative, no correlation).</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Demo (Excel) & Activity</h2>
+            <p class="section-intro">In this practical session, we'll start with creating basic charts in Excel, a tool you're already familiar with for data handling. We'll then engage in an activity to help you practice selecting the most appropriate chart type for different business scenarios, reinforcing the theoretical concepts.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Tool Demo: Creating Basic Charts in Excel</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Let's use a simple dataset to demonstrate how to create basic bar, line, and pie charts in Excel. You can follow along in your Excel application.</p>
+                
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Scenario 1: Comparing Monthly Sales (Bar Chart)</h4>
+                <p class="mb-2 text-gray-700"><strong>Data:</strong></p>
+                <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code>
+Month   | Sales (in thousands)
+--------|-------------------
+Jan     | 150
+Feb     | 170
+Mar     | 160
+Apr     | 190
+May     | 200
+                    </code></pre>
+                </div>
+                <p class="mb-4 text-gray-700"><strong>Steps in Excel:</strong></p>
+                <ol class="list-decimal pl-5 space-y-2 text-gray-700 mb-4">
+                    <li>Enter the data into two columns (e.g., A1:B6).</li>
+                    <li>Select the data range (e.g., A1:B6).</li>
+                    <li>Go to the 'Insert' tab on the Excel ribbon.</li>
+                    <li>In the 'Charts' group, click on the 'Insert Column or Bar Chart' icon.</li>
+                    <li>Choose a 2-D Clustered Column chart.</li>
+                    <li><strong>Observe:</strong> How easy it is to compare sales figures for each month.</li>
+                </ol>
+                <div class="chart-container">
+                    <canvas id="barChartExcelDemo"></canvas>
+                </div>
+                <p class="chart-description"><em>Simulated Bar Chart of Monthly Sales.</em></p>
+
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Scenario 2: Tracking Website Visitors Over Time (Line Chart)</h4>
+                <p class="mb-2 text-gray-700"><strong>Data:</strong></p>
+                <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code>
+Week | Visitors
+-----|---------
+1    | 500
+2    | 550
+3    | 480
+4    | 600
+5    | 620
+                    </code></pre>
+                </div>
+                <p class="mb-4 text-gray-700"><strong>Steps in Excel:</strong></p>
+                <ol class="list-decimal pl-5 space-y-2 text-gray-700 mb-4">
+                    <li>Enter the data into two columns.</li>
+                    <li>Select the data range.</li>
+                    <li>Go to the 'Insert' tab.</li>
+                    <li>Click on the 'Insert Line or Area Chart' icon.</li>
+                    <li>Choose a 2-D Line chart.</li>
+                    <li><strong>Observe:</strong> How easily you can see the trend of visitor numbers increasing or decreasing.</li>
+                </ol>
+                <div class="chart-container">
+                    <canvas id="lineChartExcelDemo"></canvas>
+                </div>
+                <p class="chart-description"><em>Simulated Line Chart of Weekly Visitors.</em></p>
+
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Scenario 3: Market Share by Product Category (Pie Chart)</h4>
+                <p class="mb-2 text-gray-700"><strong>Data:</strong></p>
+                <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code>
+Category   | Revenue Share (%)
+-----------|------------------
+Electronics| 40
+Apparel    | 25
+Home Goods | 20
+Books      | 15
+                    </code></pre>
+                </div>
+                <p class="mb-4 text-gray-700"><strong>Steps in Excel:</strong></p>
+                <ol class="list-decimal pl-5 space-y-2 text-gray-700 mb-4">
+                    <li>Enter the data into two columns.</li>
+                    <li>Select the data range.</li>
+                    <li>Go to the 'Insert' tab.</li>
+                    <li>Click on the 'Insert Pie or Doughnut Chart' icon.</li>
+                    <li>Choose a 2-D Pie chart.</li>
+                    <li><strong>Observe:</strong> How quickly you can identify the largest and smallest contributors to total revenue.</li>
+                </ol>
+                <div class="chart-container">
+                    <canvas id="pieChartExcelDemo"></canvas>
+                </div>
+                <p class="chart-description"><em>Simulated Pie Chart of Revenue Share by Category.</em></p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Activity: Select Appropriate Charts for Given Scenarios</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">For each of the following business scenarios, identify the most appropriate common chart type (Bar, Line, Pie, or Scatter Plot) and briefly explain why.</p>
+                
+                <ol class="list-decimal pl-5 space-y-4 text-gray-700">
+                    <li>
+                        <strong>Scenario:</strong> You want to show the distribution of customer ages from a survey, grouped into age ranges (e.g., 18-25, 26-35, etc.).
+                        <p class="italic text-gray-600 mt-1"><strong>Your Answer:</strong></p>
+                    </li>
+                    <li>
+                        <strong>Scenario:</strong> Your marketing team wants to see how website conversion rates have changed day-over-day for the past three months.
+                        <p class="italic text-gray-600 mt-1"><strong>Your Answer:</strong></p>
+                    </li>
+                    <li>
+                        <strong>Scenario:</strong> Your finance department needs to compare the total budget allocated to different departments (e.g., Marketing, Sales, Operations, HR).
+                        <p class="italic text-gray-600 mt-1"><strong>Your Answer:</strong></p>
+                    </li>
+                    <li>
+                        <strong>Scenario:</strong> You are investigating if there is a relationship between the number of customer support tickets submitted and the customer's average monthly spend.
+                        <p class="italic text-gray-600 mt-1"><strong>Your Answer:</strong></p>
+                    </li>
+                    <li>
+                        <strong>Scenario:</strong> A sales manager wants to visualize the contribution of each sales representative to the total quarterly sales.
+                        <p class="italic text-gray-600 mt-1"><strong>Your Answer:</strong></p>
+                    </li>
+                </ol>
+                <div class="mt-8 p-4 bg-blue-50 rounded-lg text-blue-800">
+                    <h4 class="font-semibold text-lg mb-2">Self-Check Answers (Hidden for now):</h4>
+                    <details class="text-sm">
+                        <summary class="cursor-pointer font-medium">Click to reveal answers</summary>
+                        <ol class="list-decimal pl-5 space-y-2 mt-2">
+                            <li><strong>Bar Chart / Histogram (if numerical bins):</strong> Excellent for comparing quantities across discrete categories (age ranges).</li>
+                            <li><strong>Line Chart:</strong> Ideal for showing trends over a continuous time series.</li>
+                            <li><strong>Bar Chart:</strong> Best for comparing discrete categories. A pie chart could also work if you're showing proportions of a whole budget, but a bar chart is usually clearer for direct comparison of magnitudes.</li>
+                            <li><strong>Scatter Plot:</strong> Perfect for identifying relationships and correlations between two numerical variables.</li>
+                            <li><strong>Pie Chart / Bar Chart:</strong> A Pie Chart is suitable if you want to show each rep's *proportion* of total sales. A Bar Chart is better if you want to *compare* the absolute sales figures among reps.</li>
+                        </ol>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('nav a').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Chart.js demos
+        document.addEventListener('DOMContentLoaded', function() {
+            // Bar Chart
+            const barCtx = document.getElementById('barChartExcelDemo').getContext('2d');
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                    datasets: [{
+                        label: 'Sales (in thousands)',
+                        data: [150, 170, 160, 190, 200],
+                        backgroundColor: 'rgba(67, 56, 202, 0.8)',
+                        borderColor: 'rgba(67, 56, 202, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Monthly Sales Comparison',
+                            font: { size: 14 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Sales (Thousands)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Line Chart
+            const lineCtx = document.getElementById('lineChartExcelDemo').getContext('2d');
+            new Chart(lineCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'],
+                    datasets: [{
+                        label: 'Website Visitors',
+                        data: [500, 550, 480, 600, 620],
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Weekly Website Visitors Trend',
+                            font: { size: 14 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Week'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Visitors'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Pie Chart
+            const pieCtx = document.getElementById('pieChartExcelDemo').getContext('2d');
+            new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Electronics', 'Apparel', 'Home Goods', 'Books'],
+                    datasets: [{
+                        label: 'Revenue Share',
+                        data: [40, 25, 20, 15],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Revenue Share by Product Category',
+                            font: { size: 14 }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

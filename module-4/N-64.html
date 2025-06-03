@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S64: Model Evaluation Metrics for Classification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="number"], input[type="range"], textarea {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            max-width: 250px; /* Constrain width for inputs */
+            margin-bottom: 0.5rem;
+        }
+        input[type="range"] {
+            padding: 0; /* Remove padding for range input */
+            height: 2.5rem; /* Adjust height for better visual */
+            -webkit-appearance: none; /* Remove default styling */
+            appearance: none;
+            background: #d1d5db; /* Track background */
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+            max-width: 100%; /* Allow range to fill width */
+        }
+        input[type="range"]:hover {
+            opacity: 1;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4338CA;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4338CA;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        textarea {
+            max-width: 100%;
+            min-height: 80px;
+            resize: vertical;
+        }
+        .action-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+        }
+        .action-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .code-block {
+            background-color: #2D3748; /* Dark background for code */
+            color: #E2E8F0; /* Light text */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', monospace; /* Monospace font */
+            overflow-x: auto; /* Allow horizontal scrolling for long lines */
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .code-block pre {
+            margin: 0;
+        }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #4A5568;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .copy-button:hover {
+            background-color: #6366F1;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px; /* Increased height for better visibility */
+            width: 100%;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        /* Message Box Styling */
+        #messageBox {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .input-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4B5563;
+        }
+
+        /* Confusion Matrix Table */
+        .confusion-matrix-table {
+            width: 100%;
+            max-width: 400px;
+            margin: 1.5rem auto;
+            border-collapse: collapse;
+            font-size: 1.1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 0.5rem;
+            overflow: hidden; /* Ensures rounded corners apply to content */
+        }
+        .confusion-matrix-table th, .confusion-matrix-table td {
+            border: 1px solid #cbd5e1; /* gray-300 */
+            padding: 1rem;
+        }
+        .confusion-matrix-table thead th {
+            background-color: #4338CA; /* indigo-700 */
+            color: white;
+            font-weight: 600;
+        }
+        .confusion-matrix-table tbody td {
+            background-color: #ffffff;
+            color: #374151;
+        }
+        .confusion-matrix-table .header-label {
+            background-color: #6366F1; /* indigo-500 */
+            color: white;
+            font-weight: 600;
+        }
+        .confusion-matrix-table .highlight-true-positive { background-color: #D1FAE5; /* green-100 */ color: #065F46; }
+        .confusion-matrix-table .highlight-true-negative { background-color: #E0F2FE; /* blue-100 */ color: #1E40AF; }
+        .confusion-matrix-table .highlight-false-positive { background-color: #FEE2E2; /* red-100 */ color: #991B1B; }
+        .confusion-matrix-table .highlight-false-negative { background-color: #FFEDD5; /* orange-100 */ color: #9A3412; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S64: Model Evaluation Metrics for Classification</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#intro" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">🚀 Intro</a></li>
+                    <li><a href="#metrics-theory" class="nav-button text-sm sm:text-base font-medium py-2 px-3">📊 Metrics Theory</a></li>
+                    <li><a href="#interactive-demo" class="nav-button text-sm sm:text-base font-medium py-2 px-3">🧪 Interactive Demo</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="intro" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">🚀</span>Introduction: Evaluating Classification Models</h2>
+            <p class="section-intro">After building a classification model (like Logistic Regression), the next critical step is to evaluate how well it performs. Unlike regression, where we look at R-squared or RMSE, classification models require a different set of metrics to understand their accuracy, ability to identify positive cases, and avoid false alarms.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Why Specific Metrics for Classification?</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Consider predicting if a customer will churn (Yes/No). Simply predicting "No" for everyone might give high accuracy if churn is rare, but it's useless for identifying at-risk customers. Classification metrics help us understand nuances like:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>How many positive cases did we correctly identify?</li>
+                    <li>Of all cases predicted positive, how many were actually positive?</li>
+                    <li>How many false alarms did we generate?</li>
+                    <li>How many truly positive cases did we miss?</li>
+                </ul>
+                <p class="mt-4 text-gray-700 leading-relaxed font-bold">Let's dive into the fundamental tools for evaluating classification models!</p>
+            </div>
+        </section>
+
+        <section id="metrics-theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📊</span>Key Model Evaluation Metrics</h2>
+            <p class="section-intro">The foundation of most classification metrics is the **Confusion Matrix**. From it, we derive various measures that provide different insights into model performance.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. Confusion Matrix</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">A Confusion Matrix is a table that summarizes the performance of a classification model on a set of test data for which the true values are known. It allows visualization of the performance of an algorithm.</p>
+                <div class="code-block bg-gray-100 text-gray-800 p-4 rounded-md">
+                    <pre><code>
+|                       | Predicted: Negative (0) | Predicted: Positive (1) |
+|-----------------------|-------------------------|-------------------------|
+| Actual: Negative (0)  | True Negative (TN)      | False Positive (FP)     |
+| Actual: Positive (1)  | False Negative (FN)     | True Positive (TP)      |
+                    </code></pre>
+                    <ul class="list-disc pl-5 text-sm text-gray-600 mt-2">
+                        <li><strong>True Positive (TP):</strong> Actual is Positive, Predicted is Positive. (Correctly identified positive cases)</li>
+                        <li><strong>True Negative (TN):</strong> Actual is Negative, Predicted is Negative. (Correctly identified negative cases)</li>
+                        <li><strong>False Positive (FP):</strong> Actual is Negative, Predicted is Positive. (Type I error - "False Alarm")</li>
+                        <li><strong>False Negative (FN):</strong> Actual is Positive, Predicted is Negative. (Type II error - "Missed Opportunity")</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. Accuracy</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Accuracy measures the proportion of total predictions that were correct. It's the most intuitive metric but can be misleading in imbalanced datasets.</p>
+                <div class="code-block bg-gray-100 text-gray-800 p-4 rounded-md">
+                    <pre><code>\[ \text{Accuracy} = \frac{\text{TP} + \text{TN}}{\text{TP} + \text{TN} + \text{FP} + \text{FN}} \]</code></pre>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. Precision (Positive Predictive Value)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Precision answers: "Of all the cases we *predicted* as positive, how many were *actually* positive?" It's important when the cost of a False Positive is high (e.g., wrongly flagging a healthy person with a disease).</p>
+                <div class="code-block bg-gray-100 text-gray-800 p-4 rounded-md">
+                    <pre><code>\[ \text{Precision} = \frac{\text{TP}}{\text{TP} + \text{FP}} \]</code></pre>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">4. Recall (Sensitivity or True Positive Rate)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Recall answers: "Of all the cases that were *actually* positive, how many did we correctly identify?" It's important when the cost of a False Negative is high (e.g., missing a cancerous tumor).</p>
+                <div class="code-block bg-gray-100 text-gray-800 p-4 rounded-md">
+                    <pre><code>\[ \text{Recall} = \frac{\text{TP}}{\text{TP} + \text{FN}} \]</code></pre>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">5. F1-Score</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">The F1-Score is the harmonic mean of Precision and Recall. It provides a single metric that balances both concerns, especially useful when there's an uneven class distribution.</p>
+                <div class="code-block bg-gray-100 text-gray-800 p-4 rounded-md">
+                    <pre><code>\[ \text{F1-Score} = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}} \]</code></pre>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">6. Specificity (True Negative Rate)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Specificity answers: "Of all the cases that were <em>actually</em> negative, how many did we correctly identify?" It's the counterpart to Recall, focusing on correctly identifying negative cases.</p>
+                <div class="code-block bg-gray-100 text-gray-800 p-4 rounded-md">
+                    <pre><code>\[ \text{Specificity} = \frac{\text{TN}}{\text{TN} + \text{FP}} \]</code></pre>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">7. ROC Curve and AUC (Area Under the Curve)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed"><strong>Receiver Operating Characteristic (ROC) curve</strong> is a graph showing the performance of a classification model at all classification thresholds. It plots the True Positive Rate (Recall) against the False Positive Rate (1 - Specificity).</p>
+                <p class="mb-4 text-gray-700 leading-relaxed"><strong>Area Under the ROC Curve (AUC)</strong> is a single scalar value that summarizes the overall performance of a classification model across all possible classification thresholds. An AUC of 1.0 indicates a perfect model, while 0.5 indicates a model no better than random guessing.</p>
+                <ul class="list-disc pl-5 text-sm text-gray-600">
+                    <li><strong>True Positive Rate (TPR) / Recall:</strong> \( \text{TPR} = \frac{\text{TP}}{\text{TP} + \text{FN}} \)</li>
+                    <li><strong>False Positive Rate (FPR):</strong> \( \text{FPR} = \frac{\text{FP}}{\text{FP} + \text{TN}} = 1 - \text{Specificity} \)</li>
+                </ul>
+                <p class="mt-4 text-gray-700 leading-relaxed font-bold">The ROC curve helps visualize the trade-off between sensitivity and specificity, and AUC provides a robust single metric for overall model performance, especially useful for imbalanced datasets.</p>
+            </div>
+        </section>
+
+        <section id="interactive-demo" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">🧪</span>Interactive Demo: Exploring Classification Metrics</h2>
+            <p class="section-intro">Let's simulate a classification scenario and see how changing the classification threshold impacts the Confusion Matrix and all the evaluation metrics. Imagine we are predicting a rare disease (Positive = Disease, Negative = No Disease).</p>
+            
+            <div class="interactive-panel">
+                <div class="panel-title">Classification Metrics Calculator</div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="input-group">
+                        <label for="num_total_obs">Total Observations:</label>
+                        <input type="number" id="num_total_obs" value="1000" min="100" max="5000" step="100">
+                        <p class="text-xs text-gray-500 mt-1">Total number of samples in your dataset.</p>
+                    </div>
+                    <div class="input-group">
+                        <label for="prevalence_positive">Actual Positive Prevalence (%):</label>
+                        <input type="number" id="prevalence_positive" value="10" min="1" max="99" step="1">
+                        <p class="text-xs text-gray-500 mt-1">Percentage of actual positive cases (e.g., disease prevalence).</p>
+                    </div>
+                    <div class="input-group md:col-span-2">
+                        <label for="classification_threshold">Classification Threshold: <span id="threshold_value">0.50</span></label>
+                        <input type="range" id="classification_threshold" min="0.01" max="0.99" step="0.01" value="0.50">
+                        <p class="text-xs text-gray-500 mt-1">If predicted probability > threshold, classify as Positive (1).</p>
+                    </div>
+                </div>
+                
+                <div class="text-center mb-4">
+                    <button id="calculateMetricsBtn" class="action-button bg-indigo-600 hover:bg-indigo-700">Calculate Metrics</button>
+                    <button id="showMetricsPythonCodeBtn" class="action-button bg-green-600 hover:bg-green-700">Show Python Code</button>
+                </div>
+
+                <div id="metricsPythonCodeSection" class="hidden mt-4">
+                    <h4 class="text-indigo-600">Python Code for Metrics Calculation & ROC Plotting:</h4>
+                    <div class="code-block">
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="metricsPythonCode">
+import numpy as np
+import pandas as pd
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, roc_curve, auc
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# --- Simulate Data (replace with your actual model's predictions) ---
+np.random.seed(42) # For reproducibility in this example
+
+num_total_obs = 1000 # Example: Total observations
+prevalence_positive = 0.10 # Example: 10% actual positive cases
+
+# Generate true labels (actual_labels)
+num_positives = int(num_total_obs * prevalence_positive)
+num_negatives = num_total_obs - num_positives
+actual_labels = np.concatenate([np.ones(num_positives), np.zeros(num_negatives)])
+np.random.shuffle(actual_labels) # Shuffle to mix positives and negatives
+
+# Generate predicted probabilities (e.g., from a Logistic Regression model)
+# Make probabilities for actual positives generally higher than for negatives
+predicted_probabilities = np.zeros(num_total_obs)
+for i in range(num_total_obs):
+    if actual_labels[i] == 1:
+        # For actual positives, probabilities are generally high
+        predicted_probabilities[i] = np.random.uniform(0.6, 0.95)
+    else:
+        # For actual negatives, probabilities are generally low
+        predicted_probabilities[i] = np.random.uniform(0.05, 0.4)
+
+# Introduce some overlap to make classification non-perfect
+# For example, some actual positives might have low probabilities and vice versa
+predicted_probabilities[actual_labels == 1][np.random.rand(num_positives) < 0.2] = np.random.uniform(0.05, 0.5) # 20% of actual positives get low prob
+predicted_probabilities[actual_labels == 0][np.random.rand(num_negatives) < 0.1] = np.random.uniform(0.5, 0.95) # 10% of actual negatives get high prob
+
+
+# --- Set Classification Threshold ---
+classification_threshold = 0.50 # This would come from user input in the demo
+
+# Convert probabilities to binary predictions based on the threshold
+predicted_labels = (predicted_probabilities >= classification_threshold).astype(int)
+
+# --- Calculate Confusion Matrix ---
+# cm = [[TN, FP], [FN, TP]]
+cm = confusion_matrix(actual_labels, predicted_labels)
+TN, FP, FN, TP = cm.ravel()
+
+print(f"\n--- Confusion Matrix (Threshold = {classification_threshold:.2f}) ---")
+print(f"True Negatives (TN): {TN}")
+print(f"False Positives (FP): {FP}")
+print(f"False Negatives (FN): {FN}")
+print(f"True Positives (TP): {TP}")
+
+# --- Calculate Metrics ---
+accuracy = accuracy_score(actual_labels, predicted_labels)
+precision = precision_score(actual_labels, predicted_labels, zero_division=0) # zero_division=0 handles cases where TP+FP is 0
+recall = recall_score(actual_labels, predicted_labels, zero_division=0)
+f1 = f1_score(actual_labels, predicted_labels, zero_division=0)
+
+# Specificity (True Negative Rate)
+specificity = TN / (TN + FP) if (TN + FP) > 0 else 0
+
+print("\n--- Classification Metrics ---")
+print(f"Accuracy: {accuracy:.4f}")
+print(f"Precision: {precision:.4f}")
+print(f"Recall (Sensitivity): {recall:.4f}")
+print(f"F1-Score: {f1:.4f}")
+print(f"Specificity: {specificity:.4f}")
+
+# --- ROC Curve and AUC ---
+# fpr = False Positive Rate, tpr = True Positive Rate (Recall)
+fpr, tpr, thresholds = roc_curve(actual_labels, predicted_probabilities)
+roc_auc = auc(fpr, tpr)
+
+print(f"\nArea Under ROC Curve (AUC): {roc_auc:.4f}")
+
+plt.figure(figsize=(8, 6))
+plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random Classifier')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate (1 - Specificity)')
+plt.ylabel('True Positive Rate (Recall)')
+plt.title('Receiver Operating Characteristic (ROC) Curve')
+plt.legend(loc="lower right")
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+</code></pre>
+                    </div>
+                </div>
+
+                <div id="metricsOutputSection" class="hidden mt-4">
+                    <h4 class="text-indigo-600 text-center mb-4">Calculated Metrics</h4>
+                    
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Confusion Matrix</h5>
+                    <table class="confusion-matrix-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" colspan="2"></th>
+                                <th colspan="2">Predicted</th>
+                            </tr>
+                            <tr>
+                                <th>Negative (0)</th>
+                                <th>Positive (1)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="2" class="header-label">Actual</td>
+                                <td class="header-label">Negative (0)</td>
+                                <td id="tn_value" class="highlight-true-negative"></td>
+                                <td id="fp_value" class="highlight-false-positive"></td>
+                            </tr>
+                            <tr>
+                                <td class="header-label">Positive (1)</td>
+                                <td id="fn_value" class="highlight-false-negative"></td>
+                                <td id="tp_value" class="highlight-true-positive"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">The Confusion Matrix shows how many predictions were correct (True Positive, True Negative) and incorrect (False Positive, False Negative).</p>
+
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Derived Metrics</h5>
+                    <div class="results-box">
+                        <div class="result-item">
+                            <span class="result-label">Accuracy:</span>
+                            <span class="result-value" id="accuracy_value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Precision:</span>
+                            <span class="result-value" id="precision_value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Recall (Sensitivity):</span>
+                            <span class="result-value" id="recall_value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">F1-Score:</span>
+                            <span class="result-value" id="f1_value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Specificity:</span>
+                            <span class="result-value" id="specificity_value"></span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">These metrics provide a more nuanced view of model performance than just accuracy.</p>
+
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">ROC Curve & AUC</h5>
+                    <div class="chart-container">
+                        <canvas id="rocCurveChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 1: The Receiver Operating Characteristic (ROC) curve plots True Positive Rate (Recall) vs. False Positive Rate (1 - Specificity) across different thresholds. The Area Under the Curve (AUC) summarizes overall model performance.</p>
+                    <div class="results-box mt-4">
+                        <div class="result-item">
+                            <span class="result-label">Area Under Curve (AUC):</span>
+                            <span class="result-value" id="auc_value"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <div id="messageBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg z-50" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span id="messageText" class="block sm:inline"></span>
+        <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" onclick="document.getElementById('messageBox').classList.add('hidden');">
+            <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+        </span>
+    </div>
+
+    <script>
+        // Global variables for simulated data
+        let actualLabels = [];
+        let predictedProbabilities = [];
+        let rocCurveChartInstance = null; // Chart.js instance for ROC curve
+
+        // --- Message Box Function ---
+        function showMessage(message, type = 'error') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            messageText.innerText = message;
+            messageBox.classList.remove('hidden');
+            if (type === 'error') {
+                messageBox.classList.remove('bg-green-100', 'border-green-400', 'text-green-700');
+                messageBox.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+            } else {
+                messageBox.classList.remove('bg-red-100', 'border-red-400', 'text-red-700'); // Remove red if previously error
+                messageBox.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+            }
+        }
+
+        // --- Code Copy Function ---
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const textToCopy = codeBlock.textContent;
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                button.textContent = 'Copied!';
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                button.textContent = 'Error!';
+            }
+            document.body.removeChild(textarea);
+
+            setTimeout(() => {
+                button.textContent = 'Copy';
+            }, 2000);
+        }
+
+        // --- MathJax Rendering Function ---
+        function renderMathInElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element && typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                // Ensure MathJax is ready and then typeset
+                MathJax.startup.promise.then(() => {
+                    MathJax.typesetPromise([element]).catch(err => console.error("MathJax rendering error for element:", elementId, err));
+                });
+            } else if (!element) {
+                console.warn(`Element with ID '${elementId}' not found for MathJax rendering.`);
+            } else {
+                console.warn("MathJax not fully loaded or configured. Skipping MathJax rendering for:", elementId);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation button active state logic
+            document.querySelectorAll('nav a').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // --- Interactive Demo Logic ---
+            const numTotalObsInput = document.getElementById('num_total_obs');
+            const prevalencePositiveInput = document.getElementById('prevalence_positive');
+            const classificationThresholdInput = document.getElementById('classification_threshold');
+            const thresholdValueSpan = document.getElementById('threshold_value');
+
+            const calculateMetricsBtn = document.getElementById('calculateMetricsBtn');
+            const showMetricsPythonCodeBtn = document.getElementById('showMetricsPythonCodeBtn');
+            const metricsPythonCodeSection = document.getElementById('metricsPythonCodeSection');
+            const metricsOutputSection = document.getElementById('metricsOutputSection');
+
+            // Confusion Matrix Elements
+            const tnValue = document.getElementById('tn_value');
+            const fpValue = document.getElementById('fp_value');
+            const fnValue = document.getElementById('fn_value');
+            const tpValue = document.getElementById('tp_value');
+
+            // Metrics Value Elements
+            const accuracyValue = document.getElementById('accuracy_value');
+            const precisionValue = document.getElementById('precision_value');
+            const recallValue = document.getElementById('recall_value');
+            const f1Value = document.getElementById('f1_value');
+            const specificityValue = document.getElementById('specificity_value');
+            const aucValue = document.getElementById('auc_value');
+
+            // Update threshold display
+            classificationThresholdInput.addEventListener('input', () => {
+                thresholdValueSpan.textContent = parseFloat(classificationThresholdInput.value).toFixed(2);
+                // Recalculate metrics immediately when threshold changes for live update
+                calculateAndDisplayMetrics();
+            });
+
+            showMetricsPythonCodeBtn.addEventListener('click', function() {
+                metricsPythonCodeSection.classList.toggle('hidden');
+            });
+
+            calculateMetricsBtn.addEventListener('click', function() {
+                metricsOutputSection.classList.remove('hidden');
+                generateSimulatedData(); // Generate data once
+                calculateAndDisplayMetrics(); // Calculate and display based on current threshold
+                renderMathInElement('metricsOutputSection'); // Render MathJax in output section
+            });
+
+            // --- Data Generation Function ---
+            function generateSimulatedData() {
+                const numTotalObs = parseInt(numTotalObsInput.value);
+                const prevalencePositive = parseFloat(prevalencePositiveInput.value) / 100;
+
+                if (isNaN(numTotalObs) || numTotalObs <= 0) {
+                    showMessage("Total Observations must be a positive number.", "error");
+                    return;
+                }
+                if (isNaN(prevalencePositive) || prevalencePositive <= 0 || prevalencePositive >= 1) {
+                    showMessage("Positive Prevalence must be between 1% and 99%.", "error");
+                    return;
+                }
+
+                actualLabels = [];
+                predictedProbabilities = [];
+
+                const numPositives = Math.round(numTotalObs * prevalencePositive);
+                const numNegatives = numTotalObs - numPositives;
+
+                // Generate true labels
+                for (let i = 0; i < numPositives; i++) actualLabels.push(1);
+                for (let i = 0; i < numNegatives; i++) actualLabels.push(0);
+                shuffleArray(actualLabels); // Shuffle to mix
+
+                // Generate predicted probabilities
+                // Make probabilities for actual positives generally higher than for negatives
+                // Introduce some overlap to make classification non-perfect
+                for (let i = 0; i < numTotalObs; i++) {
+                    let prob;
+                    if (actualLabels[i] === 1) {
+                        prob = Math.random() * (0.95 - 0.6) + 0.6; // High probabilities for actual positives
+                        if (Math.random() < 0.2) { // 20% of actual positives get lower prob (False Negatives)
+                            prob = Math.random() * (0.5 - 0.05) + 0.05;
+                        }
+                    } else {
+                        prob = Math.random() * (0.4 - 0.05) + 0.05; // Low probabilities for actual negatives
+                        if (Math.random() < 0.1) { // 10% of actual negatives get higher prob (False Positives)
+                            prob = Math.random() * (0.95 - 0.5) + 0.5;
+                        }
+                    }
+                    predictedProbabilities.push(prob);
+                }
+                console.log("Simulated data generated.");
+            }
+
+            // Fisher-Yates (Knuth) shuffle
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            // --- Metrics Calculation and Display Function ---
+            function calculateAndDisplayMetrics() {
+                if (actualLabels.length === 0 || predictedProbabilities.length === 0) {
+                    generateSimulatedData(); // Ensure data exists if not already generated
+                }
+                
+                const threshold = parseFloat(classificationThresholdInput.value);
+                const predictedLabels = predictedProbabilities.map(prob => prob >= threshold ? 1 : 0);
+
+                // Calculate Confusion Matrix components
+                let TP = 0, TN = 0, FP = 0, FN = 0;
+                for (let i = 0; i < actualLabels.length; i++) {
+                    if (actualLabels[i] === 1 && predictedLabels[i] === 1) TP++;
+                    else if (actualLabels[i] === 0 && predictedLabels[i] === 0) TN++;
+                    else if (actualLabels[i] === 0 && predictedLabels[i] === 1) FP++;
+                    else if (actualLabels[i] === 1 && predictedLabels[i] === 0) FN++;
+                }
+
+                // Display Confusion Matrix
+                tnValue.textContent = TN;
+                fpValue.textContent = FP;
+                fnValue.textContent = FN;
+                tpValue.textContent = TP;
+
+                // Calculate Metrics
+                const total = TP + TN + FP + FN;
+                const accuracy = total > 0 ? (TP + TN) / total : 0;
+                const precision = (TP + FP) > 0 ? TP / (TP + FP) : 0;
+                const recall = (TP + FN) > 0 ? TP / (TP + FN) : 0;
+                const f1 = (precision + recall) > 0 ? 2 * (precision * recall) / (precision + recall) : 0;
+                const specificity = (TN + FP) > 0 ? TN / (TN + FP) : 0;
+
+                // Display Metrics
+                accuracyValue.textContent = accuracy.toFixed(4);
+                precisionValue.textContent = precision.toFixed(4);
+                recallValue.textContent = recall.toFixed(4);
+                f1Value.textContent = f1.toFixed(4);
+                specificityValue.textContent = specificity.toFixed(4);
+
+                // Calculate ROC Curve and AUC
+                drawRocCurve(actualLabels, predictedProbabilities);
+            }
+
+            // --- ROC Curve Drawing Function ---
+            function drawRocCurve(actual, probabilities) {
+                const ctx = document.getElementById('rocCurveChart').getContext('2d');
+                if (!ctx) { console.error("ROC Curve Chart context not found."); return; }
+                console.log("Drawing ROC Curve...");
+
+                if (rocCurveChartInstance) {
+                    rocCurveChartInstance.destroy();
+                }
+
+                // Generate ROC points manually for client-side
+                // Sort predictions by probability in descending order
+                const sortedData = actual.map((a, i) => ({ actual: a, prob: probabilities[i] }))
+                                       .sort((a, b) => b.prob - a.prob);
+
+                let tp_count = 0;
+                let fp_count = 0;
+                const num_actual_positives = actual.filter(label => label === 1).length;
+                const num_actual_negatives = actual.filter(label => label === 0).length;
+
+                const fpr_points = [0];
+                const tpr_points = [0];
+
+                for (let i = 0; i < sortedData.length; i++) {
+                    if (sortedData[i].actual === 1) {
+                        tp_count++;
+                    } else {
+                        fp_count++;
+                    }
+                    fpr_points.push(num_actual_negatives > 0 ? fp_count / num_actual_negatives : 0);
+                    tpr_points.push(num_actual_positives > 0 ? tp_count / num_actual_positives : 0);
+                }
+
+                // Add (1,1) point to complete the curve
+                fpr_points.push(1);
+                tpr_points.push(1);
+
+                // Calculate AUC using trapezoidal rule (simplified)
+                let auc_val = 0;
+                for (let i = 0; i < fpr_points.length - 1; i++) {
+                    auc_val += (fpr_points[i+1] - fpr_points[i]) * (tpr_points[i+1] + tpr_points[i]) / 2;
+                }
+
+                aucValue.textContent = auc_val.toFixed(4);
+
+                const rocData = fpr_points.map((fpr, i) => ({ x: fpr, y: tpr_points[i] }));
+
+                rocCurveChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            {
+                                label: `ROC curve (AUC = ${auc_val.toFixed(2)})`,
+                                data: rocData,
+                                borderColor: 'darkorange',
+                                borderWidth: 2,
+                                fill: false,
+                                pointRadius: 0,
+                                tension: 0.1
+                            },
+                            {
+                                label: 'Random Classifier',
+                                data: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
+                                borderColor: 'navy',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                fill: false,
+                                pointRadius: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Receiver Operating Characteristic (ROC) Curve',
+                                font: { size: 16, weight: 'bold' },
+                                color: '#374151'
+                            },
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `FPR: ${context.parsed.x.toFixed(2)}, TPR: ${context.parsed.y.toFixed(2)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: {
+                                    display: true,
+                                    text: 'False Positive Rate (1 - Specificity)',
+                                    color: '#4B5563'
+                                },
+                                min: 0,
+                                max: 1
+                            },
+                            y: {
+                                type: 'linear',
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'True Positive Rate (Recall)',
+                                    color: '#4B5563'
+                                },
+                                min: 0,
+                                max: 1
+                            }
+                        },
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+            }
+
+            // Initial render of MathJax for the theory section on load
+            renderMathInElement('metrics-theory');
+
+            // Trigger initial calculation and display with default values
+            calculateMetricsBtn.click();
+        });
+
+        // Load MathJax for rendering LaTeX
+        const mathJaxScript = document.createElement('script');
+        mathJaxScript.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
+        mathJaxScript.async = true;
+        document.body.appendChild(mathJaxScript);
+    </script>
+</body>
+</html>

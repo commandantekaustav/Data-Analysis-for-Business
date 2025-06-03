@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed: Chi-Squared & ANOVA Interactive Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Updated library versions -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                packages: ['base', 'ams', 'noerrors', 'noundefined'],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                enableMenu: false,
+                messageStyle: "none",
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            },
+            startup: {
+                pageReady: () => {
+                    return MathJax.startup.defaultPageReady().then(() => {
+                        // Initial chart renders
+                        if (typeof renderChiSquaredDistributionChart === 'function') {
+                            renderChiSquaredDistributionChart(3);
+                        }
+                        if (typeof updateChiSimulation === 'function') {
+                            updateChiSimulation();
+                        }
+                        if (typeof updateAnovaSimulation === 'function') {
+                            updateAnovaSimulation();
+                        }
+                        // Force re-render of MathJax content
+                        MathJax.typesetPromise();
+                    });
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); } /* Adjusted for header/footer */
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="number"], select, textarea {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            max-width: 250px; /* Default max-width */
+            margin-bottom: 0.5rem;
+        }
+        textarea {
+            max-width: 100%; /* Allow textarea to be wider if needed by parent */
+            min-height: 80px;
+            resize: vertical;
+        }
+        .calculate-button, .simulate-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: block; /* Changed from inline-block */
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .calculate-button:hover, .simulate-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .interpretation-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5; /* Default to green for positive interpretation */
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .interpretation-box.significant { /* For significant results */
+             background-color: #D1FAE5; color: #065F46; border: 1px solid #34D399;
+        }
+        .interpretation-box.not-significant { /* For non-significant results */
+             background-color: #FEF3C7; color: #92400E; border: 1px solid #FBBF24;
+        }
+
+        .chart-illustrative {
+            position: relative;
+            height: 250px;
+            width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center; /* Center items within group */
+            margin-bottom: 1rem;
+        }
+        .input-group label {
+            font-weight: 500;
+            color: #4B5563;
+            min-width: 120px; /* Ensure label text doesn't wrap too soon */
+            text-align: right; /* Align label text to the right for consistency */
+            flex-shrink: 0;
+        }
+        .input-group input[type="number"], .input-group textarea, .input-group select {
+             flex-grow: 1; /* Allow input to grow */
+        }
+        .test-type-selection {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .test-type-selection button {
+            background-color: #E0E7FF;
+            color: #4338CA;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #C7D2FE;
+        }
+        .test-type-selection button.active {
+            background-color: #4338CA;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-type-selection button:hover:not(.active) {
+            background-color: #C7D2FE;
+        }
+        .data-input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center; /* Center the input groups */
+        }
+         .data-input-section > .input-group, .data-input-section > .contingency-table-input {
+            width: 100%;
+            max-width: 600px; /* Max width for input areas */
+        }
+        .contingency-table-input {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 1rem;
+             align-items: center;
+        }
+        .contingency-table-input label {
+            width: 100%; text-align: center;
+        }
+        .contingency-table-input textarea {
+            width: 100%;
+            max-width: none; /* Override default max-width for this specific textarea */
+            min-height: 60px;
+            font-family: monospace;
+        }
+        #messageBox {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .simulation-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .simulation-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .chart-container { /* General container for multiple charts if needed */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            margin: 2rem 0;
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .example-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+        }
+        .example-card h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #4338CA;
+            margin-bottom: 1rem;
+        }
+        .example-card p {
+            margin-bottom: 1rem;
+        }
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            justify-content: center; /* Center tabs */
+        }
+        .tab-button {
+            padding: 0.5rem 1rem;
+            background-color: #E0E7FF;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .tab-button.active {
+            background-color: #4338CA;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .distribution-slider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+        .distribution-slider input {
+            max-width: 300px;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .input-group label {
+            min-width: 200px;
+            font-weight: 500;
+        }
+        
+        .input-group input {
+            width: 100px;
+            padding: 0.5rem;
+            border: 1px solid #c7d2fe;
+            border-radius: 0.25rem;
+        }
+        
+        .simulate-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            width: fit-content;
+            margin: 1rem auto;
+        }
+        
+        .simulate-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">Fixed: Chi-Squared & ANOVA Interactive Guide</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                    <li><a href="#examples" class="nav-button text-sm sm:text-base font-medium py-2 px-3">🔍 Examples</a></li>
+                    <li><a href="#simulations" class="nav-button text-sm sm:text-base font-medium py-2 px-3">🎮 Simulations</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Chi-Squared Tests & ANOVA Introduction</h2>
+            <p class="section-intro">While t-tests are used for comparing means of numerical data, <strong>Chi-Squared (\(\chi^2\)) tests</strong> are powerful tools for analyzing <strong>categorical data</strong>. They allow us to assess relationships between categorical variables or determine if observed frequencies match expected frequencies. Additionally, we'll introduce <strong>Analysis of Variance (ANOVA)</strong>, a technique for comparing means across three or more groups.</p>
+            
+            <div class="tabs mb-4">
+                <button class="tab-button active" data-tab="chi-dist-theory">Chi-Squared Distribution</button>
+                <button class="tab-button" data-tab="goodness-fit-theory">Goodness-of-Fit Test</button>
+                <button class="tab-button" data-tab="independence-theory">Test of Independence</button>
+                <button class="tab-button" data-tab="anova-theory">ANOVA Introduction</button>
+            </div>
+
+            <div class="tab-content active" id="chi-dist-theory">
+                <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. The Chi-Squared (\(\chi^2\)) Distribution</h3>
+                    
+                    <!-- Detailed Explanation -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Understanding the Chi-Squared Distribution</h4>
+                        <p class="mb-4 text-gray-700 leading-relaxed">The Chi-Squared distribution is a fundamental probability distribution that plays a crucial role in statistical inference, particularly in tests involving categorical data. Let's break down its key characteristics and applications:</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Key Properties</h5>
+                                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                                    <li><strong>Shape:</strong> Always positive and right-skewed</li>
+                                    <li><strong>Parameters:</strong> Single parameter - degrees of freedom (df)</li>
+                                    <li><strong>Mean:</strong> Equal to degrees of freedom</li>
+                                    <li><strong>Variance:</strong> Equal to 2 × degrees of freedom</li>
+                                    <li><strong>Range:</strong> [0, ∞)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Applications</h5>
+                                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                                    <li>Testing independence in contingency tables</li>
+                                    <li>Goodness-of-fit tests</li>
+                                    <li>Variance analysis</li>
+                                    <li>Confidence interval estimation</li>
+                                    <li>Hypothesis testing for categorical data</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step Understanding -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">How the Chi-Squared Distribution Works</h4>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <ol class="list-decimal pl-5 space-y-3 text-gray-700">
+                                <li><strong>Derivation:</strong> The Chi-Squared distribution arises from the sum of squared standard normal variables:
+                                    \[\chi^2 = \sum_{i=1}^{k} Z_i^2\]
+                                    where \(Z_i\) are independent standard normal variables.</li>
+                                
+                                <li><strong>Degrees of Freedom:</strong> The number of independent variables in the sum determines the shape:
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>Low df: Highly skewed</li>
+                                        <li>High df: Approaches normal distribution</li>
+                                        <li>df = 1: Special case with infinite density at 0</li>
+                                    </ul>
+                                </li>
+                                
+                                <li><strong>Probability Density Function:</strong>
+                                    \[f(x) = \frac{1}{2^{k/2}\Gamma(k/2)}x^{k/2-1}e^{-x/2}\]
+                                    where k is the degrees of freedom and Γ is the gamma function.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Visualization -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Interactive Distribution Explorer</h4>
+                        <p class="text-sm text-gray-600 mb-4">Adjust the degrees of freedom to see how the distribution changes. Notice how the shape becomes more symmetric as df increases.</p>
+                        
+                        <div class="distribution-slider">
+                            <label for="dfSlider" class="font-medium">Degrees of Freedom (df):</label>
+                            <input type="range" id="dfSlider" min="1" max="15" value="3" class="w-full max-w-xs">
+                            <span id="dfValue" class="font-semibold">3</span>
+                        </div>
+                        
+                        <div class="chart-illustrative">
+                            <canvas id="chiSquaredDistributionChart"></canvas>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                            <div class="bg-gray-50 p-3 rounded-lg text-center">
+                                <p class="text-sm font-medium text-gray-600">Mean</p>
+                                <p id="distributionMean" class="text-lg font-semibold text-indigo-600">3.00</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg text-center">
+                                <p class="text-sm font-medium text-gray-600">Variance</p>
+                                <p id="distributionVariance" class="text-lg font-semibold text-indigo-600">6.00</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg text-center">
+                                <p class="text-sm font-medium text-gray-600">Mode</p>
+                                <p id="distributionMode" class="text-lg font-semibold text-indigo-600">1.00</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Common Misconceptions -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Common Misconceptions and Clarifications</h4>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="space-y-4">
+                                <div>
+                                    <h5 class="font-semibold text-red-600 mb-1">Misconception 1: Chi-Squared tests are only for 2×2 tables</h5>
+                                    <p class="text-gray-700">Actually, Chi-Squared tests can be used for any size contingency table, as long as the expected frequencies are sufficient.</p>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-red-600 mb-1">Misconception 2: The distribution is always symmetric</h5>
+                                    <p class="text-gray-700">The Chi-Squared distribution is always right-skewed, though it becomes more symmetric as degrees of freedom increase.</p>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-red-600 mb-1">Misconception 3: Expected frequencies must be equal</h5>
+                                    <p class="text-gray-700">Expected frequencies can be different across categories, as long as they're based on a valid theoretical distribution or model.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Practice Problems -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Practice Problems</h4>
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Problem 1: Understanding Degrees of Freedom</h5>
+                                <p class="text-gray-700 mb-2">A researcher is conducting a Chi-Squared test with 5 categories. What is the degrees of freedom for this test?</p>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-gray-600">Solution:</p>
+                                    <p class="text-gray-700">For a goodness-of-fit test with k categories, df = k - 1. Therefore, df = 5 - 1 = 4.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Problem 2: Critical Value Calculation</h5>
+                                <p class="text-gray-700 mb-2">Find the critical value for a Chi-Squared test with 3 degrees of freedom at α = 0.05.</p>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-gray-600">Solution:</p>
+                                    <p class="text-gray-700">Using the Chi-Squared distribution table or calculator, the critical value is 7.815.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="goodness-fit-theory">
+                <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. Chi-Squared Goodness-of-Fit Test</h3>
+                    
+                    <!-- Detailed Explanation -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Understanding Goodness-of-Fit Tests</h4>
+                        <p class="mb-4 text-gray-700 leading-relaxed">The Chi-Squared Goodness-of-Fit test is a powerful statistical tool that helps us determine if observed data follows an expected distribution. This test is particularly useful when you want to verify if your data matches a theoretical distribution or if it follows a specific pattern.</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">When to Use</h5>
+                                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                                    <li>Testing if data follows a specific distribution</li>
+                                    <li>Verifying if proportions match expected values</li>
+                                    <li>Checking if observed frequencies match theoretical frequencies</li>
+                                    <li>Validating if data follows a uniform distribution</li>
+                                    <li>Testing if data follows a normal distribution</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Key Requirements</h5>
+                                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                                    <li>Random sampling</li>
+                                    <li>Categorical or discrete data</li>
+                                    <li>Expected frequency ≥ 5 for each category</li>
+                                    <li>Independent observations</li>
+                                    <li>Mutually exclusive categories</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step Process -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Step-by-Step Process</h4>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <ol class="list-decimal pl-5 space-y-4 text-gray-700">
+                                <li>
+                                    <strong>State the Hypotheses:</strong>
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>\(H_0\): The observed frequencies match the expected frequencies</li>
+                                        <li>\(H_a\): The observed frequencies do not match the expected frequencies</li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <strong>Calculate Expected Frequencies:</strong>
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>For uniform distribution: \(E_i = \frac{N}{k}\)</li>
+                                        <li>For specified proportions: \(E_i = N \times p_i\)</li>
+                                        <li>For theoretical distribution: Use distribution parameters</li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <strong>Calculate Chi-Squared Statistic:</strong>
+                                    \[\chi^2 = \sum_{i=1}^{k} \frac{(O_i - E_i)^2}{E_i}\]
+                                    where:
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>\(O_i\) = observed frequency for category i</li>
+                                        <li>\(E_i\) = expected frequency for category i</li>
+                                        <li>k = number of categories</li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <strong>Determine Degrees of Freedom:</strong>
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>df = k - 1 (for simple goodness-of-fit)</li>
+                                        <li>df = k - 1 - p (if p parameters are estimated from data)</li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <strong>Find Critical Value and Make Decision:</strong>
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>Compare \(\chi^2\) statistic to critical value</li>
+                                        <li>Reject \(H_0\) if \(\chi^2 > \chi^2_{\alpha,df}\)</li>
+                                        <li>Or compare p-value to α</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Example -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Interactive Example: Customer Preference Study</h4>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-gray-700 mb-4">A coffee shop wants to test if customer preferences for different types of coffee are evenly distributed. They collected data from 200 customers:</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <h5 class="font-semibold text-indigo-600 mb-2">Observed Frequencies</h5>
+                                    <ul class="list-disc pl-5 text-gray-700">
+                                        <li>Espresso: 45</li>
+                                        <li>Latte: 65</li>
+                                        <li>Cappuccino: 50</li>
+                                        <li>Americano: 40</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-indigo-600 mb-2">Expected Frequencies</h5>
+                                    <ul class="list-disc pl-5 text-gray-700">
+                                        <li>Espresso: 50</li>
+                                        <li>Latte: 50</li>
+                                        <li>Cappuccino: 50</li>
+                                        <li>Americano: 50</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white p-3 rounded border border-gray-200">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Solution Steps:</h5>
+                                <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                                    <li>Calculate \(\chi^2\) statistic:
+                                        \[\chi^2 = \frac{(45-50)^2}{50} + \frac{(65-50)^2}{50} + \frac{(50-50)^2}{50} + \frac{(40-50)^2}{50} = 7.0\]</li>
+                                    <li>Degrees of freedom = 4 - 1 = 3</li>
+                                    <li>Critical value at α = 0.05 is 7.815</li>
+                                    <li>Since 7.0 < 7.815, we fail to reject \(H_0\)</li>
+                                    <li>Conclusion: Customer preferences appear to be evenly distributed</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Common Pitfalls -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Common Pitfalls to Avoid</h4>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="space-y-4">
+                                <div>
+                                    <h5 class="font-semibold text-red-600 mb-1">Pitfall 1: Small Expected Frequencies</h5>
+                                    <p class="text-gray-700">When expected frequencies are less than 5, the Chi-Squared approximation may be poor. Consider combining categories or using exact tests.</p>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-red-600 mb-1">Pitfall 2: Ignoring Assumptions</h5>
+                                    <p class="text-gray-700">The test assumes random sampling and independence. Violating these assumptions can lead to incorrect conclusions.</p>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-red-600 mb-1">Pitfall 3: Overlooking Effect Size</h5>
+                                    <p class="text-gray-700">A significant result doesn't necessarily mean a large effect. Consider calculating effect size measures like Cramer's V.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Practice Problems -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Practice Problems</h4>
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Problem 1: Dice Roll Test</h5>
+                                <p class="text-gray-700 mb-2">A researcher rolls a die 60 times and records the following frequencies: 8, 12, 9, 11, 10, 10. Test if the die is fair at α = 0.05.</p>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-gray-600">Solution:</p>
+                                    <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                                        <li>Expected frequency for each number = 60/6 = 10</li>
+                                        <li>\(\chi^2 = \sum \frac{(O-E)^2}{E} = 1.0\)</li>
+                                        <li>df = 6 - 1 = 5</li>
+                                        <li>Critical value = 11.07</li>
+                                        <li>Since 1.0 < 11.07, we fail to reject \(H_0\)</li>
+                                        <li>Conclusion: The die appears to be fair</li>
+                                    </ol>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Problem 2: Color Preference</h5>
+                                <p class="text-gray-700 mb-2">A marketing team believes that color preferences are distributed as follows: Red (30%), Blue (25%), Green (20%), Yellow (15%), Purple (10%). They survey 200 people and find: Red (65), Blue (45), Green (40), Yellow (30), Purple (20). Test their hypothesis at α = 0.05.</p>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-gray-600">Solution:</p>
+                                    <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                                        <li>Expected frequencies: Red (60), Blue (50), Green (40), Yellow (30), Purple (20)</li>
+                                        <li>\(\chi^2 = \sum \frac{(O-E)^2}{E} = 2.08\)</li>
+                                        <li>df = 5 - 1 = 4</li>
+                                        <li>Critical value = 9.488</li>
+                                        <li>Since 2.08 < 9.488, we fail to reject \(H_0\)</li>
+                                        <li>Conclusion: The observed distribution matches the expected distribution</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="independence-theory">
+                <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. Chi-Squared Test of Independence</h3>
+                    
+                    <!-- Detailed Explanation -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Understanding the Test of Independence</h4>
+                        <p class="mb-4 text-gray-700 leading-relaxed">The Chi-Squared Test of Independence is a statistical test used to determine if there is a significant association between two categorical variables. This test helps us understand if the distribution of one variable is independent of the other variable.</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">When to Use</h5>
+                                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                                    <li>Testing relationships between categorical variables</li>
+                                    <li>Analyzing survey responses across different groups</li>
+                                    <li>Examining market research data</li>
+                                    <li>Studying demographic patterns</li>
+                                    <li>Investigating voting patterns</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Key Requirements</h5>
+                                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                                    <li>Two categorical variables</li>
+                                    <li>Random sampling</li>
+                                    <li>Expected frequency ≥ 5 for each cell</li>
+                                    <li>Independent observations</li>
+                                    <li>Mutually exclusive categories</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step Process -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Step-by-Step Process</h4>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <ol class="list-decimal pl-5 space-y-4 text-gray-700">
+                                <li>
+                                    <strong>State the Hypotheses:</strong>
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>\(H_0\): The variables are independent</li>
+                                        <li>\(H_a\): The variables are dependent</li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <strong>Create Contingency Table:</strong>
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>Rows represent categories of first variable</li>
+                                        <li>Columns represent categories of second variable</li>
+                                        <li>Cells contain observed frequencies</li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <strong>Calculate Expected Frequencies:</strong>
+                                    \[E_{ij} = \frac{(Row\ Total_i) \times (Column\ Total_j)}{Grand\ Total}\]
+                                    where:
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>\(E_{ij}\) = expected frequency for cell (i,j)</li>
+                                        <li>\(Row\ Total_i\) = sum of row i</li>
+                                        <li>\(Column\ Total_j\) = sum of column j</li>
+                                        <li>\(Grand\ Total\) = total of all observations</li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <strong>Calculate Chi-Squared Statistic:</strong>
+                                    \[\chi^2 = \sum_{i=1}^{r} \sum_{j=1}^{c} \frac{(O_{ij} - E_{ij})^2}{E_{ij}}\]
+                                    where:
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>\(O_{ij}\) = observed frequency for cell (i,j)</li>
+                                        <li>\(E_{ij}\) = expected frequency for cell (i,j)</li>
+                                        <li>r = number of rows</li>
+                                        <li>c = number of columns</li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <strong>Determine Degrees of Freedom:</strong>
+                                    \[df = (r-1) \times (c-1)\]
+                                    where:
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>r = number of rows</li>
+                                        <li>c = number of columns</li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <strong>Find Critical Value and Make Decision:</strong>
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>Compare \(\chi^2\) statistic to critical value</li>
+                                        <li>Reject \(H_0\) if \(\chi^2 > \chi^2_{\alpha,df}\)</li>
+                                        <li>Or compare p-value to α</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Example -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Interactive Example: Education and Income Study</h4>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-gray-700 mb-4">A researcher wants to determine if there is a relationship between education level and income level. They collected data from 300 individuals:</p>
+                            
+                            <div class="overflow-x-auto mb-4">
+                                <table class="min-w-full bg-white border border-gray-200">
+                                    <thead>
+                                        <tr>
+                                            <th class="px-4 py-2 border">Education Level</th>
+                                            <th class="px-4 py-2 border">Low Income</th>
+                                            <th class="px-4 py-2 border">Middle Income</th>
+                                            <th class="px-4 py-2 border">High Income</th>
+                                            <th class="px-4 py-2 border">Row Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="px-4 py-2 border">High School</td>
+                                            <td class="px-4 py-2 border">40</td>
+                                            <td class="px-4 py-2 border">30</td>
+                                            <td class="px-4 py-2 border">10</td>
+                                            <td class="px-4 py-2 border">80</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 border">Bachelor's</td>
+                                            <td class="px-4 py-2 border">20</td>
+                                            <td class="px-4 py-2 border">50</td>
+                                            <td class="px-4 py-2 border">30</td>
+                                            <td class="px-4 py-2 border">100</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 border">Master's/PhD</td>
+                                            <td class="px-4 py-2 border">10</td>
+                                            <td class="px-4 py-2 border">40</td>
+                                            <td class="px-4 py-2 border">70</td>
+                                            <td class="px-4 py-2 border">120</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2 border">Column Total</td>
+                                            <td class="px-4 py-2 border">70</td>
+                                            <td class="px-4 py-2 border">120</td>
+                                            <td class="px-4 py-2 border">110</td>
+                                            <td class="px-4 py-2 border">300</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="bg-white p-3 rounded border border-gray-200">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Solution Steps:</h5>
+                                <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                                    <li>Calculate expected frequencies for each cell:
+                                        \[E_{ij} = \frac{(Row\ Total_i) \times (Column\ Total_j)}{300}\]</li>
+                                    <li>Calculate \(\chi^2\) statistic:
+                                        \[\chi^2 = \sum \frac{(O-E)^2}{E} = 52.38\]</li>
+                                    <li>Degrees of freedom = (3-1) × (3-1) = 4</li>
+                                    <li>Critical value at α = 0.05 is 9.488</li>
+                                    <li>Since 52.38 > 9.488, we reject \(H_0\)</li>
+                                    <li>Conclusion: There is a significant relationship between education level and income level</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Common Pitfalls -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Common Pitfalls to Avoid</h4>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="space-y-4">
+                                <div>
+                                    <h5 class="font-semibold text-red-600 mb-1">Pitfall 1: Small Expected Frequencies</h5>
+                                    <p class="text-gray-700">When expected frequencies are less than 5, the Chi-Squared approximation may be poor. Consider combining categories or using Fisher's exact test.</p>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-red-600 mb-1">Pitfall 2: Confusing Correlation with Causation</h5>
+                                    <p class="text-gray-700">A significant result only indicates association, not causation. Additional research is needed to establish causal relationships.</p>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-red-600 mb-1">Pitfall 3: Ignoring Effect Size</h5>
+                                    <p class="text-gray-700">A significant result doesn't necessarily mean a strong relationship. Consider calculating Cramer's V or Phi coefficient to measure effect size.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Practice Problems -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Practice Problems</h4>
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Problem 1: Gender and Movie Preference</h5>
+                                <p class="text-gray-700 mb-2">A movie theater wants to determine if there is a relationship between gender and movie genre preference. They surveyed 200 customers:</p>
+                                <div class="overflow-x-auto mb-4">
+                                    <table class="min-w-full bg-white border border-gray-200">
+                                        <thead>
+                                            <tr>
+                                                <th class="px-4 py-2 border">Gender</th>
+                                                <th class="px-4 py-2 border">Action</th>
+                                                <th class="px-4 py-2 border">Comedy</th>
+                                                <th class="px-4 py-2 border">Drama</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="px-4 py-2 border">Male</td>
+                                                <td class="px-4 py-2 border">40</td>
+                                                <td class="px-4 py-2 border">30</td>
+                                                <td class="px-4 py-2 border">20</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-2 border">Female</td>
+                                                <td class="px-4 py-2 border">20</td>
+                                                <td class="px-4 py-2 border">40</td>
+                                                <td class="px-4 py-2 border">30</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-gray-600">Solution:</p>
+                                    <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                                        <li>Calculate expected frequencies for each cell</li>
+                                        <li>\(\chi^2 = \sum \frac{(O-E)^2}{E} = 8.33\)</li>
+                                        <li>df = (2-1) × (3-1) = 2</li>
+                                        <li>Critical value = 5.991</li>
+                                        <li>Since 8.33 > 5.991, we reject \(H_0\)</li>
+                                        <li>Conclusion: There is a significant relationship between gender and movie preference</li>
+                                    </ol>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Problem 2: Age Group and Social Media Usage</h5>
+                                <p class="text-gray-700 mb-2">A marketing firm wants to determine if there is a relationship between age groups and social media platform preference. They surveyed 300 people:</p>
+                                <div class="overflow-x-auto mb-4">
+                                    <table class="min-w-full bg-white border border-gray-200">
+                                        <thead>
+                                            <tr>
+                                                <th class="px-4 py-2 border">Age Group</th>
+                                                <th class="px-4 py-2 border">Facebook</th>
+                                                <th class="px-4 py-2 border">Instagram</th>
+                                                <th class="px-4 py-2 border">Twitter</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="px-4 py-2 border">18-24</td>
+                                                <td class="px-4 py-2 border">30</td>
+                                                <td class="px-4 py-2 border">50</td>
+                                                <td class="px-4 py-2 border">20</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-2 border">25-34</td>
+                                                <td class="px-4 py-2 border">40</td>
+                                                <td class="px-4 py-2 border">30</td>
+                                                <td class="px-4 py-2 border">30</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-2 border">35+</td>
+                                                <td class="px-4 py-2 border">50</td>
+                                                <td class="px-4 py-2 border">20</td>
+                                                <td class="px-4 py-2 border">30</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-gray-600">Solution:</p>
+                                    <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                                        <li>Calculate expected frequencies for each cell</li>
+                                        <li>\(\chi^2 = \sum \frac{(O-E)^2}{E} = 15.56\)</li>
+                                        <li>df = (3-1) × (3-1) = 4</li>
+                                        <li>Critical value = 9.488</li>
+                                        <li>Since 15.56 > 9.488, we reject \(H_0\)</li>
+                                        <li>Conclusion: There is a significant relationship between age group and social media platform preference</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="anova-theory">
+                <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">4. Analysis of Variance (ANOVA)</h3>
+                    
+                    <!-- Detailed Explanation -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Understanding ANOVA</h4>
+                        <p class="mb-4 text-gray-700 leading-relaxed">Analysis of Variance (ANOVA) is a statistical method used to compare means across multiple groups. It helps determine if there are any statistically significant differences between the means of three or more independent groups.</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">When to Use</h5>
+                                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                                    <li>Comparing means across multiple groups</li>
+                                    <li>Testing the effect of a categorical variable</li>
+                                    <li>Analyzing experimental results</li>
+                                    <li>Studying group differences</li>
+                                    <li>Investigating treatment effects</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Key Requirements</h5>
+                                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                                    <li>Independent groups</li>
+                                    <li>Normally distributed data</li>
+                                    <li>Equal variances (homoscedasticity)</li>
+                                    <li>Random sampling</li>
+                                    <li>Continuous dependent variable</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step Process -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Step-by-Step Process</h4>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <ol class="list-decimal pl-5 space-y-4 text-gray-700">
+                                <li>
+                                    <strong>State the Hypotheses:</strong>
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>\(H_0\): All group means are equal (\(\mu_1 = \mu_2 = ... = \mu_k\))</li>
+                                        <li>\(H_a\): At least one group mean is different</li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <strong>Calculate Group Statistics:</strong>
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>Group means (\(\bar{x}_i\))</li>
+                                        <li>Group standard deviations (\(s_i\))</li>
+                                        <li>Group sizes (\(n_i\))</li>
+                                        <li>Grand mean (\(\bar{x}_{grand}\))</li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <strong>Calculate Sum of Squares:</strong>
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>Total Sum of Squares (SST):
+                                            \[SST = \sum_{i=1}^{k} \sum_{j=1}^{n_i} (x_{ij} - \bar{x}_{grand})^2\]</li>
+                                        <li>Between-Group Sum of Squares (SSB):
+                                            \[SSB = \sum_{i=1}^{k} n_i(\bar{x}_i - \bar{x}_{grand})^2\]</li>
+                                        <li>Within-Group Sum of Squares (SSW):
+                                            \[SSW = \sum_{i=1}^{k} \sum_{j=1}^{n_i} (x_{ij} - \bar{x}_i)^2\]</li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <strong>Calculate Degrees of Freedom:</strong>
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>Total df = N - 1</li>
+                                        <li>Between-groups df = k - 1</li>
+                                        <li>Within-groups df = N - k</li>
+                                        where:
+                                        <li>N = total number of observations</li>
+                                        <li>k = number of groups</li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <strong>Calculate Mean Squares:</strong>
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>Between-groups MS = SSB / (k - 1)</li>
+                                        <li>Within-groups MS = SSW / (N - k)</li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <strong>Calculate F-statistic:</strong>
+                                    \[F = \frac{MSB}{MSW}\]
+                                    where:
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>MSB = Between-groups Mean Square</li>
+                                        <li>MSW = Within-groups Mean Square</li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <strong>Make Decision:</strong>
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>Compare F-statistic to critical value</li>
+                                        <li>Reject \(H_0\) if F > F-critical</li>
+                                        <li>Or compare p-value to α</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Example -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Interactive Example: Teaching Methods Study</h4>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-gray-700 mb-4">A researcher wants to compare the effectiveness of three different teaching methods on student test scores. They collected data from 30 students (10 in each group):</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <h5 class="font-semibold text-indigo-600 mb-2">Method A (Traditional)</h5>
+                                    <ul class="list-disc pl-5 text-gray-700">
+                                        <li>Mean: 75</li>
+                                        <li>SD: 8</li>
+                                        <li>n: 10</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-indigo-600 mb-2">Method B (Online)</h5>
+                                    <ul class="list-disc pl-5 text-gray-700">
+                                        <li>Mean: 82</li>
+                                        <li>SD: 7</li>
+                                        <li>n: 10</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-indigo-600 mb-2">Method C (Hybrid)</h5>
+                                    <ul class="list-disc pl-5 text-gray-700">
+                                        <li>Mean: 78</li>
+                                        <li>SD: 9</li>
+                                        <li>n: 10</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white p-3 rounded border border-gray-200">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Solution Steps:</h5>
+                                <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                                    <li>Calculate SSB:
+                                        \[SSB = 10(75-78.33)^2 + 10(82-78.33)^2 + 10(78-78.33)^2 = 245.33\]</li>
+                                    <li>Calculate SSW:
+                                        \[SSW = 9(8^2) + 9(7^2) + 9(9^2) = 1,458\]</li>
+                                    <li>Calculate F-statistic:
+                                        \[F = \frac{245.33/2}{1,458/27} = 2.27\]</li>
+                                    <li>Critical value at α = 0.05 is 3.35</li>
+                                    <li>Since 2.27 < 3.35, we fail to reject \(H_0\)</li>
+                                    <li>Conclusion: There is no significant difference in effectiveness between the teaching methods</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Common Pitfalls -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Common Pitfalls to Avoid</h4>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="space-y-4">
+                                <div>
+                                    <h5 class="font-semibold text-red-600 mb-1">Pitfall 1: Violating Assumptions</h5>
+                                    <p class="text-gray-700">ANOVA assumes normality and equal variances. Always check these assumptions before conducting the test.</p>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-red-600 mb-1">Pitfall 2: Multiple Comparisons</h5>
+                                    <p class="text-gray-700">When conducting multiple pairwise comparisons after ANOVA, use appropriate methods (e.g., Tukey's HSD) to control Type I error.</p>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-red-600 mb-1">Pitfall 3: Ignoring Effect Size</h5>
+                                    <p class="text-gray-700">A significant F-test doesn't necessarily mean a large effect. Consider calculating η² (eta-squared) or ω² (omega-squared) to measure effect size.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Practice Problems -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Practice Problems</h4>
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Problem 1: Plant Growth Study</h5>
+                                <p class="text-gray-700 mb-2">A botanist wants to compare the growth of plants under three different light conditions. They measured the height (in cm) of 15 plants (5 in each group):</p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                    <div>
+                                        <h6 class="font-semibold text-gray-600">Natural Light</h6>
+                                        <ul class="list-disc pl-5 text-gray-700">
+                                            <li>Mean: 25.4</li>
+                                            <li>SD: 2.1</li>
+                                            <li>n: 5</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h6 class="font-semibold text-gray-600">Artificial Light</h6>
+                                        <ul class="list-disc pl-5 text-gray-700">
+                                            <li>Mean: 22.8</li>
+                                            <li>SD: 1.9</li>
+                                            <li>n: 5</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h6 class="font-semibold text-gray-600">Combined Light</h6>
+                                        <ul class="list-disc pl-5 text-gray-700">
+                                            <li>Mean: 24.2</li>
+                                            <li>SD: 2.3</li>
+                                            <li>n: 5</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-gray-600">Solution:</p>
+                                    <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                                        <li>Calculate SSB = 15.6</li>
+                                        <li>Calculate SSW = 48.8</li>
+                                        <li>F = (15.6/2)/(48.8/12) = 1.92</li>
+                                        <li>Critical value = 3.89</li>
+                                        <li>Since 1.92 < 3.89, we fail to reject \(H_0\)</li>
+                                        <li>Conclusion: No significant difference in plant growth between light conditions</li>
+                                    </ol>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-semibold text-indigo-600 mb-2">Problem 2: Exercise Program Study</h5>
+                                <p class="text-gray-700 mb-2">A fitness trainer wants to compare the effectiveness of three different exercise programs on weight loss. They measured the weight loss (in kg) of 24 participants (8 in each group):</p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                    <div>
+                                        <h6 class="font-semibold text-gray-600">Program A</h6>
+                                        <ul class="list-disc pl-5 text-gray-700">
+                                            <li>Mean: 3.2</li>
+                                            <li>SD: 0.8</li>
+                                            <li>n: 8</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h6 class="font-semibold text-gray-600">Program B</h6>
+                                        <ul class="list-disc pl-5 text-gray-700">
+                                            <li>Mean: 4.5</li>
+                                            <li>SD: 0.9</li>
+                                            <li>n: 8</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h6 class="font-semibold text-gray-600">Program C</h6>
+                                        <ul class="list-disc pl-5 text-gray-700">
+                                            <li>Mean: 2.8</li>
+                                            <li>SD: 0.7</li>
+                                            <li>n: 8</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <p class="text-sm text-gray-600">Solution:</p>
+                                    <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                                        <li>Calculate SSB = 11.52</li>
+                                        <li>Calculate SSW = 13.44</li>
+                                        <li>F = (11.52/2)/(13.44/21) = 9.0</li>
+                                        <li>Critical value = 3.47</li>
+                                        <li>Since 9.0 > 3.47, we reject \(H_0\)</li>
+                                        <li>Conclusion: There is a significant difference in weight loss between the programs</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Practical Section -->
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Perform Chi-Squared Tests & ANOVA</h2>
+            <p class="section-intro">Use these interactive tools to perform Chi-Squared Goodness of Fit, Chi-Squared Test of Independence, and One-Way ANOVA.</p>
+
+            <div class="tabs mb-4">
+                <button class="tab-button active" data-tab="chi-calc-practical">Chi-Squared Tests</button>
+                <button class="tab-button" data-tab="anova-calc-practical">ANOVA Calculator</button>
+            </div>
+
+            <div class="tab-content active" id="chi-calc-practical">
+                <div class="interactive-panel">
+                    <div class="panel-title">Chi-Squared Test Calculator</div>
+                    
+                    <div class="test-type-selection">
+                        <button id="goodnessOfFitBtn" class="active">Goodness of Fit Test</button>
+                        <button id="independenceBtn">Test of Independence</button>
+                    </div>
+
+                    <div id="goodnessOfFitInputs" class="data-input-section">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Goodness of Fit Test</h4>
+                        <p class="text-sm text-gray-600 mb-2 text-center">Enter observed frequencies and expected proportions (or frequencies) for each category. Separate values by commas.</p>
+                        <div class="input-group">
+                            <label for="observedFreqGoF">Observed Frequencies:</label>
+                            <textarea id="observedFreqGoF" placeholder="e.g., 30, 40, 30">30, 40, 30</textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="expectedPropGoF">Expected Proportions (sum to 1) or Frequencies:</label>
+                            <textarea id="expectedPropGoF" placeholder="e.g., 0.33, 0.33, 0.34 OR 33, 33, 34">0.33, 0.33, 0.34</textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="alphaLevelGoF">Significance Level (\(\alpha\)):</label>
+                            <input type="number" id="alphaLevelGoF" value="0.05" step="0.01" min="0.01" max="0.1">
+                        </div>
+                    </div>
+
+                    <div id="independenceInputs" class="data-input-section hidden">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Test of Independence</h4>
+                        <p class="text-sm text-gray-600 mb-2 text-center">Enter your contingency table data. Each row represents a category of the first variable, and values within a row (comma-separated) represent categories of the second variable. Use a new line for each row.</p>
+                        <div class="contingency-table-input">
+                            <label for="contingencyTableData">Contingency Table (rows separated by new lines, columns by commas):</label>
+                            <textarea id="contingencyTableData" placeholder="e.g.,
+20, 30, 10
+15, 25, 5
+10, 10, 5">20, 30
+30, 20</textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="alphaLevelInd">Significance Level (\(\alpha\)):</label>
+                            <input type="number" id="alphaLevelInd" value="0.05" step="0.01" min="0.01" max="0.1">
+                        </div>
+                    </div>
+                    
+                    <button id="runChiSquaredTestBtn" class="calculate-button">Run Chi-Squared Test</button>
+
+                    <div id="chiSquaredResults" class="results-box hidden">
+                        <h4>Chi-Squared Test Results:</h4>
+                        <div class="result-item">
+                            <span class="result-label">Test Type:</span>
+                            <span id="chiTestTypeResult" class="result-value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Chi-Squared Statistic (\(\chi^2\)):</span>
+                            <span id="chiStatisticResult" class="result-value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Degrees of Freedom (df):</span>
+                            <span id="chiDfResult" class="result-value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">P-value:</span>
+                            <span id="chiPValueResult" class="result-value"></span>
+                        </div>
+                        <div id="chiTestInterpretationBox" class="interpretation-box mt-4">
+                            <h5 class="font-semibold text-base mb-1">Interpretation:</h5>
+                            <p id="chiTestInterpretationText" class="text-sm"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="anova-calc-practical">
+                <div class="interactive-panel">
+                    <div class="panel-title">One-Way ANOVA Calculator</div>
+                    
+                    <p class="text-sm text-gray-600 mb-4 text-center">Enter your data for each group. Separate values by commas. Each group should be on a separate line.</p>
+                    
+                    <div class="input-group mb-4"> <!-- ANOVA input group -->
+                        <label for="anovaGroups">Group Data (each line a group):</label>
+                        <textarea id="anovaGroups" rows="5" placeholder="e.g.,
+10, 12, 14, 11, 13
+15, 16, 14, 17, 16
+18, 20, 19, 21, 17">5, 7, 6, 4, 8
+9, 8, 10, 11, 12
+12, 15, 14, 13, 16</textarea>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="anovaAlpha">Significance Level (\(\alpha\)):</label>
+                        <input type="number" id="anovaAlpha" value="0.05" step="0.01" min="0.01" max="0.1">
+                    </div>
+                    
+                    <button id="runAnovaBtn" class="calculate-button">Run ANOVA</button>
+                    
+                    <div id="anovaResults" class="results-box hidden mt-4">
+                        <h4>ANOVA Results:</h4>
+                         <div class="result-item">
+                            <span class="result-label">Sum of Squares Between (SSB):</span>
+                            <span id="ssbResult" class="result-value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Sum of Squares Within (SSW):</span>
+                            <span id="sswResult" class="result-value"></span>
+                        </div>
+                         <div class="result-item">
+                            <span class="result-label">Degrees of Freedom (Between, df1):</span>
+                            <span id="dfBetweenResult" class="result-value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Degrees of Freedom (Within, df2):</span>
+                            <span id="dfWithinResult" class="result-value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Mean Square Between (MSB):</span>
+                            <span id="msbResult" class="result-value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Mean Square Within (MSW):</span>
+                            <span id="mswResult" class="result-value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">F-statistic:</span>
+                            <span id="fStatisticResult" class="result-value"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">P-value:</span>
+                            <span id="anovaPValueResult" class="result-value"></span>
+                        </div>
+                        <div id="anovaInterpretationBox" class="interpretation-box mt-4">
+                            <h5 class="font-semibold text-base mb-1">Interpretation:</h5>
+                            <p id="anovaInterpretationText" class="text-sm"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-wrapper mt-6">
+                        <canvas id="anovaChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="examples" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">🔍</span>Real-World Examples</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="example-card">
+                    <h4 class="font-semibold text-lg mb-2">Marketing Campaign Effectiveness</h4>
+                    <p>A company runs three different marketing campaigns (A, B, C) and wants to know if conversion rates differ. They track conversions and non-conversions (out of 1000 impressions each):</p>
+                    <div class="bg-gray-100 p-3 rounded-md my-2">
+                        <p><strong>Campaign A:</strong> 120 conversions, 880 non-conversions</p>
+                        <p><strong>Campaign B:</strong> 150 conversions, 850 non-conversions</p>
+                        <p><strong>Campaign C:</strong> 180 conversions, 820 non-conversions</p>
+                    </div>
+                    <p><strong>Analysis:</strong> Use Chi-Squared Test of Independence (or Homogeneity) with a contingency table:
+                        <br><code>[[120, 880], [150, 850], [180, 820]]</code>
+                    </p>
+                    <button class="load-example-btn mt-2 text-indigo-600 font-medium" data-example="marketing">Load this example</button>
+                </div>
+                
+                <div class="example-card">
+                    <h4 class="font-semibold text-lg mb-2">Product Quality by Shift</h4>
+                    <p>A manufacturer wants to know if product defect rates differ by production shift. They collect data:</p>
+                    <div class="bg-gray-100 p-3 rounded-md my-2">
+                        <table class="w-full text-center">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Defective</th>
+                                    <th>Non-Defective</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-semibold">Morning</td>
+                                    <td>25</td>
+                                    <td>475</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Afternoon</td>
+                                    <td>35</td>
+                                    <td>465</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Night</td>
+                                    <td>45</td>
+                                    <td>455</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p><strong>Analysis:</strong> Use Chi-Squared Test of Independence with contingency table:
+                        <br><code>[[25, 475], [35, 465], [45, 455]]</code>
+                    </p>
+                    <button class="load-example-btn mt-2 text-indigo-600 font-medium" data-example="quality">Load this example</button>
+                </div>
+                
+                <div class="example-card">
+                    <h4 class="font-semibold text-lg mb-2">Drug Effectiveness Study</h4>
+                    <p>A pharmaceutical company tests four different doses of a new drug to see which is most effective at reducing blood pressure. They measure the reduction in mmHg:</p>
+                    <div class="bg-gray-100 p-3 rounded-md my-2">
+                        <p><strong>Placebo:</strong> 2, 3, 1, 4, 2</p>
+                        <p><strong>Low Dose:</strong> 5, 6, 4, 7, 5</p>
+                        <p><strong>Medium Dose:</strong> 8, 9, 7, 10, 8</p>
+                        <p><strong>High Dose:</strong> 12, 11, 13, 10, 12</p>
+                    </div>
+                    <p><strong>Analysis:</strong> Use One-Way ANOVA to determine if there are significant differences in blood pressure reduction between the groups.</p>
+                    <button class="load-example-btn mt-2 text-indigo-600 font-medium" data-example="drug">Load this example</button>
+                </div>
+                
+                <div class="example-card">
+                    <h4 class="font-semibold text-lg mb-2">Customer Satisfaction by Region</h4>
+                    <p>A retail chain wants to know if customer satisfaction scores differ by region. They survey customers in four regions:</p>
+                    <div class="bg-gray-100 p-3 rounded-md my-2">
+                        <p><strong>North:</strong> 78, 82, 85, 79, 81</p>
+                        <p><strong>South:</strong> 75, 77, 72, 76, 74</p>
+                        <p><strong>East:</strong> 88, 85, 87, 86, 84</p>
+                        <p><strong>West:</strong> 80, 82, 79, 81, 83</p>
+                    </div>
+                    <p><strong>Analysis:</strong> Use One-Way ANOVA to determine if there are significant differences in satisfaction scores across regions.</p>
+                    <button class="load-example-btn mt-2 text-indigo-600 font-medium" data-example="satisfaction">Load this example</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Simulations Section -->
+        <section id="simulations" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">🎮</span>Interactive Simulations</h2>
+            
+            <div class="tabs mb-4">
+                <button class="tab-button active" data-tab="chi-sim-main">Chi-Squared Simulation</button>
+                <button class="tab-button" data-tab="anova-sim-main">ANOVA Simulation</button>
+            </div>
+            
+            <div class="tab-content active" id="chi-sim-main">
+                <div class="interactive-panel">
+                    <div class="panel-title">Chi-Squared Distribution Simulator</div>
+                    <p class="section-intro">This simulation shows how the Chi-Squared distribution changes with different degrees of freedom and how the critical value relates to the significance level.</p>
+                    
+                    <div class="simulation-controls">
+                        <div class="input-group">
+                            <label for="simDf">Degrees of Freedom (df):</label>
+                            <input type="number" id="simDf" min="1" max="30" value="5">
+                        </div>
+                        <div class="input-group">
+                            <label for="simAlpha">Significance Level (\(\alpha\)):</label>
+                            <input type="number" id="simAlpha" min="0.01" max="0.2" step="0.01" value="0.05">
+                        </div>
+                        <button id="runChiSimulation" class="simulate-button">Update Simulation</button>
+                    </div>
+                    
+                    <div class="chart-wrapper">
+                        <canvas id="chiSimulationChart"></canvas>
+                    </div>
+                    
+                    <div class="results-box mt-4">
+                        <div class="result-item">
+                            <span class="result-label">Critical Value (\(\chi^2_{\alpha}\)):</span>
+                            <span id="criticalValue" class="result-value"></span>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-700">The critical value is the point beyond which we reject the null hypothesis. For df = <span id="simDfValue">5</span> and α = <span id="simAlphaValue">0.05</span>, any test statistic greater than <span id="criticalValueText"></span> would lead to rejection of H₀.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="anova-sim-main">
+                <div class="interactive-panel">
+                    <div class="panel-title">ANOVA F-Distribution Simulator</div>
+                    <p class="section-intro">This simulation demonstrates how the F-distribution changes with different degrees of freedom and how the critical value relates to the significance level.</p>
+                    
+                    <div class="simulation-controls">
+                        <div class="input-group">
+                            <label for="simDf1">Degrees of Freedom (Between, df1):</label>
+                            <input type="number" id="simDf1" min="1" max="20" value="2">
+                        </div>
+                        <div class="input-group">
+                            <label for="simDf2">Degrees of Freedom (Within, df2):</label>
+                            <input type="number" id="simDf2" min="1" max="100" value="12">
+                        </div>
+                        <div class="input-group">
+                            <label for="simFAlpha">Significance Level (\(\alpha\)):</label>
+                            <input type="number" id="simFAlpha" min="0.01" max="0.2" step="0.01" value="0.05">
+                        </div>
+                        <button id="runAnovaSimulation" class="simulate-button">Update Simulation</button>
+                    </div>
+                    
+                    <div class="chart-wrapper">
+                        <canvas id="fDistributionChart"></canvas>
+                    </div>
+                    
+                    <div class="results-box mt-4">
+                        <div class="result-item">
+                            <span class="result-label">Critical Value (\(F_{\alpha}\)):</span>
+                            <span id="fCriticalValue" class="result-value"></span>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-700">For df1 = <span id="simDf1Value">2</span>, df2 = <span id="simDf2Value">12</span> and α = <span id="simFAlphaValue">0.05</span>, any F-statistic greater than <span id="fCriticalValueText"></span> would lead to rejection of H₀.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <div id="messageBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg z-50" role="alert">
+        <strong id="messageTitle" class="font-bold">Error!</strong>
+        <span id="messageText" class="block sm:inline"></span>
+        <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" onclick="document.getElementById('messageBox').classList.add('hidden');">
+            <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+        </span>
+    </div>
+
+    <script>
+        // --- Message Box Function ---
+        function showMessage(message, type = 'error', title = 'Error!') {
+            const messageBox = document.getElementById('messageBox');
+            const messageTextEl = document.getElementById('messageText');
+            const messageTitleEl = document.getElementById('messageTitle');
+            
+            messageTextEl.innerText = message;
+            messageTitleEl.innerText = title;
+            messageBox.classList.remove('hidden');
+
+            // Reset classes
+            messageBox.classList.remove('bg-green-100', 'border-green-400', 'text-green-700', 'bg-red-100', 'border-red-400', 'text-red-700', 'bg-yellow-100', 'border-yellow-400', 'text-yellow-700');
+            messageBox.querySelector('svg').classList.remove('text-red-500', 'text-green-500', 'text-yellow-500');
+
+
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+                messageBox.querySelector('svg').classList.add('text-red-500');
+            } else if (type === 'success') {
+                messageBox.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+                 messageBox.querySelector('svg').classList.add('text-green-500');
+            } else if (type === 'warning') {
+                messageBox.classList.add('bg-yellow-100', 'border-yellow-400', 'text-yellow-700');
+                messageBox.querySelector('svg').classList.add('text-yellow-500');
+            }
+        }
+
+        // --- Tab Functionality (Generic for all tab groups) ---
+        document.querySelectorAll('.tabs').forEach(tabGroup => {
+            const tabButtons = tabGroup.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    const currentTabGroup = button.closest('.tabs');
+                    const currentTabContents = currentTabGroup.nextElementSibling; // Assuming content follows tabs div or need more specific selector based on structure
+
+                    // Deactivate buttons and content within the same group
+                    currentTabGroup.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    
+                    // Find sibling tab content panels (assuming they are direct siblings or structured consistently)
+                    let sibling = currentTabGroup.nextElementSibling;
+                    while(sibling) {
+                        if (sibling.classList.contains('tab-content')) {
+                            sibling.classList.remove('active');
+                        }
+                        // This logic might need adjustment if tab-content divs are not immediate siblings or nested differently
+                        // For this specific HTML, tab-content divs are siblings following the .tabs div
+                        if (sibling.id === tabId) break; // Stop if we found the target, to avoid deactivating it
+                        sibling = sibling.nextElementSibling;
+                         if (sibling && !sibling.classList.contains('tab-content')) break; // stop if no longer a tab content
+                    }
+                     
+                    // Activate current button and its corresponding content
+                    button.classList.add('active');
+                    const targetContent = document.getElementById(tabId);
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    } else {
+                        console.error("Tab content not found for ID:", tabId);
+                    }
+                });
+            });
+        });
+
+
+        // --- Helper: Parse comma-separated numbers ---
+        function parseNumbers(str) {
+            const parts = str.split(',');
+            const numbers = parts.map(s => parseFloat(s.trim()));
+            if (numbers.some(isNaN)) {
+                return null; // Indicates an error (NaN found)
+            }
+            return numbers.filter(n => !isNaN(n)); // Should be redundant if previous check is good
+        }
+
+        // --- Helper: Parse contingency table data ---
+        function parseContingencyTable(str) {
+            const rowsAsStrings = str.trim().split('\n').filter(row => row.trim() !== "");
+            if (rowsAsStrings.length === 0) return null;
+
+            const table = [];
+            let numCols = -1;
+
+            for (const rowStr of rowsAsStrings) {
+                const numbersInRow = parseNumbers(rowStr);
+                if (numbersInRow === null) return null; // Error in parsing numbers
+
+                if (numCols === -1) {
+                    numCols = numbersInRow.length;
+                    if (numCols === 0) return null; // First row has no valid numbers
+                } else if (numbersInRow.length !== numCols) {
+                    return null; // Inconsistent number of columns
+                }
+                table.push(numbersInRow);
+            }
+            return table;
+        }
+        
+        // --- Helper: Parse ANOVA group data ---
+        function parseAnovaGroups(str) {
+            const groupStrings = str.trim().split('\n');
+            const groups = [];
+            for (const groupStr of groupStrings) {
+                if (!groupStr.trim()) continue; // Skip empty lines
+                const numbers = parseNumbers(groupStr);
+                if (numbers === null || numbers.length === 0) {
+                    return null; // Error in parsing or empty group
+                }
+                groups.push(numbers);
+            }
+            return groups.length > 0 ? groups : null;
+        }
+
+
+        // --- Chi-Squared Distribution Chart (Interactive Theory) ---
+        let chiSquaredDistributionChartInstance = null;
+        const dfSlider = document.getElementById('dfSlider');
+        const dfValueDisplay = document.getElementById('dfValue'); // Renamed to avoid conflict
+
+        function renderChiSquaredDistributionChart(df) {
+            const ctx = document.getElementById('chiSquaredDistributionChart').getContext('2d');
+            if (chiSquaredDistributionChartInstance) {
+                chiSquaredDistributionChartInstance.destroy();
+            }
+
+            const data = [];
+            const maxVal = Math.max(10, Math.min(40, df * 2 + 10));
+            const step = maxVal / 200;
+            
+            for (let i = 0; i <= 200; i++) {
+                const x = i * step;
+                const y = jstat.chisquare.pdf(x, df);
+                data.push({x: x, y: y});
+            }
+
+            chiSquaredDistributionChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: { datasets: [{ label: `Chi-Squared Distribution (df = ${df})`, data: data, borderColor: '#4338CA', borderWidth: 2, fill: false, pointRadius: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' }, tooltip: { enabled: true } }, scales: { x: { type: 'linear', title: { display: true, text: 'χ² Value' }, min: 0, max: maxVal }, y: { title: { display: true, text: 'Probability Density' }, beginAtZero: true } } }
+            });
+        }
+        if (dfSlider) {
+            renderChiSquaredDistributionChart(parseInt(dfSlider.value));
+            dfSlider.addEventListener('input', () => {
+                const df = parseInt(dfSlider.value);
+                dfValueDisplay.textContent = df;
+                renderChiSquaredDistributionChart(df);
+            });
+        }
+
+
+        // --- Chi-Squared Test Calculator Logic ---
+        const goodnessOfFitBtn = document.getElementById('goodnessOfFitBtn');
+        const independenceBtn = document.getElementById('independenceBtn');
+        const goodnessOfFitInputs = document.getElementById('goodnessOfFitInputs');
+        const independenceInputs = document.getElementById('independenceInputs');
+        const runChiSquaredTestBtn = document.getElementById('runChiSquaredTestBtn');
+        const chiSquaredResultsEl = document.getElementById('chiSquaredResults');
+
+        if (goodnessOfFitBtn) {
+            goodnessOfFitBtn.addEventListener('click', () => {
+                goodnessOfFitBtn.classList.add('active');
+                independenceBtn.classList.remove('active');
+                goodnessOfFitInputs.classList.remove('hidden');
+                independenceInputs.classList.add('hidden');
+                chiSquaredResultsEl.classList.add('hidden');
+            });
+        }
+        if (independenceBtn) {
+            independenceBtn.addEventListener('click', () => {
+                independenceBtn.classList.add('active');
+                goodnessOfFitBtn.classList.remove('active');
+                goodnessOfFitInputs.classList.add('hidden');
+                independenceInputs.classList.remove('hidden');
+                chiSquaredResultsEl.classList.add('hidden');
+            });
+        }
+
+        if (runChiSquaredTestBtn) {
+            runChiSquaredTestBtn.addEventListener('click', () => {
+                chiSquaredResultsEl.classList.add('hidden'); // Hide previous results
+                const isGoodnessOfFit = goodnessOfFitBtn.classList.contains('active');
+                let chiStat, df, pValue, testType, alpha, interpretationText;
+                let warningMessage = "";
+
+                if (isGoodnessOfFit) {
+                    testType = 'Goodness of Fit';
+                    alpha = parseFloat(document.getElementById('alphaLevelGoF').value);
+                    const observedRaw = document.getElementById('observedFreqGoF').value;
+                    const expectedRaw = document.getElementById('expectedPropGoF').value;
+
+                    const observed = parseNumbers(observedRaw);
+                    let expected = parseNumbers(expectedRaw);
+
+                    if (!observed || observed.length === 0) { showMessage("Invalid observed frequencies.", "error"); return; }
+                    if (!expected || expected.length === 0) { showMessage("Invalid expected values.", "error"); return; }
+                    if (observed.length !== expected.length) { showMessage("Observed and expected counts must have the same number of categories.", "error"); return; }
+                    if (observed.length < 2) { showMessage("At least two categories are required.", "error"); return; }
+
+                    const totalObserved = observed.reduce((sum, val) => sum + val, 0);
+                    const sumExpectedUserInput = expected.reduce((sum, val) => sum + val, 0);
+
+                    // If sum of user-provided expected values is close to 1, assume they are proportions
+                    if (Math.abs(sumExpectedUserInput - 1.0) < 0.01 && expected.every(p => p >= 0 && p <=1)) {
+                        expected = expected.map(prop => prop * totalObserved);
+                    } else {
+                        // If user provided frequencies, check if their sum matches totalObserved.
+                        // This is a strong assumption for GoF. Usually, expected are derived or given as absolute.
+                        // For simplicity here, we'll assume if not proportions, they are absolute expected frequencies.
+                        // A more advanced version might warn if sum(expected) != sum(observed)
+                        // but standard GoF doesn't require sums to be equal if expected are from a theoretical model.
+                    }
+                    
+                    if (expected.some(e => e <= 0)) { showMessage("All expected frequencies must be greater than 0.", "error"); return; }
+                     if (expected.some(e => e < 5)) {
+                        warningMessage += "Warning: Some expected frequencies are less than 5. Chi-squared approximation may be less accurate.\n";
+                    }
+
+
+                    chiStat = 0;
+                    for (let i = 0; i < observed.length; i++) {
+                        chiStat += Math.pow(observed[i] - expected[i], 2) / expected[i];
+                    }
+                    df = observed.length - 1;
+                    if (df <= 0) { showMessage("Degrees of freedom must be positive. Check number of categories.", "error"); return; }
+                    pValue = 1 - jstat.chisquare.cdf(chiStat, df);
+
+                } else { // Test of Independence
+                    testType = 'Test of Independence';
+                    alpha = parseFloat(document.getElementById('alphaLevelInd').value);
+                    const tableDataRaw = document.getElementById('contingencyTableData').value;
+                    const observedTable = parseContingencyTable(tableDataRaw);
+
+                    if (!observedTable || observedTable.length < 2 || observedTable[0].length < 2) {
+                        showMessage("Contingency table must have at least 2 rows and 2 columns with valid numbers.", "error"); return;
+                    }
+
+                    const numRows = observedTable.length;
+                    const numCols = observedTable[0].length;
+
+                    const rowTotals = observedTable.map(row => row.reduce((sum, val) => sum + val, 0));
+                    const colTotals = Array(numCols).fill(0);
+                    for (let j = 0; j < numCols; j++) {
+                        for (let i = 0; i < numRows; i++) {
+                            colTotals[j] += observedTable[i][j];
+                        }
+                    }
+                    const grandTotal = rowTotals.reduce((sum, val) => sum + val, 0);
+                    if (grandTotal === 0) { showMessage("Grand total of contingency table cannot be zero.", "error"); return; }
+
+                    const expectedTable = [];
+                    chiStat = 0;
+                    for (let i = 0; i < numRows; i++) {
+                        expectedTable[i] = [];
+                        for (let j = 0; j < numCols; j++) {
+                            const expectedFreq = (rowTotals[i] * colTotals[j]) / grandTotal;
+                            if (expectedFreq <= 0) { showMessage(`Expected frequency in cell (${i+1},${j+1}) is not positive. Check data.`, "error"); return; }
+                            if (expectedFreq < 5) {
+                                warningMessage += `Warning: Expected frequency in cell (${i+1},${j+1}) is ${expectedFreq.toFixed(2)}, which is less than 5. Chi-squared approximation may be less accurate.\n`;
+                            }
+                            expectedTable[i][j] = expectedFreq;
+                            chiStat += Math.pow(observedTable[i][j] - expectedFreq, 2) / expectedFreq;
+                        }
+                    }
+                    df = (numRows - 1) * (numCols - 1);
+                     if (df <= 0) { showMessage("Degrees of freedom must be positive. Check table dimensions.", "error"); return; }
+                    pValue = 1 - jstat.chisquare.cdf(chiStat, df);
+                }
+
+                document.getElementById('chiTestTypeResult').textContent = testType;
+                document.getElementById('chiStatisticResult').textContent = chiStat.toFixed(4);
+                document.getElementById('chiDfResult').textContent = df;
+                document.getElementById('chiPValueResult').textContent = pValue.toFixed(4);
+                
+                const interpretationBox = document.getElementById('chiTestInterpretationBox');
+                if (pValue < alpha) {
+                    interpretationText = `The p-value (${pValue.toFixed(4)}) is less than the significance level (\(\alpha = ${alpha}\)). Therefore, we reject the null hypothesis.`;
+                    interpretationBox.className = 'interpretation-box mt-4 significant';
+                    if (testType === 'Goodness of Fit') interpretationText += " The data does not fit the expected distribution.";
+                    else interpretationText += " There is a statistically significant association between the variables.";
+                } else {
+                    interpretationText = `The p-value (${pValue.toFixed(4)}) is greater than or equal to the significance level (\(\alpha = ${alpha}\)). Therefore, we fail to reject the null hypothesis.`;
+                    interpretationBox.className = 'interpretation-box mt-4 not-significant';
+                    if (testType === 'Goodness of Fit') interpretationText += " The data is consistent with the expected distribution.";
+                    else interpretationText += " There is no statistically significant association between the variables.";
+                }
+                document.getElementById('chiTestInterpretationText').innerHTML = LaTeX(interpretationText); // Use innerHTML for MathJax
+
+                if (warningMessage) {
+                    showMessage(warningMessage, "warning", "Calculation Warning");
+                }
+                chiSquaredResultsEl.classList.remove('hidden');
+                 MathJax.typesetPromise && MathJax.typesetPromise(); // Retypeset for new LaTeX
+            });
+        }
+
+        // --- ANOVA Calculator Logic ---
+        const runAnovaBtn = document.getElementById('runAnovaBtn');
+        const anovaResultsEl = document.getElementById('anovaResults');
+        let anovaChartInstance = null;
+
+        if (runAnovaBtn) {
+            runAnovaBtn.addEventListener('click', () => {
+                anovaResultsEl.classList.add('hidden');
+                const groupsRaw = document.getElementById('anovaGroups').value;
+                const alpha = parseFloat(document.getElementById('anovaAlpha').value);
+                const groups = parseAnovaGroups(groupsRaw);
+
+                if (!groups || groups.length < 2) {
+                    showMessage("ANOVA requires at least two groups with valid numeric data.", "error"); return;
+                }
+                if (groups.some(g => g.length < 2)) {
+                    showMessage("Each group in ANOVA must have at least two data points.", "error"); return;
+                }
+
+                const k = groups.length; // Number of groups
+                let N = 0; // Total number of observations
+                const groupMeans = [];
+                const groupSizes = [];
+                const groupSums = [];
+                const groupSumSq = []; // Sum of squares for each observation in a group
+
+                groups.forEach(group => {
+                    N += group.length;
+                    groupSizes.push(group.length);
+                    const sum = group.reduce((acc, val) => acc + val, 0);
+                    groupSums.push(sum);
+                    groupMeans.push(sum / group.length);
+                    groupSumSq.push(group.reduce((acc, val) => acc + (val*val), 0));
+                });
+
+                if (k < 2 || N <= k) {
+                    showMessage("Insufficient data for ANOVA (need N > k, k >= 2).", "error"); return;
+                }
+
+                const grandSum = groupSums.reduce((acc, val) => acc + val, 0);
+                const grandMean = grandSum / N;
+
+                // Correction Term (CT)
+                const CT = Math.pow(grandSum, 2) / N;
+
+                // Total Sum of Squares (SST)
+                let totalSumSqObs = 0;
+                groups.forEach(group => {
+                    group.forEach(obs => totalSumSqObs += obs * obs);
+                });
+                const SST = totalSumSqObs - CT;
+                
+                // Sum of Squares Between (SSB)
+                let SSB = 0;
+                for(let i=0; i < k; i++) {
+                    SSB += Math.pow(groupSums[i], 2) / groupSizes[i];
+                }
+                SSB -= CT;
+
+                // Sum of Squares Within (SSW)
+                const SSW = SST - SSB;
+                // Alternative SSW: Sum ( (n_i-1) * variance_i )
+                // Or: sum_i sum_j (x_ij - mean_i)^2
+
+                const dfBetween = k - 1;
+                const dfWithin = N - k;
+
+                if (dfBetween <= 0 || dfWithin <= 0) {
+                     showMessage("Degrees of freedom are not positive. Check group structure and data.", "error"); return;
+                }
+
+                const MSB = SSB / dfBetween;
+                const MSW = SSW / dfWithin;
+
+                const F_statistic = (MSW === 0 && MSB === 0) ? 0 : (MSW === 0 ? Infinity : MSB / MSW); // Handle MSW = 0
+                const pValue = (F_statistic === Infinity) ? 0 : (1 - jstat.centralF.cdf(F_statistic, dfBetween, dfWithin));
+                
+                document.getElementById('ssbResult').textContent = SSB.toFixed(4);
+                document.getElementById('sswResult').textContent = SSW.toFixed(4);
+                document.getElementById('dfBetweenResult').textContent = dfBetween;
+                document.getElementById('dfWithinResult').textContent = dfWithin;
+                document.getElementById('msbResult').textContent = MSB.toFixed(4);
+                document.getElementById('mswResult').textContent = MSW.toFixed(4);
+                document.getElementById('fStatisticResult').textContent = F_statistic.toFixed(4);
+                document.getElementById('anovaPValueResult').textContent = pValue.toFixed(4);
+                
+                const interpretationBoxAnova = document.getElementById('anovaInterpretationBox');
+                let interpretationTextAnova;
+                if (pValue < alpha) {
+                    interpretationTextAnova = `The p-value (${pValue.toFixed(4)}) is less than the significance level (\(\alpha = ${alpha}\)). Therefore, we reject the null hypothesis. There is a statistically significant difference between at least two group means.`;
+                    interpretationBoxAnova.className = 'interpretation-box mt-4 significant';
+                } else {
+                    interpretationTextAnova = `The p-value (${pValue.toFixed(4)}) is greater than or equal to the significance level (\(\alpha = ${alpha}\)). Therefore, we fail to reject the null hypothesis. There is no statistically significant difference between the group means.`;
+                    interpretationBoxAnova.className = 'interpretation-box mt-4 not-significant';
+                }
+                document.getElementById('anovaInterpretationText').innerHTML = LaTeX(interpretationTextAnova);
+                
+                anovaResultsEl.classList.remove('hidden');
+                MathJax.typesetPromise && MathJax.typesetPromise();
+
+                // Update ANOVA chart
+                const anovaCtx = document.getElementById('anovaChart').getContext('2d');
+                if (anovaChartInstance) { anovaChartInstance.destroy(); }
+                
+                anovaChartInstance = new Chart(anovaCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: groups.map((_, i) => `Group ${i + 1}`),
+                        datasets: [{
+                            label: 'Group Mean',
+                            data: groupMeans,
+                            backgroundColor: ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(255, 206, 86, 0.7)', 'rgba(75, 192, 192, 0.7)', 'rgba(153, 102, 255, 0.7)'],
+                            borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio:false, plugins: { title: { display: true, text: 'Comparison of Group Means' } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Mean Value' } } } }
+                });
+            });
+        }
+
+        // --- Chi-Squared Simulation ---
+        let chiSimulationChartInstance = null;
+
+        function updateChiSimulation() {
+            try {
+                const df = parseInt(document.getElementById('simDf')?.value || '5');
+                const alpha = parseFloat(document.getElementById('simAlpha')?.value || '0.05');
+                
+                if (!df || !alpha) return;
+                
+                const criticalValue = jStat.chisquare.inv(1 - alpha, df);
+                
+                // Update display values
+                const elements = {
+                    'criticalValue': criticalValue.toFixed(4),
+                    'simDfValue': df,
+                    'simAlphaValue': alpha,
+                    'criticalValueText': criticalValue.toFixed(4)
+                };
+                
+                Object.entries(elements).forEach(([id, value]) => {
+                    const element = document.getElementById(id);
+                    if (element) element.textContent = value;
+                });
+                
+                // Update chart
+                const ctx = document.getElementById('chiSimulationChart')?.getContext('2d');
+                if (!ctx) return;
+                
+                if (chiSimulationChartInstance) {
+                    chiSimulationChartInstance.destroy();
+                }
+                
+                const data = [];
+                const maxX = Math.max(criticalValue * 1.5, df + 3 * Math.sqrt(2*df), 10);
+                const step = maxX / 200;
+                
+                for (let i = 0; i <= 200; i++) {
+                    const x = i * step;
+                    const y = jStat.chisquare.pdf(x, df);
+                    data.push({x: x, y: y});
+                }
+                
+                chiSimulationChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            {
+                                label: `χ² Distribution (df=${df})`,
+                                data: data,
+                                borderColor: '#4338CA',
+                                borderWidth: 2,
+                                fill: false,
+                                pointRadius: 0
+                            },
+                            {
+                                label: `Critical Value (${criticalValue.toFixed(2)})`,
+                                data: [
+                                    {x: criticalValue, y: 0},
+                                    {x: criticalValue, y: jStat.chisquare.pdf(criticalValue, df) * 1.05}
+                                ],
+                                borderColor: '#10B981',
+                                borderWidth: 2,
+                                pointRadius: 0,
+                                borderDash: [5, 5],
+                                type: 'line',
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top' },
+                            tooltip: { enabled: true }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                title: { display: true, text: 'χ² Value' },
+                                min: 0,
+                                max: maxX
+                            },
+                            y: {
+                                title: { display: true, text: 'Probability Density' },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error in Chi-squared simulation:', error);
+                showMessage('Error updating Chi-squared simulation. Please try again.', 'error');
+            }
+        }
+
+        // --- ANOVA F-Distribution Simulation ---
+        let fDistributionChartInstance = null;
+
+        function updateAnovaSimulation() {
+            try {
+                const df1 = parseInt(document.getElementById('simDf1')?.value || '2');
+                const df2 = parseInt(document.getElementById('simDf2')?.value || '12');
+                const alpha = parseFloat(document.getElementById('simFAlpha')?.value || '0.05');
+                
+                if (!df1 || !df2 || !alpha) return;
+                
+                const criticalValue = jStat.centralF.inv(1 - alpha, df1, df2);
+                
+                // Update display values
+                const elements = {
+                    'fCriticalValue': criticalValue.toFixed(4),
+                    'simDf1Value': df1,
+                    'simDf2Value': df2,
+                    'simFAlphaValue': alpha,
+                    'fCriticalValueText': criticalValue.toFixed(4)
+                };
+                
+                Object.entries(elements).forEach(([id, value]) => {
+                    const element = document.getElementById(id);
+                    if (element) element.textContent = value;
+                });
+                
+                // Update chart
+                const ctx = document.getElementById('fDistributionChart')?.getContext('2d');
+                if (!ctx) return;
+                
+                if (fDistributionChartInstance) {
+                    fDistributionChartInstance.destroy();
+                }
+                
+                const data = [];
+                const maxX = Math.max(criticalValue * 1.5, 5 + df1/df2 * 3, 5);
+                const step = maxX / 200;
+                
+                for (let i = 0; i <= 200; i++) {
+                    const x = i * step + (step/10);
+                    const y = jStat.centralF.pdf(x, df1, df2);
+                    data.push({x: x, y: y});
+                }
+                
+                fDistributionChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            {
+                                label: `F-Distribution (df1=${df1}, df2=${df2})`,
+                                data: data,
+                                borderColor: '#4338CA',
+                                borderWidth: 2,
+                                fill: false,
+                                pointRadius: 0
+                            },
+                            {
+                                label: `Critical Value (${criticalValue.toFixed(2)})`,
+                                data: [
+                                    {x: criticalValue, y: 0},
+                                    {x: criticalValue, y: jStat.centralF.pdf(criticalValue, df1, df2) * 1.05}
+                                ],
+                                borderColor: '#10B981',
+                                borderWidth: 2,
+                                pointRadius: 0,
+                                borderDash: [5, 5],
+                                type: 'line',
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top' },
+                            tooltip: { enabled: true }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                title: { display: true, text: 'F Value' },
+                                min: 0,
+                                max: maxX
+                            },
+                            y: {
+                                title: { display: true, text: 'Probability Density' },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error in ANOVA simulation:', error);
+                showMessage('Error updating ANOVA simulation. Please try again.', 'error');
+            }
+        }
+
+        // Initialize everything when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the df slider
+            const dfSlider = document.getElementById('dfSlider');
+            if (dfSlider) {
+                const dfValue = document.getElementById('dfValue');
+                if (dfValue) {
+                    dfValue.textContent = dfSlider.value;
+                }
+                
+                dfSlider.addEventListener('input', function() {
+                    const df = parseInt(this.value);
+                    if (dfValue) {
+                        dfValue.textContent = df;
+                    }
+                    renderChiSquaredDistributionChart(df);
+                });
+                
+                renderChiSquaredDistributionChart(parseInt(dfSlider.value));
+            }
+
+            // Initialize simulation buttons
+            const runChiSimulationBtn = document.getElementById('runChiSimulation');
+            if (runChiSimulationBtn) {
+                runChiSimulationBtn.addEventListener('click', updateChiSimulation);
+                updateChiSimulation(); // Initial render
+            }
+
+            const runAnovaSimulationBtn = document.getElementById('runAnovaSimulation');
+            if (runAnovaSimulationBtn) {
+                runAnovaSimulationBtn.addEventListener('click', updateAnovaSimulation);
+                updateAnovaSimulation(); // Initial render
+            }
+
+            // Initialize MathJax
+            if (typeof MathJax !== 'undefined') {
+                MathJax.typesetPromise().catch(function (err) {
+                    console.error('MathJax error:', err);
+                });
+            }
+        });
+
+        // --- Load Example Data ---
+        document.querySelectorAll('.load-example-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const example = this.getAttribute('data-example');
+                
+                // Switch to practical section main nav
+                const practicalNavButton = document.querySelector('a[href="#practical"]');
+                if (practicalNavButton) practicalNavButton.click(); // This handles scroll and active state for main nav
+                
+                switch(example) {
+                    case 'marketing':
+                        // Ensure "Chi-Squared Tests" tab in Practical section is active
+                        document.querySelector('button[data-tab="chi-calc-practical"]').click();
+                        // Then select "Test of Independence"
+                        if(independenceBtn) independenceBtn.click();
+                        document.getElementById('contingencyTableData').value = "120, 880\n150, 850\n180, 820";
+                        document.getElementById('alphaLevelInd').value = "0.05";
+                        if (runChiSquaredTestBtn) runChiSquaredTestBtn.click();
+                        break;
+                    case 'quality':
+                        document.querySelector('button[data-tab="chi-calc-practical"]').click();
+                        if(independenceBtn) independenceBtn.click();
+                        document.getElementById('contingencyTableData').value = "25, 475\n35, 465\n45, 455";
+                        document.getElementById('alphaLevelInd').value = "0.05";
+                        if (runChiSquaredTestBtn) runChiSquaredTestBtn.click();
+                        break;
+                    case 'drug':
+                        // Ensure "ANOVA Calculator" tab in Practical section is active
+                        document.querySelector('button[data-tab="anova-calc-practical"]').click();
+                        document.getElementById('anovaGroups').value = "2, 3, 1, 4, 2\n5, 6, 4, 7, 5\n8, 9, 7, 10, 8\n12, 11, 13, 10, 12";
+                        document.getElementById('anovaAlpha').value = "0.05";
+                        if (runAnovaBtn) runAnovaBtn.click();
+                        break;
+                    case 'satisfaction':
+                        document.querySelector('button[data-tab="anova-calc-practical"]').click();
+                        document.getElementById('anovaGroups').value = "78, 82, 85, 79, 81\n75, 77, 72, 76, 74\n88, 85, 87, 86, 84\n80, 82, 79, 81, 83";
+                        document.getElementById('anovaAlpha').value = "0.05";
+                        if (runAnovaBtn) runAnovaBtn.click();
+                        break;
+                }
+                 // Ensure the practical section is scrolled into view after tab changes
+                setTimeout(() => {
+                     const practicalSection = document.getElementById('practical');
+                     if (practicalSection) practicalSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100); // Small delay for tab content to render
+            });
+        });
+
+        // --- Navigation Button Highlighting & Smooth Scroll ---
+        document.querySelectorAll('.nav-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+        
+        // Helper to process LaTeX for MathJax
+        function LaTeX(text) {
+            // Basic replacement for \alpha, \chi^2 etc. for display if MathJax is slow or fails
+            // More complex LaTeX might need full MathJax.
+            // For this case, MathJax will handle it, but this shows an idea.
+            return text; 
+        }
+    </script>
+</body>
+</html>

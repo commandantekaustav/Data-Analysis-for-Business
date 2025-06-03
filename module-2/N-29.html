@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S29: Handling Missing Data - Deletion & Imputation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices:
+        - Deletion Strategies: Report Info: Listwise, pairwise. Goal: Inform, compare. Viz/Method: Detailed text explanation with bulleted pros/cons for each. Justification: Provides a clear understanding of when and how to use deletion.
+        - Imputation Strategies (Basic): Report Info: Mean, median, mode. Goal: Inform, compare. Viz/Method: Detailed text explanation with bulleted pros/cons for each. Justification: Explains the mechanics and implications of simple imputation.
+        - Pandas Demo (dropna()): Report Info: Code, parameters. Goal: Illustrate, apply. Viz/Method: Detailed Python code snippet with extensive comments and explanations for dropping missing values. Justification: Provides hands-on conceptual understanding.
+        - Pandas Demo (fillna()): Report Info: Code, parameters. Goal: Illustrate, apply. Viz/Method: Detailed Python code snippet with extensive comments and explanations for filling missing values. Justification: Provides hands-on conceptual understanding.
+        - Discussion of Impact: Report Info: Changes to dataset. Goal: Explain. Viz/Method: Detailed text explanation. Justification: Highlights the real-world consequences of applying these techniques.
+        CONFIRMATION: No charts used (Chart.js/Plotly.js not needed as report is conceptual/textual).
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); /* Adjust based on header/footer height */ }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+
+        .accordion-header { cursor: pointer; user-select: none; }
+        .accordion-content { display: none; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; }
+        .accordion-item.open .accordion-content { display: block; max-height: 1000px; /* Arbitrary large value */ padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .accordion-arrow { transition: transform 0.3s ease; }
+        .accordion-item.open .accordion-arrow { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S29: Strategies for Handling Missing Data - Deletion & Imputation</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Strategies for Handling Missing Data</h2>
+            <p class="section-intro">Once missing data has been identified, the next critical step is to decide how to handle it. The chosen strategy can significantly impact the validity and reliability of your analysis. This section delves into two primary categories of approaches: deletion and imputation, exploring their various methods, advantages, and disadvantages.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Deletion Strategies: Removing Missing Values</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Deletion methods involve removing observations (rows) or variables (columns) that contain missing values. While seemingly straightforward, this approach can have significant implications for your dataset's size and representativeness.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">1. Listwise Deletion (Complete Case Analysis)</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Listwise deletion involves removing an entire row (observation) from the dataset if any variable in that row has a missing value. This is the default behavior for many statistical software packages and analytical functions.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Pros:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Simplicity:</strong> It's straightforward to implement and understand.</li>
+                            <li><strong>Unbiased Estimates (if MCAR):</strong> If the data is Missing Completely At Random (MCAR) – meaning the missingness is unrelated to any variables, observed or unobserved – then listwise deletion will produce unbiased parameter estimates.</li>
+                            <li><strong>Consistent Sample Size:</strong> All analyses will be based on the same set of complete observations, simplifying comparisons across different analyses.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Cons:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Significant Data Loss:</strong> If missingness is widespread across many variables, even a small percentage of missingness in each variable can lead to a substantial reduction in the total number of observations, especially in high-dimensional datasets. This reduces statistical power.</li>
+                            <li><strong>Potential for Bias (if not MCAR):</strong> If data is Missing At Random (MAR) or Missing Not At Random (MNAR) – meaning missingness is related to observed or unobserved variables, respectively – listwise deletion can introduce significant bias into the results. The remaining "complete" sample might not be representative of the original population.</li>
+                            <li><strong>Reduced Statistical Power:</strong> Losing a large number of observations decreases the statistical power of tests, making it harder to detect true effects or relationships.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">2. Pairwise Deletion (Available Case Analysis)</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Pairwise deletion involves using all available data for each specific analysis. If a particular calculation or model requires values from certain variables, only observations missing data for *those specific variables* are excluded. For other calculations involving different variables, those same observations might be included if they have data for those other variables.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Pros:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Maximizes Data Retention:</strong> It utilizes as much of the available data as possible for each specific analysis, potentially retaining more statistical power than listwise deletion.</li>
+                            <li><strong>Less Bias (sometimes):</strong> Can be less biased than listwise deletion if data is MAR, as it uses more information.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Cons:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Varying Sample Sizes:</strong> Different analyses will be based on different subsets of the data, leading to inconsistent sample sizes across analyses. This can make results difficult to compare or interpret coherently.</li>
+                            <li><strong>Increased Complexity:</strong> Managing varying sample sizes and ensuring that conclusions are drawn from comparable populations can be analytically complex.</li>
+                            <li><strong>Potential for Bias (still):</strong> While better than listwise for MAR data, it can still introduce bias if the missingness pattern is systematic or if the underlying assumptions for MAR are violated.</li>
+                            <li><strong>Software Compatibility:</strong> Not all statistical software handles pairwise deletion seamlessly, and it can sometimes lead to computational issues.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Deletion methods are generally suitable only when the amount of missing data is very small (e.g., less than 5%) and/or you are confident that the data is MCAR. Otherwise, they can severely compromise the validity of your findings.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Imputation Strategies (Basic): Filling in Missing Values</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Imputation involves estimating and filling in missing values with substitute values. The goal is to create a complete dataset, allowing for more robust analysis and the use of algorithms that cannot handle missing data. Here, we'll focus on simple, commonly used imputation techniques.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">1. Mean Imputation</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Mean imputation involves replacing missing values in a numerical variable with the mean (average) of the observed values for that variable.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Pros:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Simplicity:</strong> Very easy to understand and implement.</li>
+                            <li><strong>Preserves Sample Size:</strong> All observations are retained, avoiding data loss.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Cons:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Reduces Variance:</strong> Replacing missing values with the mean reduces the natural variability (variance) of the variable, making the data appear less spread out than it actually is.</li>
+                            <li><strong>Distorts Relationships:</strong> Can weaken or distort correlations and other relationships between variables, as the imputed values don't add any new information about the underlying relationship.</li>
+                            <li><strong>Sensitive to Outliers:</strong> The mean itself is sensitive to outliers, so if the observed data has extreme values, the imputed mean might not be representative.</li>
+                            <li><strong>Not Suitable for Categorical Data:</strong> Only applicable to numerical data.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">2. Median Imputation</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Median imputation involves replacing missing values in a numerical variable with the median (middle value) of the observed values for that variable.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Pros:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Robust to Outliers:</strong> Unlike the mean, the median is not heavily influenced by extreme values, making it a more robust choice for skewed distributions or data with outliers.</li>
+                            <li><strong>Simplicity:</strong> Still relatively easy to implement.</li>
+                            <li><strong>Preserves Sample Size:</strong> All observations are retained.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Cons:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Reduces Variance:</strong> Similar to mean imputation, it reduces the true variability of the data.</li>
+                            <li><strong>Distorts Relationships:</strong> Can still weaken or distort relationships between variables.</li>
+                            <li><strong>Not Suitable for Categorical Data:</strong> Only applicable to numerical data.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">3. Mode Imputation</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Mode imputation involves replacing missing values with the mode (most frequently occurring value) of the observed values for that variable. This method is particularly useful for categorical variables but can also be applied to discrete numerical variables.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Pros:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Suitable for Categorical Data:</strong> The only simple imputation method directly applicable to nominal and ordinal categorical data.</li>
+                            <li><strong>Simplicity:</strong> Easy to implement.</li>
+                            <li><strong>Preserves Sample Size:</strong> All observations are retained.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Cons:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Reduces Variability:</strong> Can artificially increase the frequency of the mode, potentially distorting the true distribution of the variable.</li>
+                            <li><strong>Distorts Relationships:</strong> Similar to mean/median, it can weaken or distort relationships between variables.</li>
+                            <li><strong>Multiple Modes:</strong> If a variable has multiple modes, deciding which one to use for imputation can be arbitrary.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">While simple imputation methods are easy to apply, they should be used with caution, especially when a large proportion of data is missing or if the missingness is not random. More advanced imputation techniques exist (e.g., K-Nearest Neighbors imputation, regression imputation, multiple imputation) that attempt to preserve the underlying data distribution and relationships more effectively, but these are beyond the scope of basic imputation.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Tool Demo & Impact Discussion</h2>
+            <p class="section-intro">This practical section demonstrates how to apply deletion and simple imputation strategies using Python's Pandas library. We will use a sample dataset to illustrate the `dropna()` and `fillna()` methods, and then discuss the immediate and potential long-term impacts of these operations on your data and subsequent analysis.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Tool Demo: Applying Deletion (`dropna()`) and Imputation (`fillna()`) with Pandas</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Let's use a slightly modified version of our customer survey dataset from N-S28 to demonstrate how to handle missing values programmatically. We'll focus on the `dropna()` for deletion and `fillna()` for imputation.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800">
+                    <h4 class="font-semibold text-indigo-700 mb-2">Python Code Snippet (using Pandas)</h4>
+                    <pre><code class="language-python">
+import pandas as pd
+import numpy as np
+
+# 1. Create a sample DataFrame with missing values (similar to N-S28)
+print("--- Step 1: Original Sample DataFrame with Missing Values ---")
+data = {
+    'CustomerID': [101, 102, 103, 104, 105, 106, 107, 108, 109, 110],
+    'Age': [25, 34, np.nan, 45, 29, np.nan, 50, 31, 42, np.nan],
+    'Gender': ['Male', 'Female', 'Female', 'Male', 'Female', 'Male', 'Female', 'Male', np.nan, 'Female'],
+    'PurchaseAmount': [150.00, 230.50, 80.00, np.nan, 400.25, 120.00, 310.75, 95.00, 280.00, np.nan],
+    'FeedbackScore': [4, 5, 3, 4, np.nan, 2, 5, 4, 3, 5],
+    'City': ['New York', 'Los Angeles', 'Chicago', np.nan, 'Houston', 'Miami', 'Chicago', 'Boston', 'Seattle', np.nan]
+}
+df = pd.DataFrame(data)
+print(df)
+print("\nMissing values before handling:\n", df.isnull().sum(), "\n")
+
+# --- DELETION STRATEGIES ---
+
+# 2. Listwise Deletion (Drop rows with ANY missing value)
+# df.dropna(how='any') removes a row if it has at least one NaN.
+# The 'axis=0' (default) means rows. 'inplace=False' (default) returns a new DataFrame.
+print("--- Step 2: Listwise Deletion (df.dropna(how='any')) ---")
+df_listwise_deleted = df.dropna(how='any')
+print(df_listwise_deleted)
+print(f"\nOriginal rows: {len(df)}, Rows after listwise deletion: {len(df_listwise_deleted)}\n")
+
+# 3. Drop rows only if ALL values are missing (less common for actual data)
+# df.dropna(how='all') removes a row only if all its values are NaN.
+print("--- Step 3: Drop rows if ALL values are missing (df.dropna(how='all')) ---")
+df_all_nan_deleted = df.dropna(how='all')
+print(df_all_nan_deleted)
+print(f"\nOriginal rows: {len(df)}, Rows after 'all NaN' deletion: {len(df_all_nan_deleted)}\n")
+
+# 4. Drop columns with ANY missing value (use with extreme caution)
+# df.dropna(axis=1, how='any') removes a column if it has at least one NaN.
+print("--- Step 4: Drop columns with ANY missing value (df.dropna(axis=1, how='any')) ---")
+df_cols_deleted = df.dropna(axis=1, how='any')
+print(df_cols_deleted)
+print(f"\nOriginal columns: {df.shape[1]}, Columns after deletion: {df_cols_deleted.shape[1]}\n")
+
+# 5. Drop rows if a specific subset of columns has missing values
+# df.dropna(subset=['Age', 'PurchaseAmount']) removes rows where Age OR PurchaseAmount is NaN.
+print("--- Step 5: Drop rows based on a subset of columns (df.dropna(subset=['Age', 'PurchaseAmount'])) ---")
+df_subset_deleted = df.dropna(subset=['Age', 'PurchaseAmount'])
+print(df_subset_deleted)
+print(f"\nOriginal rows: {len(df)}, Rows after subset deletion: {len(df_subset_deleted)}\n")
+
+
+# --- IMPUTATION STRATEGIES ---
+
+# 6. Impute missing 'Age' with its Mean
+# Calculate the mean of the non-missing 'Age' values and fill NaNs.
+print("--- Step 6: Impute 'Age' with its Mean ---")
+mean_age = df['Age'].mean()
+df_imputed_mean = df.copy() # Work on a copy to preserve original df
+df_imputed_mean['Age'].fillna(mean_age, inplace=True)
+print(df_imputed_mean[['Age', 'PurchaseAmount', 'FeedbackScore', 'City']]) # Show relevant columns
+print(f"\nMissing 'Age' after mean imputation: {df_imputed_mean['Age'].isnull().sum()}\n")
+
+# 7. Impute missing 'PurchaseAmount' with its Median
+# Calculate the median of the non-missing 'PurchaseAmount' values and fill NaNs.
+print("--- Step 7: Impute 'PurchaseAmount' with its Median ---")
+median_purchase = df['PurchaseAmount'].median()
+df_imputed_median = df.copy()
+df_imputed_median['PurchaseAmount'].fillna(median_purchase, inplace=True)
+print(df_imputed_median[['Age', 'PurchaseAmount', 'FeedbackScore', 'City']])
+print(f"\nMissing 'PurchaseAmount' after median imputation: {df_imputed_median['PurchaseAmount'].isnull().sum()}\n")
+
+# 8. Impute missing 'City' with its Mode (most frequent city)
+# Calculate the mode of the non-missing 'City' values and fill NaNs.
+# .mode()[0] is used because .mode() can return multiple modes if frequencies are tied.
+print("--- Step 8: Impute 'City' with its Mode ---")
+mode_city = df['City'].mode()[0]
+df_imputed_mode = df.copy()
+df_imputed_mode['City'].fillna(mode_city, inplace=True)
+print(df_imputed_mode[['Age', 'PurchaseAmount', 'FeedbackScore', 'City']])
+print(f"\nMissing 'City' after mode imputation: {df_imputed_mode['City'].isnull().sum()}\n")
+
+# 9. Impute missing 'FeedbackScore' with a constant value (e.g., 0 or a specific category)
+# This is useful when missingness itself conveys information.
+print("--- Step 9: Impute 'FeedbackScore' with a Constant Value (e.g., 0) ---")
+df_imputed_constant = df.copy()
+df_imputed_constant['FeedbackScore'].fillna(0, inplace=True)
+print(df_imputed_constant[['Age', 'PurchaseAmount', 'FeedbackScore', 'City']])
+print(f"\nMissing 'FeedbackScore' after constant imputation: {df_imputed_constant['FeedbackScore'].isnull().sum()}\n")
+                    </code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">The `dropna()` method is powerful for removing missing data, with `how='any'` being the most common for listwise deletion. The `fillna()` method provides flexible options for basic imputation, allowing you to replace NaNs with a specific value, or a calculated statistic like the mean, median, or mode. Remember to always work on a copy of your DataFrame (`df.copy()`) if you want to preserve the original data.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Discussion: Impact of Deletion and Simple Imputation on Your Data</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">While deletion and simple imputation techniques are fundamental for preparing data, it's crucial to understand their implications. These methods are not without consequences and can significantly alter your dataset and the validity of your analytical findings if not applied thoughtfully.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Impact of Deletion:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Reduced Sample Size:</strong> The most immediate and obvious impact. Removing rows or columns directly reduces the amount of data available for analysis. This can lead to a loss of statistical power, making it harder to detect significant relationships or differences, especially in smaller datasets.</li>
+                    <li><strong>Potential for Bias:</strong> If the missing data is not completely random (MCAR), deleting observations can introduce bias. The remaining data might no longer be representative of the original population, leading to skewed results and incorrect generalizations. For example, if customers with lower incomes are more likely to skip income questions, deleting those records will make your remaining sample appear wealthier than it truly is.</li>
+                    <li><strong>Loss of Information:</strong> Even if missingness is random, deleting entire rows means discarding all other valid information in those rows, which could be valuable for other variables or analyses.</li>
+                    <li><strong>Inconsistent Comparisons:</strong> With pairwise deletion, different analyses might be based on different subsets of data, making it difficult to compare results consistently across your study.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Impact of Simple Imputation (Mean, Median, Mode):</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Artificial Reduction in Variability:</strong> Replacing missing values with a single central tendency measure (mean, median, mode) makes the imputed values identical to each other. This artificially reduces the true variance (spread) of the variable, making the data appear more uniform than it actually is. This can lead to underestimated standard errors and overly narrow confidence intervals.</li>
+                    <li><strong>Distortion of Relationships:</strong> Simple imputation does not account for the relationships between variables. Replacing a missing value in one column with its mean, for example, ignores how that value might correlate with other variables in the same row. This can weaken or distort true correlations and regression coefficients.</li>
+                    <li><strong>Increased Frequency of Imputed Value:</strong> Especially with mode imputation, the frequency of the most common category or value is artificially inflated, potentially misrepresenting the true distribution of the variable.</li>
+                    <li><strong>Does Not Add New Information:</strong> Simple imputation simply fills a gap; it does not introduce any new information or insight into the missing values. It's a placeholder, not a true estimate of the missing data's underlying value.</li>
+                    <li><strong>Underestimation of Uncertainty:</strong> By creating a "complete" dataset, simple imputation can give a false sense of certainty, as it doesn't reflect the uncertainty inherent in the missing data.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600"><strong>Key Takeaway:</strong> Both deletion and simple imputation are quick fixes. While necessary for some algorithms, they should be chosen carefully based on the amount of missing data, the pattern of missingness, and the goals of your analysis. For complex scenarios or when missingness is substantial and not random, more sophisticated imputation techniques (which attempt to model the missing values based on other variables) are often preferred to minimize bias and preserve data integrity.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-6 mt-auto">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        function toggleAccordion(itemElement) {
+            itemElement.classList.toggle('open');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scroll for nav links and initial active state
+            document.querySelectorAll('a.nav-button').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll('a.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Set initial active nav button based on URL hash or first section
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'theory';
+            const initialNavButton = document.querySelector(`a.nav-button[href="#${initialSection}"]`);
+            if (initialNavButton) {
+                initialNavButton.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

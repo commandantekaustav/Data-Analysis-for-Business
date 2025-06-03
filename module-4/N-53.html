@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S53: Hypothesis Testing Framework</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="number"], select {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            max-width: 200px; /* Adjusted for better fit */
+            margin-bottom: 0.5rem;
+        }
+        .calculate-button, .simulate-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .calculate-button:hover, .simulate-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .interpretation-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .chart-illustrative {
+            position: relative;
+            height: 250px;
+            width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .scenario-selector select {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 1.5rem;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .quiz-question {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+        .quiz-question h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .quiz-options button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            text-align: left;
+            background-color: #f3f4f6;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .quiz-options button:hover {
+            background-color: #e0e7ff;
+            border-color: #c7d2fe;
+        }
+        .quiz-options button.correct {
+            background-color: #D1FAE5;
+            border-color: #34D399;
+            color: #065F46;
+            font-weight: 600;
+        }
+        .quiz-options button.incorrect {
+            background-color: #FEE2E2;
+            border-color: #EF4444;
+            color: #991B1B;
+            font-weight: 600;
+        }
+        .quiz-feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .quiz-feedback.correct { background-color: #D1FAE5; color: #065F46; border: 1px solid #34D399; }
+        .quiz-feedback.incorrect { background-color: #FEE2E2; color: #991B1B; border: 1px solid #EF4444; }
+        .quiz-feedback.neutral { background-color: #FEF3C7; color: #92400E; border: 1px solid #FBBF24; }
+        .p-value-input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .p-value-input-group label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+    </style>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                packages: ['base', 'ams', 'noerrors', 'noundefined']
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/ams']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S53: Hypothesis Testing Framework</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Hypothesis Testing Framework</h2>
+            <p class="section-intro">Hypothesis testing is a formal procedure for investigating our ideas about the world using statistics. It's a structured way to make decisions about a population based on sample data, allowing us to determine if observed differences or relationships are statistically significant or merely due to random chance. This framework is fundamental to drawing reliable conclusions from data in various fields, from business and healthcare to social sciences.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. What is a Statistical Hypothesis?</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">A statistical hypothesis is a testable statement about a population parameter (e.g., mean, proportion, variance, correlation) that we want to evaluate using sample data. In hypothesis testing, we always set up two competing hypotheses:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Null Hypothesis (\(H_0\)):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Represents the status quo, no effect, no difference, or no relationship. It's the statement of "no change" or "no impact."</li>
+                            <li>It is the statement we assume to be true until we have overwhelming statistical evidence from our sample data to suggest otherwise. Think of it as "innocent until proven guilty."</li>
+                            <li>Always contains an equality sign ($=$, $\le$, or $\ge$). This is crucial because it defines a specific value or boundary for the population parameter under the assumption of no effect.</li>
+                            <li><em>Example 1:</em> A company claims their average delivery time is 3 days. \(H_0: \mu = 3\) days.</li>
+                            <li><em>Example 2:</em> A new marketing campaign has no effect on customer conversion rate. \(H_0: p_{\text{new}} = p_{\text{old}}\).</li>
+                            <li><em>Example 3:</em> The average salary for data analysts is not more than \$80,000. \(H_0: \mu \le \$80,000\).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Alternative Hypothesis (\(H_a\) or \(H_1\)):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Represents what we are trying to find evidence for; the effect, difference, or relationship we suspect exists. It's the claim or research question we are investigating.</li>
+                            <li>It is the statement we accept if we reject the null hypothesis. It challenges the status quo.</li>
+                            <li>Never contains an equality sign ($<$, $>$, or $\ne$). Its form depends on the research question.</li>
+                            <li><strong>Types of Alternative Hypotheses:</strong>
+                                <ul class="list-square pl-5 mt-1">
+                                    <li><strong>Two-tailed (Non-directional):</strong> \(H_a: \text{parameter} \ne \text{value}\). We are interested if the parameter is simply *different* (either greater or less than) the hypothesized value. This test has critical regions in both tails of the distribution.
+                                        <br><em>Example:</em> The new website design has a *different* conversion rate. \(H_a: \mu_{\text{new}} \ne \mu_{\text{old}}\).
+                                    </li>
+                                    <li><strong>One-tailed (Directional - Right-tailed):</strong> \(H_a: \text{parameter} > \text{value}\). We are only interested if the parameter is *greater than* the hypothesized value. The critical region is in the right tail.
+                                        <br><em>Example:</em> The new website design *increases* conversion rate. \(H_a: \mu_{\text{new}} > \mu_{\text{old}}\).
+                                    </li>
+                                    <li><strong>One-tailed (Directional - Left-tailed):</strong> \(H_a: \text{parameter} < \text{value}\). We are only interested if the parameter is *less than* the hypothesized value. The critical region is in the left tail.
+                                        <br><em>Example:</em> The new manufacturing process *reduces* defect rate. \(H_a: p_{\text{new}} < p_{\text{old}}\).
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. Type I and Type II Errors</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">In hypothesis testing, because we are making decisions about a population based on incomplete information (a sample), there's always a risk of making an incorrect conclusion. These errors are classified as Type I and Type II.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Type I Error (\(\alpha\) - Alpha):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>**Definition:** Rejecting the null hypothesis ($H_0$) when it is actually true. This is often called a "false positive."</li>
+                            <li>**Analogy:** Convicting an innocent person in a court of law.</li>
+                            <li>**Consequence:**
+                                <ul class="list-square pl-5 mt-1">
+                                    <li><em>Business:</em> Launching an expensive new product based on a "significant" test result, when in reality the product has no real market advantage, leading to wasted investment.</li>
+                                    <li><em>Healthcare:</em> Approving a drug as effective when it actually isn't, potentially harming patients or wasting resources.</li>
+                                </ul>
+                            </li>
+                            <li>**Probability:** The probability of committing a Type I error is denoted by \(\alpha\), also known as the **significance level**. We set \(\alpha\) to control the risk of this error. Common values are 0.05 (5%) or 0.01 (1%).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Type II Error (\(\beta\) - Beta):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>**Definition:** Failing to reject the null hypothesis ($H_0$) when it is actually false. This is often called a "false negative."</li>
+                            <li>**Analogy:** Letting a guilty person go free in a court of law.</li>
+                            <li>**Consequence:**
+                                <ul class="list-square pl-5 mt-1">
+                                    <li><em>Business:</em> Failing to adopt a truly effective new marketing strategy because the test results weren't "significant" enough, missing out on potential profits.</li>
+                                    <li><em>Healthcare:</em> Failing to detect that a drug is effective when it truly is, delaying or preventing beneficial treatment.</li>
+                                </ul>
+                            </li>
+                            <li>**Probability:** The probability of committing a Type II error is denoted by \(\beta\).</li>
+                            <li><strong>Power of the Test:</strong> The probability of correctly rejecting a false null hypothesis is \(1 - \beta\). A high power is desirable, meaning the test is good at detecting a real effect when one exists. Power is influenced by sample size, effect size, and significance level.</li>
+                        </ul>
+                    </li>
+                    <li><strong>The Trade-off:</strong> There is an inverse relationship between Type I and Type II errors. Decreasing the probability of a Type I error (e.g., by lowering \(\alpha\)) will generally increase the probability of a Type II error (and decrease power), and vice-versa, assuming sample size and effect size are constant. We must balance these risks based on the specific context and consequences.</li>
+                </ul>
+                <div class="chart-illustrative">
+                    <canvas id="errorTypesChart"></canvas>
+                </div>
+                <p class="chart-description text-center text-sm text-gray-600"><em>Visualizing Type I and Type II Errors in a Hypothesis Test. The critical region (Type I error) is where $H_0$ is rejected when true. The Type II error region is where $H_0$ is *not* rejected when false.</em></p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. P-value and Significance Level (\(\alpha\))</h3>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>P-value:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>**Definition:** The p-value is the probability of observing a test statistic as extreme as, or more extreme than, the one calculated from your sample data, *assuming that the null hypothesis is true*. It quantifies the strength of evidence against the null hypothesis.</li>
+                            <li>**Interpretation:**
+                                <ul class="list-square pl-5 mt-1">
+                                    <li>A **small p-value** (e.g., 0.01) means that the observed data (or more extreme data) would be very unlikely if the null hypothesis were true. This provides strong evidence *against* the null hypothesis, leading us to reject \(H_0\).</li>
+                                    <li>A **large p-value** (e.g., 0.30) means the observed data is quite likely to occur if the null hypothesis were true. This indicates that we do not have enough evidence to reject \(H_0\).</li>
+                                </ul>
+                            </li>
+                            <li>**Common Misconceptions:**
+                                <ul class="list-square pl-5 mt-1">
+                                    <li>The p-value is NOT the probability that the null hypothesis is true.</li>
+                                    <li>The p-value is NOT the probability that the alternative hypothesis is false.</li>
+                                    <li>A statistically significant result (small p-value) does NOT necessarily imply practical significance or a large effect size.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Significance Level (\(\alpha\)):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>**Definition:** A pre-determined threshold for rejecting the null hypothesis. It is the maximum acceptable probability of committing a Type I error that a researcher is willing to tolerate.</li>
+                            <li>**Common Values:** Typically set at 0.05 (5%), 0.01 (1%), or 0.10 (10%). The choice of \(\alpha\) depends heavily on the context and the consequences of a Type I error. For high-stakes decisions (e.g., drug trials), a smaller \(\alpha\) (e.g., 0.01) might be chosen to minimize false positives.</li>
+                            <li>**Decision Rule:**
+                                <ul class="list-square pl-5 mt-1">
+                                    <li>If $p\text{-value} \le \alpha$: Reject $H_0$. We conclude there is sufficient statistical evidence to support the alternative hypothesis.</li>
+                                    <li>If $p\text{-value} > \alpha$: Fail to reject $H_0$. We conclude there is not sufficient statistical evidence to support the alternative hypothesis. (Note: Failing to reject $H_0$ does not mean $H_0$ is true; it simply means we don't have enough evidence to claim it's false).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Critical Values:</strong> An alternative approach to decision making involves comparing the calculated test statistic to a critical value (or values) determined by \(\alpha\) and the distribution of the test statistic. If the test statistic falls into the "critical region," $H_0$ is rejected. This is conceptually equivalent to the p-value approach.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">4. Steps in Hypothesis Testing: A Systematic Approach</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Following these steps ensures that your statistical analysis is rigorous, transparent, and directly addresses your research question:</p>
+                <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                    <li><strong>State the Null and Alternative Hypotheses (\(H_0\) and \(H_a\)):</strong>
+                        <ul class="list-circle pl-5 mt-1">
+                            <li>This is the most crucial step. Clearly define the population parameter you are interested in (e.g., population mean $\mu$, population proportion $p$).</li>
+                            <li>$H_0$ represents the default assumption (no effect/no difference). $H_a$ represents the claim you are trying to find evidence for (an effect/difference).</li>
+                            <li>Ensure $H_0$ includes an equality ($=, \le, \ge$) and $H_a$ includes an inequality ($<, >, \ne$).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Choose the Significance Level (\(\alpha\)):</strong>
+                        <ul class="list-circle pl-5 mt-1">
+                            <li>This is your threshold for deciding how much evidence is "enough" to reject $H_0$.</li>
+                            <li>Common values are 0.05, 0.01, or 0.10. The choice depends on the context and the acceptable risk of a Type I error. A smaller \(\alpha\) means you require stronger evidence to reject $H_0$.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Select the Appropriate Test Statistic:</strong>
+                        <ul class="list-circle pl-5 mt-1">
+                            <li>The choice of test depends on:
+                                <ul class="list-square pl-5 mt-1">
+                                    <li> **Type of data:** Categorical or numerical.</li>
+                                    <li> **Number of samples/groups:** One sample, two independent samples, paired samples, three or more samples.</li>
+                                    <li> **Population standard deviation:** Known or unknown.</li>
+                                    <li> **Research question:** Comparing means, proportions, variances, or testing relationships.</li>
+                                </ul>
+                            </li>
+                            <li>Examples: Z-test (for means, large samples, known population $\sigma$), t-test (for means, small samples, unknown population $\sigma$), Chi-squared test (for categorical data, proportions), ANOVA (for comparing means of 3+ groups).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Formulate the Decision Rule:</strong>
+                        <ul class="list-circle pl-5 mt-1">
+                            <li>This defines the criteria for rejecting $H_0$. It can be based on:
+                                <ul class="list-square pl-5 mt-1">
+                                    <li>**P-value approach:** Reject $H_0$ if $p\text{-value} \le \alpha$.</li>
+                                    <li>**Critical value approach:** Reject $H_0$ if the calculated test statistic falls into the critical region(s) (e.g., if Z-score > critical Z-score).</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Collect Data and Compute the Test Statistic:</strong>
+                        <ul class="list-circle pl-5 mt-1">
+                            <li>Gather your sample data.</li>
+                            <li>Calculate the relevant sample statistics (e.g., sample mean, sample standard deviation, sample proportion).</li>
+                            <li>Use these sample statistics to compute the value of the chosen test statistic (e.g., Z-score, t-score, Chi-squared value).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Make a Statistical Decision:</strong>
+                        <ul class="list-circle pl-5 mt-1">
+                            <li>Compare your calculated p-value to your chosen \(\alpha\) (or your test statistic to the critical value).</li>
+                            <li>Based on this comparison, decide whether to "Reject $H_0$" or "Fail to Reject $H_0$."</li>
+                        </ul>
+                    </li>
+                    <li><strong>State the Conclusion in Business Context:</strong>
+                        <ul class="list-circle pl-5 mt-1">
+                            <li>Translate your statistical decision back into clear, non-technical language relevant to the original business problem.</li>
+                            <li>Avoid using statistical jargon like "reject the null." Instead, state what this means for the business.</li>
+                            <li><em>Example:</em> "We have sufficient evidence to conclude that the new website design significantly increases the conversion rate." or "We do not have sufficient evidence to conclude that the new marketing campaign has a different impact on sales."</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p class="mt-4 text-sm text-gray-600">Mastering this framework is essential for making data-driven decisions that are statistically sound, actionable, and effectively communicated to stakeholders.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Formulating Hypotheses & Interpreting P-values</h2>
+            <p class="section-intro">Practice formulating the null (\(H_0\)) and alternative (\(H_a\)) hypotheses for various business scenarios. This is the crucial first step in any hypothesis test. Additionally, use the P-value Interpreter to understand decision-making based on statistical significance.</p>
+
+            <div class="interactive-panel mb-8">
+                <div class="panel-title">Hypothesis Formulation Challenge</div>
+                <div class="scenario-selector">
+                    <label for="scenarioSelect" class="block text-gray-700 font-semibold mb-2 text-center">Select a Business Scenario:</label>
+                    <select id="scenarioSelect">
+                        <option value="">-- Select a Scenario --</option>
+                        <option value="website_conversion">Website Conversion Rate</option>
+                        <option value="product_defect">Product Defect Rate</option>
+                        <option value="customer_satisfaction">Customer Satisfaction Score</option>
+                        <option value="delivery_time">Delivery Time Improvement</option>
+                        <option value="employee_turnover">Employee Turnover Rate</option>
+                        <option value="ad_campaign_sales">Ad Campaign Sales Impact</option>
+                    </select>
+                </div>
+
+                <div id="scenarioDisplay" class="quiz-question hidden">
+                    <h4 id="scenarioProblem"></h4>
+                    <div class="mb-4">
+                        <p class="font-semibold text-gray-700 mb-2">Choose the correct Null Hypothesis (\(H_0\)):</p>
+                        <div id="nullOptions" class="quiz-options"></div>
+                        <div id="nullFeedback" class="quiz-feedback hidden"></div>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-700 mb-2">Choose the correct Alternative Hypothesis (\(H_a\)):</p>
+                        <div id="altOptions" class="quiz-options"></div>
+                        <div id="altFeedback" class="quiz-feedback hidden"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interactive-panel">
+                <div class="panel-title">P-value Interpreter</div>
+                <p class="text-gray-700 text-center mb-4">Enter a p-value and a significance level (\(\alpha\)) to see the statistical decision and its interpretation.</p>
+                <div class="p-value-input-group">
+                    <label for="pValueInput">P-value:</label>
+                    <input type="number" id="pValueInput" value="0.03" step="0.001" min="0" max="1">
+                    <label for="alphaInput">Significance Level (\(\alpha\)):</label>
+                    <input type="number" id="alphaInput" value="0.05" step="0.01" min="0.01" max="0.1">
+                </div>
+                <button id="interpretPValueBtn" class="calculate-button">Interpret P-value</button>
+                <div class="results-box mt-4">
+                    <div class="result-item">
+                        <span class="result-label">Statistical Decision:</span>
+                        <span id="decisionResult" class="result-value"></span>
+                    </div>
+                    <div id="pvalueInterpretationBox" class="interpretation-box mt-4">
+                        <h5 class="font-semibold text-base mb-1">Interpretation:</h5>
+                        <p id="pvalueInterpretationText" class="text-sm"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mt-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Discussion Points:</h3>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>Why is it important for $H_0$ to always contain an equality sign?</li>
+                    <li>How does the business question guide whether $H_a$ is one-tailed or two-tailed? Provide examples beyond those in the scenarios.</li>
+                    <li>What are the practical implications of making a Type I error versus a Type II error in a business context (e.g., launching a new product, approving a drug)? How would you balance these risks?</li>
+                    <li>Why is choosing the significance level (\(\alpha\)) an important decision that should be made *before* data collection and analysis?</li>
+                    <li>Using the P-value Interpreter, try different p-value and \(\alpha\) combinations. How does the decision change? What does a p-value of 0.001 tell you compared to a p-value of 0.15?</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Accurately formulating hypotheses and correctly interpreting p-values are the bedrock of valid statistical inference. It ensures your analysis directly addresses the business question and avoids misinterpretations, leading to more reliable data-driven decisions.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation button active state logic
+            document.querySelectorAll('nav a').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // --- Type I and Type II Errors Chart ---
+            const errorTypesCtx = document.getElementById('errorTypesChart').getContext('2d');
+            new Chart(errorTypesCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 100}, (_, i) => i / 100), // Represents a range of test statistic values
+                    datasets: [
+                        {
+                            label: 'Distribution when H0 is TRUE',
+                            data: Array.from({length: 100}, (_, i) => {
+                                const x = i / 100;
+                                // Simulate a normal distribution centered around 0.5
+                                return Math.exp(-Math.pow(x - 0.5, 2) / (2 * Math.pow(0.1, 2))) / (0.1 * Math.sqrt(2 * Math.PI));
+                            }),
+                            borderColor: '#4338CA',
+                            backgroundColor: 'rgba(67, 56, 202, 0.2)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Distribution when H0 is FALSE (H1 is TRUE)',
+                            data: Array.from({length: 100}, (_, i) => {
+                                const x = i / 100;
+                                // Simulate a normal distribution centered around 0.7
+                                return Math.exp(-Math.pow(x - 0.7, 2) / (2 * Math.pow(0.1, 2))) / (0.1 * Math.sqrt(2 * Math.PI));
+                            }),
+                            borderColor: '#22C55E',
+                            backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: { display: true, text: 'Type I vs. Type II Errors', font: { size: 14 } },
+                        tooltip: { enabled: false }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { display: true, text: 'Test Statistic Value' },
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Probability Density' },
+                            ticks: { display: false },
+                            grid: { display: false }
+                        }
+                    },
+                    animation: {
+                        onComplete: function() {
+                            const chart = this;
+                            const ctx = chart.ctx;
+                            const xScale = chart.scales.x;
+                            const yScale = chart.scales.y;
+
+                            // Critical Value (example: 0.6)
+                            const criticalValue = 0.6;
+                            const criticalX = xScale.getPixelForValue(criticalValue);
+                            const topY = chart.chartArea.top;
+                            const bottomY = chart.chartArea.bottom;
+
+                            // Draw Critical Value Line
+                            ctx.save();
+                            ctx.strokeStyle = '#EF4444'; // Red for critical value
+                            ctx.lineWidth = 2;
+                            ctx.setLineDash([6, 6]);
+                            ctx.beginPath();
+                            ctx.moveTo(criticalX, topY);
+                            ctx.lineTo(criticalX, bottomY);
+                            ctx.stroke();
+                            ctx.fillStyle = '#EF4444';
+                            ctx.font = 'bold 12px Inter';
+                            ctx.textAlign = 'center';
+                            ctx.fillText('Critical Value', criticalX, topY + 15);
+                            ctx.restore();
+
+                            // Shade Type I Error (Alpha) - area under H0 curve to the right of critical value
+                            ctx.save();
+                            ctx.fillStyle = 'rgba(239, 68, 68, 0.4)'; // Light red
+                            const dataset0 = chart.data.datasets[0]; // H0 distribution
+                            const meta0 = chart.getDatasetMeta(0);
+                            const points0 = meta0.data;
+
+                            ctx.beginPath();
+                            ctx.moveTo(criticalX, bottomY);
+                            for (let i = 0; i < points0.length; i++) {
+                                const x = xScale.getPixelForValue(chart.data.labels[i]);
+                                if (x >= criticalX) {
+                                    ctx.lineTo(x, points0[i].y);
+                                }
+                            }
+                            ctx.lineTo(chart.chartArea.right, bottomY); // Ensure it closes to the bottom right
+                            ctx.fill();
+                            ctx.restore();
+
+                            ctx.save();
+                            ctx.fillStyle = '#EF4444';
+                            ctx.font = 'bold 14px Inter';
+                            ctx.textAlign = 'left';
+                            ctx.fillText('Type I Error (α)', criticalX + 10, topY + 40);
+                            ctx.restore();
+
+
+                            // Shade Type II Error (Beta) - area under H1 curve to the left of critical value
+                            ctx.save();
+                            ctx.fillStyle = 'rgba(249, 115, 22, 0.4)'; // Light orange
+                            const dataset1 = chart.data.datasets[1]; // H1 distribution
+                            const meta1 = chart.getDatasetMeta(1);
+                            const points1 = meta1.data;
+
+                            ctx.beginPath();
+                            ctx.moveTo(criticalX, bottomY);
+                            for (let i = points1.length - 1; i >= 0; i--) {
+                                const x = xScale.getPixelForValue(chart.data.labels[i]);
+                                if (x <= criticalX) {
+                                    ctx.lineTo(x, points1[i].y);
+                                }
+                            }
+                            ctx.lineTo(chart.chartArea.left, bottomY); // Ensure it closes to the bottom left
+                            ctx.fill();
+                            ctx.restore();
+
+                            ctx.save();
+                            ctx.fillStyle = '#F97316';
+                            ctx.font = 'bold 14px Inter';
+                            ctx.textAlign = 'right';
+                            ctx.fillText('Type II Error (β)', criticalX - 10, topY + 40);
+                            ctx.restore();
+                        }
+                    }
+                }
+            });
+
+            // --- Hypothesis Formulation Challenge Logic ---
+            const scenarioSelect = document.getElementById('scenarioSelect');
+            const scenarioDisplay = document.getElementById('scenarioDisplay');
+            const scenarioProblem = document.getElementById('scenarioProblem');
+            const nullOptionsDiv = document.getElementById('nullOptions');
+            const altOptionsDiv = document.getElementById('altOptions');
+            const nullFeedbackDiv = document.getElementById('nullFeedback');
+            const altFeedbackDiv = document.getElementById('altFeedback');
+
+            const scenarios = {
+                website_conversion: {
+                    problem: "A marketing team wants to know if a new website design increases the average daily conversion rate (percentage of visitors who make a purchase) from the current 2.5%.",
+                    null: {
+                        options: [
+                            { text: "$H_0$: The new design's conversion rate is different from 2.5% ($\\mu \\ne 2.5\\%$)", correct: false },
+                            { text: "$H_0$: The new design's conversion rate is less than or equal to 2.5% ($\\mu \\le 2.5\\%$)", correct: true },
+                            { text: "$H_0$: The new design's conversion rate is greater than 2.5% ($\\mu > 2.5\\%$)", correct: false }
+                        ],
+                        feedback: {
+                            correct: "Correct! The null hypothesis assumes no increase or even a decrease/same rate. It's the 'status quo' that needs to be disproven. We assume the new design is not better until proven otherwise.",
+                            incorrect: "Incorrect. Remember, the null hypothesis always contains an equality and represents the status quo or no effect. We start by assuming the new design is NOT an improvement."
+                        }
+                    },
+                    alt: {
+                        options: [
+                            { text: "$H_a$: The new design's conversion rate is different from 2.5% ($\\mu \\ne 2.5\\%$)", correct: false },
+                            { text: "$H_a$: The new design's conversion rate is greater than 2.5% ($\\mu > 2.5\\%$)", correct: true },
+                            { text: "$H_a$: The new design's conversion rate is less than 2.5% ($\\mu < 2.5\\%$)", correct: false }
+                        ],
+                        feedback: {
+                            correct: "Correct! The marketing team specifically wants to know if it *increases* the rate, so this is a one-tailed (right-tailed) alternative hypothesis. This reflects their specific objective.",
+                            incorrect: "Incorrect. The alternative hypothesis reflects the claim or effect we are trying to find evidence for. Pay attention to the direction of the claim in the problem statement ('increases')."
+                        }
+                    }
+                },
+                product_defect: {
+                    problem: "A manufacturing company aims to reduce its product defect rate, which historically stands at 5%. They implement a new quality control process and want to test if the defect rate has significantly *decreased*.",
+                    null: {
+                        options: [
+                            { text: "$H_0$: The new defect rate is less than 5% ($p < 0.05$)", correct: false },
+                            { text: "$H_0$: The new defect rate is equal to or greater than 5% ($p \\ge 0.05$)", correct: true },
+                            { text: "$H_0$: The new defect rate is greater than 5% ($p > 0.05$)", correct: false }
+                        ],
+                        feedback: {
+                            correct: "Correct! The null hypothesis assumes the defect rate remains at 5% or has not decreased (the status quo). We assume the new process is not better until proven otherwise.",
+                            incorrect: "Incorrect. The null hypothesis always contains an equality and represents the status quo or no effect. We start by assuming the new process is NOT an improvement."
+                        }
+                    },
+                    alt: {
+                        options: [
+                            { text: "$H_a$: The new defect rate is different from 5% ($p \\ne 0.05$)", correct: false },
+                            { text: "$H_a$: The new defect rate is less than 5% ($p < 0.05$)", correct: true },
+                            { text: "$H_a$: The new defect rate is greater than 5% ($p > 0.05$)", correct: false }
+                        ],
+                        feedback: {
+                            correct: "Correct! The company is specifically interested in a *decrease* in the defect rate, making this a one-tailed (left-tailed) alternative hypothesis. This aligns with their goal of reduction.",
+                            incorrect: "Incorrect. The alternative hypothesis reflects the claim or effect we are trying to find evidence for. The problem states they want to test if it has 'decreased'."
+                        }
+                    }
+                },
+                customer_satisfaction: {
+                    problem: "A customer service manager believes that the average customer satisfaction score (on a scale of 1-10) has changed from its historical average of 7.5 after a recent training program for agents. They want to test if there is *any difference*.",
+                    null: {
+                        options: [
+                            { text: "$H_0$: The average satisfaction score is different from 7.5 ($\\mu \\ne 7.5$)", correct: false },
+                            { text: "$H_0$: The average satisfaction score is equal to 7.5 ($\\mu = 7.5$)", correct: true },
+                            { text: "$H_0$: The average satisfaction score is greater than 7.5 ($\\mu > 7.5$)", correct: false }
+                        ],
+                        feedback: {
+                            correct: "Correct! The null hypothesis assumes no change from the historical average. We assume the training had no effect until proven otherwise.",
+                            incorrect: "Incorrect. The null hypothesis always contains an equality and represents the status quo or no effect."
+                        }
+                    },
+                    alt: {
+                        options: [
+                            { text: "$H_a$: The average satisfaction score is different from 7.5 ($\\mu \\ne 7.5$)", correct: true },
+                            { text: "$H_a$: The average satisfaction score is greater than 7.5 ($\\mu > 7.5$)", correct: false },
+                            { text: "$H_a$: The average satisfaction score is less than 7.5 ($\\mu < 7.5$)", correct: false }
+                        ],
+                        feedback: {
+                            correct: "Correct! Since the manager is looking for *any difference* (either an increase or a decrease), this is a two-tailed alternative hypothesis. The direction of change is not specified or of primary interest.",
+                            incorrect: "Incorrect. The alternative hypothesis reflects the claim. Since the manager is interested in 'any difference', a two-tailed test is appropriate."
+                        }
+                    }
+                },
+                delivery_time: {
+                    problem: "A logistics company claims its new optimized routing system has reduced the average delivery time from the previous 4 hours. They want to test if the average delivery time is now *less than* 4 hours.",
+                    null: {
+                        options: [
+                            { text: "$H_0$: The average delivery time is less than 4 hours ($\\mu < 4$)", correct: false },
+                            { text: "$H_0$: The average delivery time is equal to or greater than 4 hours ($\\mu \\ge 4$)", correct: true },
+                            { text: "$H_0$: The average delivery time is greater than 4 hours ($\\mu > 4$)", correct: false }
+                        ],
+                        feedback: {
+                            correct: "Correct! The null hypothesis assumes the new system has no effect on reducing the time, so it remains 4 hours or more. We assume no improvement until evidence suggests otherwise.",
+                            incorrect: "Incorrect. The null hypothesis always contains an equality and represents the status quo or no effect."
+                        }
+                    },
+                    alt: {
+                        options: [
+                            { text: "$H_a$: The average delivery time is different from 4 hours ($\\mu \\ne 4$)", correct: false },
+                            { text: "$H_a$: The average delivery time is less than 4 hours ($\\mu < 4$)", correct: true },
+                            { text: "$H_a$: The average delivery time is greater than 4 hours ($\\mu > 4$)", correct: false }
+                        ],
+                        feedback: {
+                            correct: "Correct! The company specifically claims a *reduction* in delivery time, so this is a one-tailed (left-tailed) alternative hypothesis. This directly tests their claim of improvement.",
+                            incorrect: "Incorrect. The alternative hypothesis reflects the claim or effect we are trying to find evidence for. The claim is specifically about 'less than' 4 hours."
+                        }
+                    }
+                },
+                employee_turnover: {
+                    problem: "A Human Resources department wants to determine if the average annual employee turnover rate in their company is *higher than* the industry average of 15%.",
+                    null: {
+                        options: [
+                            { text: "$H_0$: The company's turnover rate is less than 15% ($p < 0.15$)", correct: false },
+                            { text: "$H_0$: The company's turnover rate is equal to or less than 15% ($p \\le 0.15$)", correct: true },
+                            { text: "$H_0$: The company's turnover rate is greater than 15% ($p > 0.15$)", correct: false }
+                        ],
+                        feedback: {
+                            correct: "Correct! The null hypothesis assumes the company's turnover rate is not higher than the industry average (i.e., it's 15% or less).",
+                            incorrect: "Incorrect. The null hypothesis always contains an equality and represents the status quo or no effect. We assume the company is not worse than the industry average until proven otherwise."
+                        }
+                    },
+                    alt: {
+                        options: [
+                            { text: "$H_a$: The company's turnover rate is different from 15% ($p \\ne 0.15$)", correct: false },
+                            { text: "$H_a$: The company's turnover rate is greater than 15% ($p > 0.15$)", correct: true },
+                            { text: "$H_a$: The company's turnover rate is less than 15% ($p < 0.15$)", correct: false }
+                        ],
+                        feedback: {
+                            correct: "Correct! The HR department is specifically interested if their rate is *higher than* the industry average, making this a one-tailed (right-tailed) alternative hypothesis.",
+                            incorrect: "Incorrect. The alternative hypothesis reflects the claim or effect we are trying to find evidence for. The question asks if it's 'higher than'."
+                        }
+                    }
+                },
+                ad_campaign_sales: {
+                    problem: "A sales manager wants to evaluate if a new advertising campaign has had *any impact* on the average weekly sales, which were historically \$10,000. They are open to it being either higher or lower.",
+                    null: {
+                        options: [
+                            { text: "$H_0$: The average weekly sales are different from \$10,000 ($\\mu \\ne 10000$)", correct: false },
+                            { text: "$H_0$: The average weekly sales are equal to \$10,000 ($\\mu = 10000$)", correct: true },
+                            { text: "$H_0$: The average weekly sales are greater than \$10,000 ($\\mu > 10000$)", correct: false }
+                        ],
+                        feedback: {
+                            correct: "Correct! The null hypothesis assumes no change from the historical average sales. We assume the campaign had no impact until proven otherwise.",
+                            incorrect: "Incorrect. The null hypothesis always contains an equality and represents the status quo or no effect."
+                        }
+                    },
+                    alt: {
+                        options: [
+                            { text: "$H_a$: The average weekly sales are different from \$10,000 ($\\mu \\ne 10000$)", correct: true },
+                            { text: "$H_a$: The average weekly sales are greater than \$10,000 ($\\mu > 10000$)", correct: false },
+                            { text: "$H_a$: The average weekly sales are less than \$10,000 ($\\mu < 10000$)", correct: false }
+                        ],
+                        feedback: {
+                            correct: "Correct! Since the manager is looking for *any impact* (either an increase or a decrease), this is a two-tailed alternative hypothesis. The direction of change is not specified or of primary interest.",
+                            incorrect: "Incorrect. The alternative hypothesis reflects the claim or effect we are trying to find evidence for. The problem states 'any impact', implying a two-tailed test."
+                        }
+                    }
+                }
+            };
+
+            scenarioSelect.addEventListener('change', function() {
+                const selectedScenarioKey = this.value;
+                if (selectedScenarioKey) {
+                    const scenario = scenarios[selectedScenarioKey];
+                    scenarioDisplay.classList.remove('hidden');
+                    scenarioProblem.innerHTML = `<strong>Problem:</strong> ${scenario.problem}`;
+                    
+                    // Reset and populate Null Hypothesis options
+                    nullOptionsDiv.innerHTML = '';
+                    scenario.null.options.forEach((option, index) => {
+                        const button = document.createElement('button');
+                        button.innerHTML = option.text;
+                        button.onclick = () => checkHypothesisAnswer(button, option.correct, nullFeedbackDiv, scenario.null.feedback);
+                        nullOptionsDiv.appendChild(button);
+                    });
+                    nullFeedbackDiv.classList.add('hidden');
+                    nullFeedbackDiv.className = 'quiz-feedback hidden';
+
+                    // Reset and populate Alternative Hypothesis options
+                    altOptionsDiv.innerHTML = '';
+                    scenario.alt.options.forEach((option, index) => {
+                        const button = document.createElement('button');
+                        button.innerHTML = option.text;
+                        button.onclick = () => checkHypothesisAnswer(button, option.correct, altFeedbackDiv, scenario.alt.feedback);
+                        altOptionsDiv.appendChild(button);
+                    });
+                    altFeedbackDiv.classList.add('hidden');
+                    altFeedbackDiv.className = 'quiz-feedback hidden';
+
+                    // Render MathJax after content is loaded
+                    if (typeof MathJax !== 'undefined') {
+                        MathJax.typesetPromise([scenarioDisplay]);
+                    }
+
+                } else {
+                    scenarioDisplay.classList.add('hidden');
+                }
+            });
+
+            function checkHypothesisAnswer(button, isCorrect, feedbackDiv, feedbackMessages) {
+                // Disable all buttons for this set of options
+                Array.from(button.parentNode.children).forEach(btn => {
+                    btn.disabled = true;
+                    if (btn === button) {
+                        btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+                    } else if (isCorrect) { // If the selected option was incorrect, highlight the correct one
+                        // Find the correct option button and highlight it
+                        const correctOptionText = feedbackMessages.correct.includes("Correct!") ? feedbackMessages.correct.replace("Correct! ", "") : "";
+                        if (correctOptionText && btn.innerHTML.includes(correctOptionText.substring(0,20))) { // Basic check for matching text
+                             // This part is tricky with dynamic MathJax, simpler to just give feedback
+                        }
+                    }
+                });
+
+                feedbackDiv.classList.remove('hidden');
+                feedbackDiv.className = `quiz-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+                feedbackDiv.innerHTML = isCorrect ? feedbackMessages.correct : feedbackMessages.incorrect;
+                
+                // Re-render MathJax for feedback if needed
+                if (typeof MathJax !== 'undefined') {
+                    MathJax.typesetPromise([feedbackDiv]);
+                }
+            }
+
+            // --- P-value Interpreter Logic ---
+            const pValueInput = document.getElementById('pValueInput');
+            const alphaInput = document.getElementById('alphaInput');
+            const interpretPValueBtn = document.getElementById('interpretPValueBtn');
+            const decisionResultSpan = document.getElementById('decisionResult');
+            const pvalueInterpretationText = document.getElementById('pvalueInterpretationText');
+
+            interpretPValueBtn.addEventListener('click', interpretPValue);
+
+            function interpretPValue() {
+                const pValue = parseFloat(pValueInput.value);
+                const alpha = parseFloat(alphaInput.value);
+
+                if (isNaN(pValue) || isNaN(alpha) || pValue < 0 || pValue > 1 || alpha <= 0 || alpha >= 1) {
+                    decisionResultSpan.innerText = "Invalid Input";
+                    pvalueInterpretationText.innerText = "Please enter valid p-value (0-1) and alpha (0-1, typically 0.01, 0.05, 0.10).";
+                    return;
+                }
+
+                let decision = "";
+                let interpretation = "";
+
+                if (pValue <= alpha) {
+                    decision = "Reject H₀";
+                    interpretation = `Since your p-value (${pValue}) is less than or equal to your chosen significance level ($\\alpha = ${alpha}$), you **reject the null hypothesis ($H_0$)**. This means there is sufficient statistical evidence to conclude that the observed effect or difference is statistically significant and likely not due to random chance. You can now support the alternative hypothesis ($H_a$).`;
+                } else {
+                    decision = "Fail to Reject H₀";
+                    interpretation = `Since your p-value (${pValue}) is greater than your chosen significance level ($\\alpha = ${alpha}$), you **fail to reject the null hypothesis ($H_0$)**. This means there is not sufficient statistical evidence to conclude that the observed effect or difference is statistically significant. You do not have enough evidence to support the alternative hypothesis ($H_a$). It's important to note that failing to reject $H_0$ does not mean $H_0$ is true; it simply means the data does not provide strong enough evidence against it.`;
+                }
+
+                decisionResultSpan.innerText = decision;
+                pvalueInterpretationText.innerHTML = interpretation;
+
+                // Render MathJax for interpretation text
+                if (typeof MathJax !== 'undefined') {
+                    MathJax.typesetPromise([pvalueInterpretationText]);
+                }
+            }
+
+            // Initial interpretation for p-value interpreter
+            interpretPValue();
+
+            // Load MathJax for rendering LaTeX
+            const script = document.createElement('script');
+            script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
+            script.async = true;
+            document.head.appendChild(script);
+        });
+    </script>
+</body>
+</html>

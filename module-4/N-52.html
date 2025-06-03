@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S52: Basics of Probability & Sampling Distributions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="number"], select {
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            max-width: 150px;
+            margin-bottom: 0.5rem;
+        }
+        .calculate-button, .simulate-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .calculate-button:hover, .simulate-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .interpretation-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .chart-illustrative {
+            position: relative;
+            height: 250px; /* Adjusted height for clarity */
+            width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .chart-container-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        .chart-container-group > div {
+            flex: 1 1 calc(50% - 1.5rem); /* Two columns on larger screens */
+            min-width: 300px; /* Minimum width for charts */
+        }
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .input-group label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+    </style>
+    <!-- Add MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        };
+    </script>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S52: Basics of Probability & Sampling Distributions</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Basics of Probability & Sampling Distributions</h2>
+            <p class="section-intro">In this session, we'll introduce <strong>probability</strong> and <strong>sampling distributions</strong>—the foundation for making inferences about populations from samples in business analytics.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. Fundamental Probability Concepts</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">Probability is a measure of the likelihood that an event will occur. It is expressed as a number between 0 and 1, where 0 indicates impossibility and 1 indicates certainty.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Experiment:</strong> A process that leads to well-defined outcomes (e.g., rolling a die, flipping a coin).</li>
+                    <li><strong>Outcome:</strong> A single possible result of an experiment (e.g., rolling a 3, getting Heads).</li>
+                    <li><strong>Sample Space (S):</strong> The set of all possible outcomes of an experiment (e.g., for a single die roll, S = {1, 2, 3, 4, 5, 6}).</li>
+                    <li><strong>Event (E):</strong> A subset of the sample space; one or more outcomes (e.g., rolling an even number = {2, 4, 6}).</li>
+                    <li><strong>Probability of an Event:</strong> \[P(E) = \frac{\text{Number of favorable outcomes}}{\text{Total number of possible outcomes}}\]</li>
+                    <li><strong>Key Rules:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Addition Rule (for mutually exclusive events):</strong> \[P(A \text{ or } B) = P(A) + P(B)\]</li>
+                            <li><strong>Multiplication Rule (for independent events):</strong> \[P(A \text{ and } B) = P(A) \times P(B)\]</li>
+                            <li><strong>Complement Rule:</strong> \[P(\text{not } A) = 1 - P(A)\]</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. Random Variables</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">A random variable is a variable whose value is a numerical outcome of a random phenomenon. Random variables can be discrete or continuous.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Discrete Random Variable:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Can take on a finite or countably infinite number of values.</li>
+                            <li>Often results from counting (e.g., number of heads in 3 coin flips: 0, 1, 2, 3).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Continuous Random Variable:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Can take on any value within a given range.</li>
+                            <li>Often results from measuring (e.g., height, temperature, time).</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. Introduction to Sampling and Sampling Distributions</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">In statistics, we often want to understand characteristics of a large group (a **population**), but it's impractical to collect data from every member. Instead, we take a smaller, representative subset called a **sample**.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Population:</strong> The entire group of individuals or objects that we want to study (e.g., all customers of a company).</li>
+                    <li><strong>Sample:</strong> A subset of the population selected for analysis (e.g., 100 randomly selected customers).</li>
+                    <li><strong>Parameter:</strong> A numerical characteristic of a population (e.g., population mean \(\mu\), population standard deviation \(\sigma\)). Parameters are usually unknown.</li>
+                    <li><strong>Statistic:</strong> A numerical characteristic of a sample (e.g., sample mean \(\bar{x}\), sample standard deviation \(s\)). Statistics are used to estimate parameters.</li>
+                    <li><strong>Sampling Distribution:</strong> Imagine taking *many* samples of the same size from a population and calculating a statistic (like the mean) for each sample. The distribution of these sample statistics is called a **sampling distribution**. It's a theoretical distribution that describes the behavior of sample statistics.</li>
+                    <li><em>Why is it important?</em> It allows us to understand how much a sample statistic (like $\bar{x}$) is likely to vary from sample to sample, and how well it represents the true population parameter.</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">4. Central Limit Theorem (CLT) - Conceptual Understanding</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">The Central Limit Theorem (CLT) is one of the most fundamental theorems in statistics. It explains why the normal distribution is so prevalent in nature and in statistical analysis.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>The Theorem States:</strong> Regardless of the shape of the original population distribution, the sampling distribution of the sample mean (or sum) will tend to be approximately normally distributed as the sample size ($n$) increases.</li>
+                    <li><strong>Key Implications:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Even if the population data is skewed or non-normal, if you take sufficiently large samples (typically $n \ge 30$), the distribution of the *means of those samples* will look like a bell curve.</li>
+                            <li>The mean of the sampling distribution of sample means (\(\mu_{\bar{x}}\)) will be equal to the population mean (\(\mu\)).</li>
+                            <li>The standard deviation of the sampling distribution of sample means (called the <strong>Standard Error of the Mean</strong>, \(\sigma_{\bar{x}}\)) will be \(\frac{\sigma}{\sqrt{n}}\).</li>
+                        </ul>
+                    </li>
+                    <li><em>Why is this powerful?</em> It allows us to use statistical methods that rely on the normal distribution (like hypothesis testing and confidence intervals) even when we don't know the population's distribution, as long as our sample size is large enough.</li>
+                </ul>
+                <div class="chart-illustrative">
+                    <canvas id="cltIllustrationChart"></canvas>
+                </div>
+                <p class="chart-description text-center text-sm text-gray-600"><em>Conceptual Illustration of CLT: As sample size increases, the distribution of sample means approaches normality.</em></p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Probability & Sampling Distribution Simulation</h2>
+            <p class="section-intro">Engage with these interactive tools to solidify your understanding of probability and witness the Central Limit Theorem in action through a dice rolling simulation.</p>
+
+            <div class="interactive-panel mb-8">
+                <div class="panel-title">Simple Probability Calculator</div>
+                <div class="input-group">
+                    <label for="totalOutcomes">Total Possible Outcomes:</label>
+                    <input type="number" id="totalOutcomes" value="6" min="1">
+                </div>
+                <div class="input-group">
+                    <label for="favorableOutcomes">Favorable Outcomes:</label>
+                    <input type="number" id="favorableOutcomes" value="1" min="0">
+                </div>
+                <button id="calculateProbabilityBtn" class="calculate-button">Calculate Probability</button>
+                <div class="results-box mt-4">
+                    <div class="result-item">
+                        <span class="result-label">Probability P(E):</span>
+                        <span id="probabilityResult" class="result-value"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interactive-panel">
+                <div class="panel-title">Central Limit Theorem Dice Roll Simulation</div>
+                <p class="text-gray-700 text-center mb-4">Observe how the distribution of sample means changes as you increase the number of dice rolled per sample (sample size) and the total number of samples.</p>
+                
+                <div class="input-group">
+                    <label for="numDice">Number of Dice per Sample (n):</label>
+                    <input type="number" id="numDice" value="1" min="1" max="10">
+                </div>
+                <div class="input-group">
+                    <label for="numSamples">Number of Samples:</label>
+                    <input type="number" id="numSamples" value="100" min="10" max="10000">
+                </div>
+                <button id="simulateDiceBtn" class="simulate-button">Run Simulation</button>
+
+                <div class="results-box mt-4">
+                    <div class="chart-illustrative">
+                        <canvas id="samplingDistributionChart"></canvas>
+                    </div>
+                    <div id="simulationInterpretationBox" class="interpretation-box mt-4">
+                        <h5 class="font-semibold text-base mb-1">Simulation Interpretation:</h5>
+                        <p id="simulationInterpretationText" class="text-sm"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mt-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Discussion Points:</h3>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>For the probability calculator, try "rolling a 6" on a 6-sided die. Then try "rolling an even number".</li>
+                    <li>In the dice simulation:
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Start with 1 die per sample and 100 samples. What does the distribution look like? (It should be uniform-ish).</li>
+                            <li>Increase "Number of Dice per Sample" to 2, then 5, then 10. Keep "Number of Samples" at 100. How does the shape of the distribution of sample means change?</li>
+                            <li>Now, keep "Number of Dice per Sample" at 10, but increase "Number of Samples" to 1000, then 5000. How does the smoothness and normality of the distribution improve?</li>
+                            <li>What does this simulation visually demonstrate about the Central Limit Theorem?</li>
+                        </ul>
+                    </li>
+                    <li>Why is the Central Limit Theorem so important for data analysts, even if they never directly perform these simulations?</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Understanding probability and sampling distributions is foundational for inferential statistics, allowing us to generalize findings from samples to larger populations with confidence.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        // Global chart instance for sampling distribution
+        let samplingDistributionChartInstance = null;
+        let cltIllustrationChartInstance = null; // For the theory section chart
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation button active state logic
+            document.querySelectorAll('nav a').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // --- Probability Calculator Logic ---
+            const totalOutcomesInput = document.getElementById('totalOutcomes');
+            const favorableOutcomesInput = document.getElementById('favorableOutcomes');
+            const calculateProbabilityBtn = document.getElementById('calculateProbabilityBtn');
+            const probabilityResultSpan = document.getElementById('probabilityResult');
+
+            calculateProbabilityBtn.addEventListener('click', function() {
+                const total = parseInt(totalOutcomesInput.value);
+                const favorable = parseInt(favorableOutcomesInput.value);
+
+                if (isNaN(total) || isNaN(favorable) || total <= 0 || favorable < 0 || favorable > total) {
+                    probabilityResultSpan.innerText = "Invalid input";
+                    return;
+                }
+                const probability = favorable / total;
+                probabilityResultSpan.innerText = probability.toFixed(4);
+            });
+
+            // Initial calculation for probability calculator
+            calculateProbabilityBtn.click();
+
+            // --- Central Limit Theorem Dice Roll Simulation Logic ---
+            const numDiceInput = document.getElementById('numDice');
+            const numSamplesInput = document.getElementById('numSamples');
+            const simulateDiceBtn = document.getElementById('simulateDiceBtn');
+            const simulationInterpretationText = document.getElementById('simulationInterpretationText');
+
+            simulateDiceBtn.addEventListener('click', runDiceSimulation);
+
+            // Initial simulation on page load
+            runDiceSimulation();
+
+            function runDiceSimulation() {
+                const numDice = parseInt(numDiceInput.value);
+                const numSamples = parseInt(numSamplesInput.value);
+
+                if (isNaN(numDice) || isNaN(numSamples) || numDice < 1 || numSamples < 10) {
+                    alert("Please enter valid numbers for dice (min 1) and samples (min 10).");
+                    return;
+                }
+
+                const sampleMeans = [];
+                for (let i = 0; i < numSamples; i++) {
+                    let sumOfRolls = 0;
+                    for (let j = 0; j < numDice; j++) {
+                        sumOfRolls += Math.floor(Math.random() * 6) + 1; // Roll a 6-sided die
+                    }
+                    sampleMeans.push(sumOfRolls / numDice); // Calculate average for the sample
+                }
+
+                renderSamplingDistributionChart(sampleMeans, numDice, numSamples);
+                updateSimulationInterpretation(sampleMeans, numDice, numSamples);
+            }
+
+            function renderSamplingDistributionChart(data, numDice, numSamples) {
+                if (samplingDistributionChartInstance) {
+                    samplingDistributionChartInstance.destroy();
+                }
+
+                // Create bins for histogram
+                const minVal = numDice * 1; // Minimum possible sum / numDice
+                const maxVal = numDice * 6; // Maximum possible sum / numDice
+                const binCount = Math.max(10, Math.min(50, Math.ceil(Math.sqrt(data.length)))); // Dynamic bin count
+                const binWidth = (maxVal - minVal) / binCount;
+
+                const bins = Array(binCount).fill(0);
+                const labels = [];
+
+                for (let i = 0; i < binCount; i++) {
+                    const lowerBound = minVal + i * binWidth;
+                    const upperBound = minVal + (i + 1) * binWidth;
+                    labels.push(`${lowerBound.toFixed(1)}-${upperBound.toFixed(1)}`);
+                    data.forEach(val => {
+                        if (val >= lowerBound && (i === binCount - 1 ? val <= upperBound + 0.0001 : val < upperBound)) {
+                            bins[i]++;
+                        }
+                    });
+                }
+
+                // Calculate KDE for the sample means
+                const kdeData = calculateKDE(data, 100);
+
+                const ctx = document.getElementById('samplingDistributionChart').getContext('2d');
+                samplingDistributionChartInstance = new Chart(ctx, {
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Frequency of Sample Means',
+                                data: bins,
+                                backgroundColor: 'rgba(67, 56, 202, 0.6)',
+                                borderColor: 'rgba(67, 56, 202, 1)',
+                                borderWidth: 1,
+                                type: 'bar',
+                                order: 2
+                            },
+                            {
+                                label: 'KDE of Sample Means',
+                                data: kdeData.x.map((x, i) => ({ x: x, y: kdeData.y[i] })),
+                                borderColor: '#F97316', /* Orange for KDE */
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0.4,
+                                type: 'line',
+                                order: 1, // Draw KDE line on top
+                                pointRadius: 0,
+                                xAxisID: 'x-axis-kde',
+                                yAxisID: 'y-axis-kde'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: `Distribution of Sample Means (n=${numDice}, Samples=${numSamples})`,
+                                font: { size: 14 }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(context) {
+                                        if (context[0].dataset.type === 'bar') {
+                                            return `Range: ${context[0].label}`;
+                                        }
+                                        return `Value: ${context[0].parsed.x.toFixed(2)}`;
+                                    },
+                                    label: function(context) {
+                                        if (context.dataset.type === 'bar') {
+                                            return `Count: ${context.raw}`;
+                                        }
+                                        return `Density: ${context.raw.y.toFixed(3)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'category',
+                                labels: labels,
+                                title: { display: true, text: 'Average Roll per Sample' },
+                                ticks: { autoSkip: true, maxRotation: 45, minRotation: 0 },
+                                grid: { display: false },
+                                order: 2
+                            },
+                            'x-axis-kde': {
+                                type: 'linear',
+                                position: 'bottom',
+                                min: Math.min(...kdeData.x),
+                                max: Math.max(...kdeData.x),
+                                grid: { display: false },
+                                display: false,
+                                order: 1
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Frequency' },
+                                ticks: { precision: 0 },
+                                order: 2
+                            },
+                            'y-axis-kde': {
+                                type: 'linear',
+                                position: 'left',
+                                beginAtZero: true,
+                                grid: { display: false },
+                                display: false,
+                                min: 0,
+                                max: Math.max(...kdeData.y, ...bins) * 1.1
+                            }
+                        }
+                    }
+                });
+            }
+
+            function updateSimulationInterpretation(sampleMeans, numDice, numSamples) {
+                const meanOfSampleMeans = sampleMeans.reduce((sum, val) => sum + val, 0) / sampleMeans.length;
+                const stdDevOfSampleMeans = Math.sqrt(sampleMeans.reduce((sum, val) => sum + Math.pow(val - meanOfSampleMeans, 2), 0) / (sampleMeans.length - 1));
+
+                let interpretation = `For ${numSamples} samples, each with ${numDice} dice, the average of the sample means is **${meanOfSampleMeans.toFixed(2)}**. The standard deviation of these sample means (Standard Error) is **${stdDevOfSampleMeans.toFixed(2)}**.`;
+
+                if (numDice >= 5 && numSamples >= 1000) {
+                    interpretation += ` As you can see from the chart, with a larger sample size per sample and many samples, the distribution of sample means is beginning to resemble a **normal (bell-shaped) distribution**, which is a key concept of the Central Limit Theorem.`;
+                } else if (numDice >= 2 && numSamples >= 100) {
+                     interpretation += ` The distribution is starting to show a bell-like shape, illustrating the initial effects of the Central Limit Theorem.`;
+                } else {
+                    interpretation += ` The distribution might still look somewhat uniform or irregular, especially with a small number of dice per sample or few samples. Try increasing both to see the Central Limit Theorem in action!`;
+                }
+                simulationInterpretationText.innerText = interpretation;
+            }
+
+            // --- Theory Section CLT Illustration Chart ---
+            function renderCLTIllustrationChart() {
+                const ctx = document.getElementById('cltIllustrationChart').getContext('2d');
+                cltIllustrationChartInstance = new Chart(ctx, {
+                    type: 'line', // Using line to represent conceptual distributions
+                    data: {
+                        labels: Array.from({length: 100}, (_, i) => i), // Dummy labels for x-axis
+                        datasets: [
+                            {
+                                label: 'Population Distribution (e.g., Single Die Roll)',
+                                data: Array.from({length: 6}, (_, i) => ({x: i * 10 + 5, y: 1})), // Uniform distribution
+                                fill: false,
+                                borderColor: '#4338CA',
+                                borderWidth: 2,
+                                tension: 0,
+                                pointRadius: 0,
+                                stepped: true,
+                                spanGaps: true
+                            },
+                            {
+                                label: 'Sampling Distribution (Small n)',
+                                data: [
+                                    {x: 10, y: 0.1}, {x: 20, y: 0.3}, {x: 30, y: 0.6}, {x: 40, y: 0.8}, {x: 50, y: 0.6},
+                                    {x: 60, y: 0.3}, {x: 70, y: 0.1}
+                                ], // Slightly bell-shaped
+                                fill: false,
+                                borderColor: '#F97316',
+                                borderWidth: 2,
+                                tension: 0.4,
+                                pointRadius: 0
+                            },
+                            {
+                                label: 'Sampling Distribution (Large n)',
+                                data: [
+                                    {x: 10, y: 0.05}, {x: 20, y: 0.2}, {x: 30, y: 0.5}, {x: 40, y: 0.9}, {x: 50, y: 1.0},
+                                    {x: 60, y: 0.9}, {x: 70, y: 0.5}, {x: 80, y: 0.2}, {x: 90, y: 0.05}
+                                ], // More pronounced bell-shape
+                                fill: false,
+                                borderColor: '#22C55E',
+                                borderWidth: 2,
+                                tension: 0.4,
+                                pointRadius: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            title: {
+                                display: true,
+                                text: 'Central Limit Theorem: Shape of Sampling Distributions',
+                                font: { size: 14 }
+                            },
+                            tooltip: { enabled: false }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                title: { display: true, text: 'Value / Sample Mean' },
+                                min: 0, max: 100,
+                                grid: { display: false }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Density' },
+                                ticks: { display: false },
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+
+            renderCLTIllustrationChart(); // Render the theory chart on load
+
+            // Helper to calculate KDE points (reused from N-S51, slightly adapted for general use)
+            function calculateKDE(data, numPoints = 100) {
+                if (data.length === 0) return { x: [], y: [] };
+
+                const sortedData = [...data].sort((a, b) => a - b);
+                const minVal = sortedData[0];
+                const maxVal = sortedData[sortedData.length - 1];
+                const range = maxVal - minVal;
+                
+                const mean = data.reduce((sum, val) => sum + val, 0) / data.length;
+                const sumOfSquaredDifferences = data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0);
+                const stdDev = data.length > 1 ? Math.sqrt(sumOfSquaredDifferences / (data.length - 1)) : 0;
+
+                const getQuartile = (arr, percentile) => {
+                    const index = (percentile / 100) * (arr.length - 1);
+                    const floorIndex = Math.floor(index);
+                    const ceilIndex = Math.ceil(index);
+                    if (floorIndex === ceilIndex) return arr[floorIndex];
+                    return arr[floorIndex] + (arr[ceilIndex] - arr[floorIndex]) * (index - floorIndex);
+                };
+                const q1 = getQuartile(sortedData, 25);
+                const q3 = getQuartile(sortedData, 75);
+                const iqr = q3 - q1;
+
+                let h;
+                if (stdDev === 0 || iqr === 0 || data.length < 2) { 
+                    h = 0.5; // Fallback to a reasonable default for small or no variance data
+                } else {
+                    h = 0.9 * Math.min(stdDev, iqr / 1.34) * Math.pow(data.length, -0.2);
+                }
+                if (h < 0.01) h = 0.01; // Minimum bandwidth to avoid division by zero or too sharp peaks
+
+                const kernel = (u) => (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * u * u); // Gaussian kernel
+
+                const xValues = [];
+                const yValues = [];
+
+                // Extend the range slightly for better visualization of tails
+                const plotMin = minVal - (range * 0.1 || 1); // Add padding, or 1 if range is 0
+                const plotMax = maxVal + (range * 0.1 || 1);
+                const step = (plotMax - plotMin) / numPoints;
+
+                for (let i = 0; i < numPoints; i++) {
+                    const x = plotMin + i * step;
+                    let density = 0;
+                    for (let j = 0; j < data.length; j++) {
+                        density += kernel((x - data[j]) / h);
+                    }
+                    yValues.push(density / (data.length * h));
+                    xValues.push(x);
+                }
+
+                // Scale KDE y-values to fit histogram scale (optional, but makes overlay easier)
+                const histogramBins = createHistogramData(data, 10).data; // Re-use histogram binning
+                const maxHistFreq = histogramBins.length > 0 ? Math.max(...histogramBins) : 1;
+                const maxKdeDensity = yValues.length > 0 ? Math.max(...yValues) : 1;
+
+                const scaledYValues = yValues.map(y => (y / maxKdeDensity) * maxHistFreq * 1.2); // Scale up slightly
+
+                return { x: xValues, y: scaledYValues };
+            }
+
+            // Helper to create histogram data (reused from N-S51)
+            function createHistogramData(numbers, binCount = 10) {
+                if (numbers.length === 0) return { labels: [], data: [], minVal: 0, maxVal: 0, binWidth: 0 };
+                const minVal = Math.min(...numbers);
+                const maxVal = Math.max(...numbers);
+                const range = maxVal - minVal;
+                const binWidth = range === 0 ? 1 : range / binCount; 
+
+                const bins = Array(binCount).fill(0);
+                const labels = [];
+
+                for (let i = 0; i < binCount; i++) {
+                    const lowerBound = minVal + i * binWidth;
+                    const upperBound = minVal + (i + 1) * binWidth;
+                    labels.push(`${lowerBound.toFixed(1)}-${upperBound.toFixed(1)}`);
+                    numbers.forEach(num => {
+                        if (num >= lowerBound && (i === binCount - 1 ? num <= upperBound + 0.0001 : num < upperBound)) {
+                            bins[i]++;
+                        }
+                    });
+                }
+                return { labels, data: bins, minVal, maxVal, binWidth };
+            }
+        });
+    </script>
+</body>
+</html>

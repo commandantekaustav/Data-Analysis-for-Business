@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S35: Python (Pandas) for Data Prep - DataFrame Operations & Transformations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices:
+        - Hands-on Selecting Data: Report Info: Code, explanation. Goal: Apply. Viz/Method: Detailed Python code snippets with extensive comments for various selection methods (single column, multiple columns, rows by .loc/.iloc). Justification: Provides practical guidance for data subsetting.
+        - Hands-on Filtering Data: Report Info: Code, explanation. Goal: Apply. Viz/Method: Detailed Python code snippets for complex filtering conditions (AND, OR, .isin()). Justification: Demonstrates powerful conditional selection.
+        - Hands-on Changing Dtypes: Report Info: Code, explanation. Goal: Apply. Viz/Method: Detailed Python code snippets for converting data types (.astype(), pd.to_datetime(), pd.to_numeric()). Justification: Addresses a common data cleaning task.
+        - Creating New Columns: Report Info: Concepts. Goal: Inform. Viz/Method: Detailed text explanation with code examples for simple arithmetic and conditional column creation. Justification: Explains feature engineering basics.
+        - Using .apply(): Report Info: Concepts. Goal: Inform. Viz/Method: Detailed text explanation with code examples for applying custom functions to Series/DataFrames. Justification: Introduces a versatile method for complex transformations.
+        CONFIRMATION: No charts used (Chart.js/Plotly.js not needed as report is conceptual/textual).
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); /* Adjust based on header/footer height */ }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S35: Python (Pandas) for Data Prep - DataFrame Operations & Transformations</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#practical" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">💡 Practical Operations</a></li>
+                    <li><a href="#theory" class="nav-button text-sm sm:text-base font-medium py-2 px-3">📚 Theory: New Columns & Apply</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Hands-on DataFrame Operations</h2>
+            <p class="section-intro">This section provides a conceptual "hands-on" guide to essential DataFrame operations in Python using the Pandas library. We'll cover selecting data, filtering rows based on conditions, and crucially, changing data types. These are fundamental skills for any data preparation workflow.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Hands-on Exercise: Selecting Data, Filtering, and Changing Data Types</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">We'll use a hypothetical "Product Sales" dataset to demonstrate these core Pandas operations. Imagine this data was loaded from a CSV file.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800">
+                    <h4 class="font-semibold text-indigo-700 mb-2">Python Code Snippet (Setting up DataFrame)</h4>
+                    <pre><code class="language-python">
+import pandas as pd
+import numpy as np
+
+# Create a sample DataFrame (simulating data loaded from a CSV)
+data = {
+    'OrderID': [101, 102, 103, 104, 105, 106, 107, 108],
+    'ProductCategory': ['Electronics', 'Clothing', 'Books', 'Electronics', 'Clothing', 'Books', 'Electronics', 'Clothing'],
+    'SalesAmount': [150.00, 75.50, 25.00, 300.00, 120.00, 40.00, 80.00, 90.00],
+    'OrderDate': ['2024-01-05', '2024-01-06', '2024-01-05', '2024-01-07', '2024-01-08', '2024-01-07', '2024-01-09', '2024-01-08'],
+    'Region': ['North', 'South', 'North', 'West', 'East', 'South', 'North', 'West'],
+    'CustomerRating': ['4', '5', '3', '5', '4', '2', '4', '5'], # Stored as string initially
+    'DiscountApplied': [True, False, False, True, False, False, True, False]
+}
+df_sales = pd.DataFrame(data)
+print("--- Original DataFrame ---")
+print(df_sales)
+print("\nInitial Data Types:\n", df_sales.dtypes, "\n")
+                    </code></pre>
+
+                    <h4 class="font-semibold text-indigo-700 mt-6 mb-3">1. Selecting Data (Columns and Rows)</h4>
+                    <p class="mb-2 text-gray-700 leading-relaxed">Accessing specific parts of your DataFrame is the first step in manipulation.</p>
+                    <pre><code class="language-python">
+# Select a single column (returns a Pandas Series)
+print("--- Selecting Single Column 'SalesAmount' ---")
+sales_amounts = df_sales['SalesAmount']
+print(sales_amounts.head())
+print(f"Type of sales_amounts: {type(sales_amounts)}\n")
+
+# Select multiple columns (returns a DataFrame)
+print("--- Selecting Multiple Columns 'ProductCategory' and 'SalesAmount' ---")
+product_sales = df_sales[['ProductCategory', 'SalesAmount']]
+print(product_sales.head())
+print(f"Type of product_sales: {type(product_sales)}\n")
+
+# Select rows by label (index) using .loc (e.g., first two rows by index 0 and 1)
+print("--- Selecting Rows by Label (Index 0 and 1) using .loc ---")
+first_two_orders_loc = df_sales.loc[0:1] # .loc is inclusive of end label
+print(first_two_orders_loc)
+print("\n")
+
+# Select rows by integer position using .iloc (e.g., first two rows by position 0 and 1)
+print("--- Selecting Rows by Position (Index 0 and 1) using .iloc ---")
+first_two_orders_iloc = df_sales.iloc[0:2] # .iloc is exclusive of end position
+print(first_two_orders_iloc)
+print("\n")
+
+# Select specific rows and columns using .loc
+print("--- Selecting Specific Rows (0, 2) and Columns ('ProductCategory', 'SalesAmount') using .loc ---")
+specific_data = df_sales.loc[[0, 2], ['ProductCategory', 'SalesAmount']]
+print(specific_data)
+print("\n")
+                    </code></pre>
+
+                    <h4 class="font-semibold text-indigo-700 mt-6 mb-3">2. Filtering Data (Conditional Selection of Rows)</h4>
+                    <p class="mb-2 text-gray-700 leading-relaxed">Filtering allows you to select rows that meet specific conditions, similar to Excel's filters but with much greater programmatic control.</p>
+                    <pre><code class="language-python">
+# Filter for sales amount greater than 100
+print("--- Filtering: SalesAmount > 100 ---")
+high_value_sales = df_sales[df_sales['SalesAmount'] > 100]
+print(high_value_sales)
+print("\n")
+
+# Filter for 'Electronics' category
+print("--- Filtering: ProductCategory == 'Electronics' ---")
+electronics_sales = df_sales[df_sales['ProductCategory'] == 'Electronics']
+print(electronics_sales)
+print("\n")
+
+# Filter with multiple conditions (AND: & operator)
+# Sales in 'North' region AND SalesAmount > 100
+print("--- Filtering: Region == 'North' AND SalesAmount > 100 ---")
+north_high_sales = df_sales[(df_sales['Region'] == 'North') & (df_sales['SalesAmount'] > 100)]
+print(north_high_sales)
+print("\n")
+
+# Filter with multiple conditions (OR: | operator)
+# Sales in 'North' region OR 'South' region
+print("--- Filtering: Region == 'North' OR Region == 'South' ---")
+north_or_south_sales = df_sales[(df_sales['Region'] == 'North') | (df_sales['Region'] == 'South')]
+print(north_or_south_sales)
+print("\n")
+
+# Filter using .isin() for multiple categorical values
+# Sales where ProductCategory is 'Electronics' or 'Books'
+print("--- Filtering: ProductCategory IN ['Electronics', 'Books'] using .isin() ---")
+selected_categories = ['Electronics', 'Books']
+filtered_by_categories = df_sales[df_sales['ProductCategory'].isin(selected_categories)]
+print(filtered_by_categories)
+print("\n")
+                    </code></pre>
+
+                    <h4 class="font-semibold text-indigo-700 mt-6 mb-3">3. Changing Data Types (`.astype()`, `pd.to_datetime()`, `pd.to_numeric()`)</h4>
+                    <p class="mb-2 text-gray-700 leading-relaxed">Ensuring columns have the correct data type is crucial for proper analysis and calculations. Pandas provides flexible methods for type conversion.</p>
+                    <pre><code class="language-python">
+# Check initial data types again
+print("--- Initial Data Types ---")
+print(df_sales.dtypes)
+print("\n")
+
+# Convert 'CustomerRating' from object (string) to integer
+# It's currently a string because of the '4', '5' etc. in quotes in the initial data.
+print("--- Converting 'CustomerRating' to Integer ---")
+df_sales['CustomerRating'] = df_sales['CustomerRating'].astype(int)
+print(df_sales[['CustomerRating']].dtypes)
+print(df_sales['CustomerRating'].head())
+print("\n")
+
+# Convert 'OrderDate' from object (string) to datetime objects
+# This allows for date-based operations (e.g., extracting year, month, day, or calculating duration).
+print("--- Converting 'OrderDate' to Datetime ---")
+df_sales['OrderDate'] = pd.to_datetime(df_sales['OrderDate'])
+print(df_sales[['OrderDate']].dtypes)
+print(df_sales['OrderDate'].head())
+print("\n")
+
+# Convert a column to numeric, handling errors (e.g., if there were non-numeric strings)
+# Imagine 'SalesAmount' was initially loaded as an object due to some text entries.
+# errors='coerce' will turn non-convertible values into NaN.
+# df_sales['SalesAmount'] = pd.to_numeric(df_sales['SalesAmount'], errors='coerce')
+# print("--- Converting 'SalesAmount' to Numeric (if needed) ---")
+# print(df_sales[['SalesAmount']].dtypes)
+# print(df_sales['SalesAmount'].head())
+# print("\n")
+
+print("--- Final Data Types After Conversions ---")
+print(df_sales.dtypes)
+print("\n")
+                    </code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">These hands-on conceptual exercises cover the most frequent initial data preparation tasks in Pandas. Mastering selection, filtering, and type conversion is fundamental to effectively cleaning and preparing your data for deeper analysis and model building.</p>
+            </div>
+        </section>
+
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Creating New Columns & Using `.apply()`</h2>
+            <p class="section-intro">Beyond cleaning existing data, a crucial part of data preparation (often called "feature engineering") involves creating new, meaningful columns from existing ones. This section will explore how to derive new insights by performing calculations and conditional logic on columns, and introduce the powerful `.apply()` method for more complex, custom transformations.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Creating New Columns from Existing Ones: Feature Engineering Basics</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Deriving new columns is a common and powerful technique to extract more value from your data. These new "features" can provide additional context, simplify analysis, or improve the performance of machine learning models. You can create new columns using simple arithmetic operations, conditional logic, or by extracting information from existing columns.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">1. Simple Arithmetic Operations</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">You can perform basic arithmetic operations directly on Pandas Series (columns) to create new numerical columns.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <h5 class="font-semibold text-indigo-700 mb-2">Conceptual Code: Calculating 'SalesTax' and 'TotalRevenue'</h5>
+                    <pre><code class="language-python">
+# Assuming df_sales DataFrame from previous section
+# Add a 'SalesTax' column (e.g., 8% tax)
+df_sales['SalesTax'] = df_sales['SalesAmount'] * 0.08
+print("--- DataFrame with 'SalesTax' ---")
+print(df_sales[['SalesAmount', 'SalesTax']].head())
+# Output:
+#    SalesAmount  SalesTax
+# 0       150.00     12.00
+# 1        75.50      6.04
+# ...
+
+# Add a 'TotalRevenue' column (SalesAmount + SalesTax)
+df_sales['TotalRevenue'] = df_sales['SalesAmount'] + df_sales['SalesTax']
+print("\n--- DataFrame with 'TotalRevenue' ---")
+print(df_sales[['SalesAmount', 'SalesTax', 'TotalRevenue']].head())
+# Output:
+#    SalesAmount  SalesTax  TotalRevenue
+# 0       150.00     12.00        162.00
+# 1        75.50      6.04         81.54
+# ...
+                    </code></pre>
+                </div>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">2. Conditional Column Creation (using `np.where` or boolean indexing)</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">You can create new categorical columns based on conditions applied to existing columns. `numpy.where()` is particularly useful for this.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <h5 class="font-semibold text-indigo-700 mb-2">Conceptual Code: Creating 'HighValueCustomer' based on 'SalesAmount'</h5>
+                    <pre><code class="language-python">
+# Create 'HighValueCustomer' column: 'Yes' if SalesAmount > 100, 'No' otherwise
+# np.where(condition, value_if_true, value_if_false)
+df_sales['HighValueCustomer'] = np.where(df_sales['SalesAmount'] > 100, 'Yes', 'No')
+print("--- DataFrame with 'HighValueCustomer' ---")
+print(df_sales[['SalesAmount', 'HighValueCustomer']].head())
+# Output:
+#    SalesAmount HighValueCustomer
+# 0       150.00               Yes
+# 1        75.50                No
+# ...
+                    </code></pre>
+                </div>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">3. Extracting Information from Date/Time Columns</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Once a column is converted to a datetime object (as shown in the practical section), you can easily extract components like year, month, day, or day of the week.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <h5 class="font-semibold text-indigo-700 mb-2">Conceptual Code: Extracting 'OrderMonth' and 'OrderDayOfWeek'</h5>
+                    <pre><code class="language-python">
+# Assuming 'OrderDate' is already converted to datetime dtype
+df_sales['OrderMonth'] = df_sales['OrderDate'].dt.month
+df_sales['OrderDayOfWeek'] = df_sales['OrderDate'].dt.day_name() # e.g., 'Monday', 'Tuesday'
+print("--- DataFrame with Date Components ---")
+print(df_sales[['OrderDate', 'OrderMonth', 'OrderDayOfWeek']].head())
+# Output:
+#    OrderDate  OrderMonth OrderDayOfWeek
+# 0 2024-01-05           1         Friday
+# 1 2024-01-06           1       Saturday
+# ...
+                    </code></pre>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Using `.apply()`: Applying Custom Functions for Complex Transformations</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">The `.apply()` method is one of the most versatile and powerful functions in Pandas. It allows you to apply a custom function (or a built-in function) along an axis of a DataFrame or Series. This is incredibly useful for transformations that cannot be achieved with simple arithmetic or vectorized operations.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">How `.apply()` Works:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>On a Series (Column):</strong> When used on a single column, `.apply()` passes each value in that column to the specified function.</li>
+                    <li><strong>On a DataFrame (Rows or Columns):</strong> When used on an entire DataFrame, `.apply()` can iterate row-wise (`axis=1`) or column-wise (`axis=0`, default), passing each row or column as a Series to the function.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Conceptual Example 1: Custom Text Transformation on a Column</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Let's say we want to categorize `ProductCategory` into "Digital" or "Physical" based on a custom logic.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <h5 class="font-semibold text-indigo-700 mb-2">Conceptual Code: Custom Categorization using `.apply()`</h5>
+                    <pre><code class="language-python">
+# Define a custom function
+def categorize_product_type(category):
+    if category in ['Electronics', 'Books']: # Assuming books can be e-books
+        return 'Digital/Physical'
+    elif category == 'Clothing':
+        return 'Physical'
+    else:
+        return 'Other'
+
+# Apply the function to the 'ProductCategory' column
+df_sales['ProductType'] = df_sales['ProductCategory'].apply(categorize_product_type)
+print("--- DataFrame with 'ProductType' using .apply() ---")
+print(df_sales[['ProductCategory', 'ProductType']].head())
+# Output:
+#   ProductCategory   ProductType
+# 0     Electronics  Digital/Physical
+# 1        Clothing          Physical
+# 2           Books  Digital/Physical
+# ...
+                    </code></pre>
+                </div>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Conceptual Example 2: Row-wise Calculation using `.apply()`</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Imagine calculating a 'CustomerScore' based on both 'SalesAmount' and 'CustomerRating' for each customer.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <h5 class="font-semibold text-indigo-700 mb-2">Conceptual Code: Row-wise calculation using `.apply(axis=1)`</h5>
+                    <pre><code class="language-python">
+# Define a custom function that takes a row (as a Series) as input
+def calculate_customer_score(row):
+    # Ensure CustomerRating is numeric for calculation
+    rating = int(row['CustomerRating']) # Convert to int if it's still object type
+    
+    if row['SalesAmount'] > 100 and rating >= 4:
+        return 'High Score'
+    elif row['SalesAmount'] <= 100 and rating >= 3:
+        return 'Medium Score'
+    else:
+        return 'Low Score'
+
+# Apply the function row-wise (axis=1)
+# Make sure CustomerRating is int before this step as done in previous section
+df_sales['CustomerSegment'] = df_sales.apply(calculate_customer_score, axis=1)
+print("--- DataFrame with 'CustomerSegment' using .apply(axis=1) ---")
+print(df_sales[['SalesAmount', 'CustomerRating', 'CustomerSegment']].head())
+# Output:
+#    SalesAmount CustomerRating CustomerSegment
+# 0       150.00              4      High Score
+# 1        75.50              5    Medium Score
+# 2        25.00              3    Medium Score
+# ...
+                    </code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">The `.apply()` method is incredibly flexible, allowing you to perform virtually any custom transformation or calculation on your data, whether it's column-wise or row-wise. It's an essential tool for complex feature engineering and data cleaning tasks in Pandas.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-6 mt-auto">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        // No specific interactive elements beyond nav buttons for this module.
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scroll for nav links and initial active state
+            document.querySelectorAll('a.nav-button').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll('a.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Set initial active nav button based on URL hash or first section
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'practical';
+            const initialNavButton = document.querySelector(`a.nav-button[href="#${initialSection}"]`);
+            if (initialNavButton) {
+                initialNavButton.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

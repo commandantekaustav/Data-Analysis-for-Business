@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S64: Python for Statistical Analysis - NumPy & SciPy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-boxplot@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="number"], textarea {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            max-width: 250px; /* Constrain width for inputs */
+            margin-bottom: 0.5rem;
+        }
+        textarea {
+            max-width: 100%;
+            min-height: 80px;
+            resize: vertical;
+        }
+        .action-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+        }
+        .action-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .code-block {
+            background-color: #2D3748; /* Dark background for code */
+            color: #E2E8F0; /* Light text */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', monospace; /* Monospace font */
+            overflow-x: auto; /* Allow horizontal scrolling for long lines */
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .code-block pre {
+            margin: 0;
+        }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #4A5568;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .copy-button:hover {
+            background-color: #6366F1;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px; /* Increased height for better visibility */
+            width: 100%;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        /* Message Box Styling */
+        #messageBox {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .input-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4B5563;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S64: Python for Statistical Analysis - NumPy & SciPy</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#intro" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">🚀 Intro</a></li>
+                    <li><a href="#numpy-deep-dive" class="nav-button text-sm sm:text-base font-medium py-2 px-3">🐍 NumPy Deep Dive</a></li>
+                    <li><a href="#scipy-stats-deep-dive" class="nav-button text-sm sm:text-base font-medium py-2 px-3">🔬 SciPy.stats Deep Dive</a></li>
+                    <li><a href="#practical-demo" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💻 Practical Demo</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="intro" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">🚀</span>Introduction: Python for Advanced Statistics</h2>
+            <p class="section-intro">Building on our understanding of Excel for basic statistics, we now transition to Python, the industry standard for advanced statistical modeling, data manipulation, and visualization. At the heart of scientific computing in Python lie two indispensable libraries: **NumPy** and **SciPy**.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Why Python, NumPy, and SciPy?</h3>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>**Scalability:** Process datasets with millions or billions of rows efficiently.</li>
+                    <li>**Reproducibility:** Code-based analysis ensures consistent results and facilitates sharing and peer review.</li>
+                    <li>**Advanced Algorithms:** Access to a vast ecosystem of cutting-edge statistical models, machine learning algorithms, and scientific tools.</li>
+                    <li>**Automation & Integration:** Automate complex analytical pipelines and seamlessly integrate with other software systems.</li>
+                    <li>**Community & Ecosystem:** Benefit from a vibrant global community and a rich collection of specialized libraries (e.g., Pandas, Matplotlib, Scikit-learn, Seaborn).</li>
+                </ul>
+                <p class="mt-4 text-gray-700 leading-relaxed font-bold">NumPy provides the foundational numerical structures and operations, while SciPy builds upon it, offering specialized tools for scientific computing, including a comprehensive `stats` module for statistical analysis.</p>
+            </div>
+        </section>
+
+        <section id="numpy-deep-dive" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">🐍</span>NumPy: Numerical Python - The Foundation</h2>
+            <p class="section-intro">NumPy (Numerical Python) is the cornerstone of numerical computing in Python. It provides the `ndarray` object, a powerful, efficient, and flexible container for large, multi-dimensional arrays and matrices, along with an extensive collection of high-level mathematical functions to operate on these arrays.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. The `ndarray` Object: Creation & Attributes</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">The `ndarray` is NumPy's primary data structure. Unlike Python lists, `ndarray`s are designed for numerical efficiency, homogeneity (all elements of the same data type), and vectorized operations.</p>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-4">Creating Arrays:</h4>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+
+# From a Python list or tuple
+arr1 = np.array([1, 2, 3, 4, 5])
+arr2d = np.array([[10, 20, 30], [40, 50, 60]])
+
+# Arrays filled with specific values
+zeros_arr = np.zeros((3, 4)) # 3 rows, 4 columns of zeros
+ones_arr = np.ones(5)       # 1D array of five ones
+full_arr = np.full((2, 2), 7) # 2x2 array filled with 7s
+empty_arr = np.empty((2, 3)) # Returns new array of given shape and type, without initializing entries
+
+# Arrays with sequences
+range_arr = np.arange(0, 10, 2)     # Start (inclusive), Stop (exclusive), Step
+linspace_arr = np.linspace(0, 1, 5) # Start (inclusive), Stop (inclusive), Number of elements
+
+# Identity matrix (for linear algebra)
+identity_matrix = np.identity(3) # 3x3 identity matrix
+
+# Random number generation (essential for simulations)
+rand_uniform = np.random.rand(3)         # 3 random numbers from uniform [0,1)
+rand_normal = np.random.randn(2, 2)      # 2x2 matrix from standard normal distribution
+rand_int = np.random.randint(1, 10, size=(2, 3)) # Random integers from low (inclusive) to high (exclusive)
+
+print(f"1D Array (arr1):\n{arr1}")
+print(f"\n2D Array (arr2d):\n{arr2d}")
+print(f"\nZeros Array:\n{zeros_arr}")
+print(f"\nIdentity Matrix:\n{identity_matrix}")
+print(f"\nRandom Integers:\n{rand_int}")
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-6">Array Attributes:</h4>
+                <p class="mb-4 text-gray-700 leading-relaxed">Understanding array attributes helps in inspecting and manipulating data.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>`shape`: Tuple of array dimensions.</li>
+                    <li>`ndim`: Number of array dimensions.</li>
+                    <li>`size`: Total number of elements.</li>
+                    <li>`dtype`: Data type of elements (e.g., `int64`, `float64`). NumPy arrays are homogeneous, meaning all elements must be of the same type.</li>
+                </ul>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+arr = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.float64) # Explicitly set dtype
+print(f"Array:\n{arr}")
+print(f"Shape: {arr.shape}")   # (2, 3)
+print(f"Dimensions: {arr.ndim}") # 2
+print(f"Size: {arr.size}")     # 6
+print(f"Data type: {arr.dtype}") # float64
+                    </code></pre>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. Array Indexing & Slicing</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Accessing specific elements or subsets of arrays is fundamental. NumPy's indexing is similar to Python lists, but with extensions for multi-dimensional arrays.</p>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2">Basic Indexing:</h4>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+
+arr = np.array([10, 20, 30, 40, 50])
+print(f"Array: {arr}")
+print(f"First element: {arr[0]}")     # 10
+print(f"Last element: {arr[-1]}")    # 50
+
+arr_2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+print(f"\n2D Array:\n{arr_2d}")
+print(f"Element at [0, 1]: {arr_2d[0, 1]}") # 2 (row 0, column 1)
+print(f"Element at [2, 0]: {arr_2d[2, 0]}") # 7 (row 2, column 0)
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-6">Slicing:</h4>
+                <p class="mb-4 text-gray-700 leading-relaxed">Extracting sub-arrays using `[start:stop:step]` syntax. Slices create views, not copies, so modifying a slice modifies the original array.</p>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+
+arr = np.array([10, 20, 30, 40, 50, 60, 70])
+print(f"Original Array: {arr}")
+print(f"Slice from index 2 to 5 (exclusive): {arr[2:5]}") # [30 40 50]
+print(f"First 3 elements: {arr[:3]}")                      # [10 20 30]
+print(f"Elements from index 4 onwards: {arr[4:]}")         # [50 60 70]
+print(f"Every other element: {arr[::2]}")                  # [10 30 50 70]
+
+arr_2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+print(f"\nOriginal 2D Array:\n{arr_2d}")
+print(f"First two rows:\n{arr_2d[:2]}")
+print(f"All rows, first two columns:\n{arr_2d[:, :2]}")
+print(f"Specific slice (rows 0-1, cols 1-2):\n{arr_2d[0:2, 1:3]}")
+
+# Modifying a slice
+sub_array = arr_2d[0:2, 1:3]
+sub_array[0, 0] = 99 # This will modify arr_2d as well
+print(f"\nModified sub_array:\n{sub_array}")
+print(f"Original 2D Array after slice modification:\n{arr_2d}")
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-6">Boolean Indexing (Masking):</h4>
+                <p class="mb-4 text-gray-700 leading-relaxed">Selecting elements based on a condition, which returns a boolean array of the same shape. This is extremely powerful for filtering data.</p>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+
+data = np.array([10, 15, 22, 5, 30, 8, 25])
+print(f"Data: {data}")
+
+# Create a boolean mask
+mask = data > 15
+print(f"Boolean mask (data > 15): {mask}") # [False False True False True False True]
+
+# Use the mask to select elements
+filtered_data = data[mask]
+print(f"Filtered data (> 15): {filtered_data}") # [22 30 25]
+
+# Combine conditions using logical operators (& for AND, | for OR, ~ for NOT)
+combined_filter = (data > 10) & (data < 25)
+print(f"Filtered data (10 < data < 25): {data[combined_filter]}") # [15 22]
+                    </code></pre>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. Reshaping Arrays</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Changing the dimensions of an array without changing its data. Useful for preparing data for different functions or models.</p>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+
+arr = np.arange(1, 10) # [1 2 3 4 5 6 7 8 9]
+print(f"Original array:\n{arr}")
+print(f"Original shape: {arr.shape}")
+
+# Reshape to a 3x3 matrix
+reshaped_arr = arr.reshape((3, 3))
+print(f"\nReshaped to 3x3:\n{reshaped_arr}")
+
+# Using -1 for unknown dimension: it will be automatically calculated
+reshaped_auto = arr.reshape(3, -1) # Same as (3, 3)
+print(f"\nReshaped with auto-dimension (3 rows, -1 columns):\n{reshaped_auto}")
+
+# Flattening an array (back to 1D)
+flattened_arr = reshaped_arr.flatten() # Returns a copy
+raveled_arr = reshaped_arr.ravel()   # Returns a view if possible (more memory efficient)
+print(f"\nFlattened array (copy): {flattened_arr}")
+print(f"Raveled array (view): {raveled_arr}")
+                    </code></pre>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">4. Mathematical Operations & Aggregation</h3>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2">Element-wise Operations:</h4>
+                <p class="mb-4 text-gray-700 leading-relaxed">NumPy performs operations element-wise by default, which is incredibly efficient for large datasets.</p>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+
+arr_a = np.array([1, 2, 3])
+arr_b = np.array([4, 5, 6])
+
+print(f"Array A: {arr_a}")
+print(f"Array B: {arr_b}")
+
+print(f"\nAddition (A + B): {arr_a + arr_b}")
+print(f"Multiplication (A * B): {arr_a * arr_b}")
+print(f"Division (A / B): {arr_a / arr_b}")
+print(f"Exponentiation (A ** 2): {arr_a ** 2}")
+print(f"Square root (np.sqrt(A)): {np.sqrt(arr_a).round(2)}")
+print(f"Logarithm (np.log(A)): {np.log(arr_a).round(2)}")
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-6">Broadcasting:</h4>
+                <p class="mb-4 text-gray-700 leading-relaxed">NumPy's broadcasting mechanism allows operations on arrays of different shapes, provided they are compatible. It's a powerful feature that avoids explicit looping and makes code more concise and efficient.</p>
+                <p class="mb-4 text-gray-700 leading-relaxed">**Rules of Broadcasting:**</p>
+                <ol class="list-decimal pl-5 space-y-1 text-gray-700">
+                    <li>If the arrays do not have the same number of dimensions, the shape of the smaller array is padded with ones on its left side.</li>
+                    <li>If the shape of the two arrays does not match in any dimension, the array with shape equal to 1 in that dimension is stretched to match the other shape.</li>
+                    <li>If in any dimension the sizes disagree and neither is 1, an error is raised.</li>
+                </ol>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+
+# Scalar-array broadcasting
+arr = np.array([1, 2, 3])
+result_scalar = arr + 5
+print(f"Array: {arr}")
+print(f"Array + Scalar (5): {result_scalar}") # [6 7 8]
+
+# 2D array and 1D array broadcasting
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+row_vector = np.array([10, 20, 30])
+result_row_broadcast = matrix + row_vector
+print(f"\nMatrix:\n{matrix}")
+print(f"Row Vector: {row_vector}")
+print(f"Matrix + Row Vector (broadcasted):\n{result_row_broadcast}")
+
+# Column vector broadcasting (requires reshaping the 1D array)
+col_vector = np.array([100, 200, 300]).reshape(3, 1)
+result_col_broadcast = matrix + col_vector
+print(f"\nColumn Vector:\n{col_vector}")
+print(f"Matrix + Column Vector (broadcasted):\n{result_col_broadcast}")
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-6">Matrix Operations:</h4>
+                <p class="mb-4 text-gray-700 leading-relaxed">For actual matrix multiplication, use `@` operator or `np.dot()`.</p>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+
+matrix_a = np.array([[1, 2], [3, 4]])
+matrix_b = np.array([[5, 6], [7, 8]])
+
+print(f"Matrix A:\n{matrix_a}")
+print(f"\nMatrix B:\n{matrix_b}")
+
+dot_product = matrix_a @ matrix_b # Or np.dot(matrix_a, matrix_b)
+print(f"\nMatrix Multiplication (A @ B):\n{dot_product}")
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-6">Aggregation Functions:</h4>
+                <p class="mb-4 text-gray-700 leading-relaxed">Summarizing data along specific axes or the entire array.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>`np.sum()`: Sum of elements.</li>
+                    <li>`np.mean()`: Arithmetic mean.</li>
+                    <li>`np.std()`: Standard deviation. Use `ddof=1` for sample standard deviation.</li>
+                    <li>`np.min()`, `np.max()`: Minimum/Maximum value.</li>
+                    <li>`np.median()`: Median value.</li>
+                    <li>`np.percentile(arr, q)`: Compute the q-th percentile.</li>
+                    <li>`np.argmin()`, `np.argmax()`: Indices of min/max values.</li>
+                </ul>
+                <p class="mt-2 text-gray-700 leading-relaxed font-bold">The `axis` parameter:</p>
+                <p class="text-gray-700 leading-relaxed">For multi-dimensional arrays, `axis=0` operates column-wise, `axis=1` operates row-wise. Default (`axis=None`) operates on the entire array.</p>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+
+data_matrix = np.array([[10, 12, 15], [20, 25, 18], [30, 28, 22]])
+print(f"Data Matrix:\n{data_matrix}")
+
+print(f"\nTotal Sum: {np.sum(data_matrix)}")
+print(f"Mean of all elements: {np.mean(data_matrix):.2f}")
+print(f"Median of all elements: {np.median(data_matrix):.2f}")
+
+print(f"\nSum of each column (axis=0): {np.sum(data_matrix, axis=0)}")
+print(f"Mean of each row (axis=1): {np.mean(data_matrix, axis=1).round(2)}")
+
+# Sample standard deviation
+print(f"Std Dev of all elements (sample): {np.std(data_matrix, ddof=1):.2f}")
+print(f"Max value in each column: {np.max(data_matrix, axis=0)}")
+print(f"Min value in each row: {np.min(data_matrix, axis=1)}")
+                    </code></pre>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">5. Array Manipulation</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Functions for combining, splitting, and rearranging arrays.</p>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2">Concatenation and Stacking:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>`np.concatenate((arr1, arr2), axis=...)`: Joins arrays along an existing axis.</li>
+                    <li>`np.stack((arr1, arr2), axis=...)`: Joins arrays along a new axis.</li>
+                    <li>`np.vstack((arr1, arr2))`: Stack arrays vertically (row-wise).</li>
+                    <li>`np.hstack((arr1, arr2))`: Stack arrays horizontally (column-wise).</li>
+                </ul>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+
+arr1 = np.array([1, 2, 3])
+arr2 = np.array([4, 5, 6])
+matrix1 = np.array([[10, 20], [30, 40]])
+matrix2 = np.array([[50, 60], [70, 80]])
+
+print(f"arr1: {arr1}, arr2: {arr2}")
+print(f"matrix1:\n{matrix1}")
+print(f"matrix2:\n{matrix2}")
+
+# Concatenate 1D arrays
+concatenated_1d = np.concatenate((arr1, arr2))
+print(f"\nConcatenated 1D: {concatenated_1d}") # [1 2 3 4 5 6]
+
+# Concatenate 2D arrays (row-wise, default axis=0)
+concatenated_2d_rows = np.concatenate((matrix1, matrix2), axis=0)
+print(f"\nConcatenated 2D (rows):\n{concatenated_2d_rows}")
+
+# Concatenate 2D arrays (column-wise, axis=1)
+concatenated_2d_cols = np.concatenate((matrix1, matrix2), axis=1)
+print(f"\nConcatenated 2D (columns):\n{concatenated_2d_cols}")
+
+# Stack arrays along a new axis (e.g., creating a 3D array from 2D arrays)
+stacked_3d = np.stack((matrix1, matrix2), axis=0)
+print(f"\nStacked 3D array (axis=0):\n{stacked_3d}")
+print(f"Shape of stacked_3d: {stacked_3d.shape}") # (2, 2, 2)
+
+# Vertical and Horizontal stacking
+v_stacked = np.vstack((matrix1, matrix2))
+h_stacked = np.hstack((matrix1, matrix2))
+print(f"\nVertically Stacked:\n{v_stacked}")
+print(f"\nHorizontally Stacked:\n{h_stacked}")
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-6">Splitting Arrays:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>`np.split(arr, indices_or_sections, axis=...)`: Splits an array into multiple sub-arrays.</li>
+                    <li>`np.hsplit()`, `np.vsplit()`: Convenience functions for horizontal/vertical splitting.</li>
+                </ul>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+
+arr = np.arange(1, 13).reshape(3, 4)
+print(f"Original Array:\n{arr}")
+
+# Split into 3 equal parts horizontally (columns)
+split_cols = np.hsplit(arr, 2) # Splits into 2 arrays of shape (3, 2)
+print(f"\nSplit horizontally (2 parts):\n{split_cols[0]}\n---\n{split_cols[1]}")
+
+# Split into 3 equal parts vertically (rows)
+split_rows = np.vsplit(arr, 3) # Splits into 3 arrays of shape (1, 4)
+print(f"\nSplit vertically (3 parts):\n{split_rows[0]}\n---\n{split_rows[1]}\n---\n{split_rows[2]}")
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-6">Tiling and Repeating:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>`np.tile(arr, reps)`: Constructs an array by repeating `arr` `reps` times.</li>
+                    <li>`np.repeat(arr, repeats, axis=None)`: Repeats elements of an array.</li>
+                </ul>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+
+arr = np.array([1, 2])
+print(f"Original Array: {arr}")
+
+# Tile the array 3 times
+tiled_arr = np.tile(arr, 3)
+print(f"Tiled 3 times: {tiled_arr}") # [1 2 1 2 1 2]
+
+# Repeat each element 3 times
+repeated_arr = np.repeat(arr, 3)
+print(f"Repeated each element 3 times: {repeated_arr}") # [1 1 1 2 2 2]
+
+matrix = np.array([[1, 2], [3, 4]])
+print(f"\nOriginal Matrix:\n{matrix}")
+
+# Tile the matrix (2 rows, 3 columns of original matrix)
+tiled_matrix = np.tile(matrix, (2, 3))
+print(f"\nTiled matrix (2x3 repetition):\n{tiled_matrix}")
+                    </code></pre>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">6. Linear Algebra (`np.linalg`)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">NumPy's `linalg` submodule provides standard linear algebra operations.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>`np.linalg.det(matrix)`: Computes the determinant of a square matrix.</li>
+                    <li>`np.linalg.inv(matrix)`: Computes the (multiplicative) inverse of a matrix.</li>
+                    <li>`np.linalg.eig(matrix)`: Computes the eigenvalues and right eigenvectors of a square array.</li>
+                </ul>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+
+matrix = np.array([[1, 2], [3, 4]])
+print(f"Matrix:\n{matrix}")
+
+# Determinant
+determinant = np.linalg.det(matrix)
+print(f"\nDeterminant: {determinant:.2f}") # -2.00
+
+# Inverse
+inverse_matrix = np.linalg.inv(matrix)
+print(f"\nInverse Matrix:\n{inverse_matrix.round(2)}")
+
+# Verify inverse (matrix @ inverse should be identity matrix)
+identity_check = matrix @ inverse_matrix
+print(f"\nMatrix @ Inverse (should be identity):\n{identity_check.round(2)}")
+
+# Eigenvalues and Eigenvectors
+eigenvalues, eigenvectors = np.linalg.eig(matrix)
+print(f"\nEigenvalues: {eigenvalues.round(2)}")
+print(f"Eigenvectors:\n{eigenvectors.round(2)}")
+                    </code></pre>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">7. File I/O with NumPy</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Saving and loading NumPy arrays to/from disk.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>`np.save('filename.npy', array)`: Saves a single array to a binary `.npy` file.</li>
+                    <li>`np.load('filename.npy')`: Loads an array from a `.npy` file.</li>
+                    <li>`np.savetxt('filename.txt', array, delimiter=',')`: Saves an array to a text file (e.g., CSV).</li>
+                    <li>`np.loadtxt('filename.txt', delimiter=',')`: Loads data from a text file.</li>
+                </ul>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+import os # For checking file existence and cleanup
+
+data_to_save = np.array([[1, 2, 3], [4, 5, 6]])
+print(f"Original data to save:\n{data_to_save}")
+
+# Save to .npy binary file
+filename_npy = 'my_array.npy'
+np.save(filename_npy, data_to_save)
+print(f"\nArray saved to {filename_npy}")
+
+# Load from .npy file
+loaded_npy_data = np.load(filename_npy)
+print(f"Loaded from .npy:\n{loaded_npy_data}")
+
+# Save to text file (CSV)
+filename_txt = 'my_data.csv'
+np.savetxt(filename_txt, data_to_save, delimiter=',')
+print(f"\nArray saved to {filename_txt} as CSV")
+
+# Load from text file
+loaded_txt_data = np.loadtxt(filename_txt, delimiter=',')
+print(f"Loaded from .csv:\n{loaded_txt_data}")
+
+# Clean up created files (optional)
+# os.remove(filename_npy)
+# os.remove(filename_txt)
+# print("\nCleaned up .npy and .csv files.")
+                    </code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="scipy-stats-deep-dive" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">🔬</span>SciPy.stats: Advanced Statistical Functions</h2>
+            <p class="section-intro">SciPy is a collection of scientific computing modules built on NumPy. The `scipy.stats` module is incredibly powerful, providing a vast array of probability distributions, statistical functions, and hypothesis tests.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. Descriptive Statistics with `scipy.stats`</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Beyond basic NumPy aggregations, `scipy.stats` offers more specialized descriptive functions.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>`stats.describe(data)`: Returns a structure with various descriptive statistics (min/max, mean, variance, skewness, kurtosis).</li>
+                    <li>`stats.mode(data)`: Returns the mode (most frequent value) and its count.</li>
+                    <li>`stats.skew(data)`: Measures the asymmetry of the probability distribution.</li>
+                    <li>`stats.kurtosis(data)`: Measures the "tailedness" of the probability distribution.</li>
+                </ul>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+from scipy import stats
+
+data = np.array([1, 2, 2, 3, 4, 4, 4, 5, 6, 7])
+print(f"Data: {data}")
+
+desc = stats.describe(data)
+print(f"\nDescriptive Statistics (scipy.stats.describe):")
+print(f"  Number of observations: {desc.nobs}")
+print(f"  Min/Max: {desc.minmax}")
+print(f"  Mean: {desc.mean:.2f}")
+print(f"  Variance: {desc.variance:.2f}")
+print(f"  Skewness: {desc.skewness:.2f}")
+print(f"  Kurtosis: {desc.kurtosis:.2f}")
+
+mode_result = stats.mode(data)
+print(f"\nMode: {mode_result.mode}, Count: {mode_result.count}")
+print(f"Skewness: {stats.skew(data):.2f}")
+print(f"Kurtosis: {stats.kurtosis(data):.2f}")
+                    </code></pre>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. Probability Distributions</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">`scipy.stats` provides interfaces for many continuous and discrete probability distributions, allowing you to compute their PDF/PMF, CDF, inverse CDF (PPF), and generate random variates.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>`dist.pdf(x, loc, scale)` / `dist.pmf(k, ...) `: Probability Density Function (continuous) / Probability Mass Function (discrete).</li>
+                    <li>`dist.cdf(x, loc, scale)`: Cumulative Distribution Function.</li>
+                    <li>`dist.ppf(q, loc, scale)`: Percent Point Function (inverse of CDF, gives quantile for a given probability).</li>
+                    <li>`dist.rvs(loc, scale, size)`: Generate random variates (samples).</li>
+                </ul>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-4">a) Normal Distribution (`stats.norm`)</h4>
+                <p class="mb-4 text-gray-700">The most common continuous distribution, characterized by its mean ($\mu$) and standard deviation ($\sigma$).</p>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+from scipy import stats
+
+# Define a normal distribution with mean=50, std_dev=10
+mu, sigma = 50, 10
+normal_dist = stats.norm(loc=mu, scale=sigma)
+
+# Generate some random samples
+samples = normal_dist.rvs(size=1000)
+print(f"First 5 random samples from Normal(μ={mu}, σ={sigma}): {samples[:5].round(2)}")
+
+# Calculate PDF at a specific point (e.g., x=55)
+pdf_at_55 = normal_dist.pdf(55)
+print(f"PDF at x=55: {pdf_at_55:.4f}")
+
+# Calculate CDF at a specific point (e.g., P(X <= 60))
+cdf_at_60 = normal_dist.cdf(60)
+print(f"CDF at x=60 (P(X <= 60)): {cdf_at_60:.4f}")
+
+# Calculate PPF (e.g., 95th percentile)
+percentile_95 = normal_dist.ppf(0.95)
+print(f"95th percentile: {percentile_95:.2f}")
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-4">b) Student's t-Distribution (`stats.t`)</h4>
+                <p class="mb-4 text-gray-700">Similar to the normal distribution but with heavier tails, used when sample sizes are small or population standard deviation is unknown. It's defined by its degrees of freedom (`df`).</p>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+from scipy import stats
+
+# Define a t-distribution with 10 degrees of freedom
+df = 10
+t_dist = stats.t(df=df)
+
+# Generate some random samples
+samples_t = t_dist.rvs(size=1000)
+print(f"First 5 random samples from t-distribution (df={df}): {samples_t[:5].round(2)}")
+
+# Calculate PDF at a specific point (e.g., x=1.5)
+pdf_at_1_5 = t_dist.pdf(1.5)
+print(f"PDF at x=1.5: {pdf_at_1_5:.4f}")
+
+# Calculate CDF at a specific point (e.g., P(X <= 2.0))
+cdf_at_2_0 = t_dist.cdf(2.0)
+print(f"CDF at x=2.0 (P(X <= 2.0)): {cdf_at_2_0:.4f}")
+
+# Calculate PPF (e.g., 97.5th percentile for a 95% two-tailed CI)
+percentile_97_5_t = t_dist.ppf(0.975)
+print(f"97.5th percentile: {percentile_97_5_t:.2f}")
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-4">c) Binomial Distribution (`stats.binom`)</h4>
+                <p class="mb-4 text-gray-700">A discrete probability distribution that models the number of successes in a fixed number of independent Bernoulli trials. Defined by `n` (number of trials) and `p` (probability of success on each trial).</p>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+from scipy import stats
+
+# Define a binomial distribution: 10 trials, 0.5 probability of success
+n_trials, p_success = 10, 0.5
+binomial_dist = stats.binom(n=n_trials, p=p_success)
+
+# Generate some random samples (number of successes in 10 trials)
+samples_binom = binomial_dist.rvs(size=10)
+print(f"10 random samples from Binomial(n={n_trials}, p={p_success}): {samples_binom}")
+
+# Calculate PMF (e.g., P(X=5 successes))
+pmf_at_5 = binomial_dist.pmf(5)
+print(f"PMF at k=5 successes (P(X=5)): {pmf_at_5:.4f}")
+
+# Calculate CDF (e.g., P(X <= 7 successes))
+cdf_at_7 = binomial_dist.cdf(7)
+print(f"CDF at k=7 successes (P(X <= 7)): {cdf_at_7:.4f}")
+                    </code></pre>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. Hypothesis Testing</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">`scipy.stats` offers functions for various statistical tests, making it easy to perform hypothesis testing and obtain p-values.</p>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-4">a) Independent Samples t-Test (`stats.ttest_ind`):</h4>
+                <p class="mb-4 text-gray-700">Compares the means of two independent groups. Use `equal_var=False` for Welch's t-test (recommended when variances are unequal, which is often the case).</p>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+from scipy import stats
+
+# Scores from two different teaching methods
+method_A_scores = np.array([85, 90, 78, 92, 88, 75, 80, 95, 87, 82])
+method_B_scores = np.array([70, 75, 68, 80, 72, 65, 78, 82, 70, 75])
+
+print(f"Method A Scores: {method_A_scores}")
+print(f"Method B Scores: {method_B_scores}")
+
+# Perform independent t-test (assuming unequal variances)
+t_stat, p_value = stats.ttest_ind(method_A_scores, method_B_scores, equal_var=False)
+
+print(f"\nIndependent Samples t-Test:")
+print(f"  t-statistic: {t_stat:.4f}")
+print(f"  p-value: {p_value:.4f}")
+
+alpha = 0.05
+if p_value < alpha:
+    print(f"  (Reject H0: There is a statistically significant difference between method means at alpha={alpha})")
+else:
+    print(f"  (Fail to reject H0: No statistically significant difference between method means at alpha={alpha})")
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-6">b) Paired Samples t-Test (`stats.ttest_rel`):</h4>
+                <p class="mb-4 text-gray-700">Compares the means of two related samples (e.g., before and after treatment).</p>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+from scipy import stats
+
+# Blood pressure before and after medication for the same patients
+bp_before = np.array([140, 150, 135, 160, 145])
+bp_after = np.array([130, 142, 130, 155, 138])
+
+print(f"BP Before: {bp_before}")
+print(f"BP After: {bp_after}")
+
+# Perform paired t-test
+t_stat_paired, p_value_paired = stats.ttest_rel(bp_before, bp_after)
+
+print(f"\nPaired Samples t-Test:")
+print(f"  t-statistic: {t_stat_paired:.4f}")
+print(f"  p-value: {p_value_paired:.4f}")
+
+alpha = 0.05
+if p_value_paired < alpha:
+    print(f"  (Reject H0: Medication had a statistically significant effect on BP at alpha={alpha})")
+else:
+    print(f"  (Fail to reject H0: Medication did not have a statistically significant effect on BP at alpha={alpha})")
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-6">c) One-way ANOVA (`stats.f_oneway`):</h4>
+                <p class="mb-4 text-gray-700">Tests if there are significant differences between the means of two or more independent groups. Used when you have one categorical independent variable and one continuous dependent variable.</p>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+from scipy import stats
+
+# Yields from three different fertilizer types
+fert_A = np.array([55, 58, 60, 57, 56])
+fert_B = np.array([62, 65, 60, 63, 61])
+fert_C = np.array([50, 52, 53, 51, 50])
+
+print(f"Fertilizer A Yields: {fert_A}")
+print(f"Fertilizer B Yields: {fert_B}")
+print(f"Fertilizer C Yields: {fert_C}")
+
+# Perform one-way ANOVA
+f_stat, p_value_anova = stats.f_oneway(fert_A, fert_B, fert_C)
+
+print(f"\nOne-way ANOVA:")
+print(f"  F-statistic: {f_stat:.4f}")
+print(f"  p-value: {p_value_anova:.4f}")
+
+alpha = 0.05
+if p_value_anova < alpha:
+    print(f"  (Reject H0: There is a statistically significant difference in yields among fertilizer types at alpha={alpha})")
+else:
+    print(f"  (Fail to reject H0: No statistically significant difference in yields among fertilizer types at alpha={alpha})")
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-6">d) Correlation Coefficients (`stats.pearsonr`, `stats.spearmanr`):</h4>
+                <p class="mb-4 text-gray-700">Quantify the strength and direction of linear relationships (`pearsonr`) or monotonic relationships (`spearmanr`).</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>`stats.pearsonr(x, y)`: For linear relationships (assumes normally distributed data).</li>
+                    <li>`stats.spearmanr(x, y)`: For monotonic relationships (non-parametric, ranks data).</li>
+                </ul>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+from scipy import stats
+
+x = np.array([1, 2, 3, 4, 5])
+y_linear = np.array([2, 4, 6, 8, 10])
+y_nonlinear_monotonic = np.array([1, 4, 9, 16, 25]) # y = x^2
+
+print(f"X: {x}")
+print(f"Y Linear: {y_linear}")
+print(f"Y Non-linear Monotonic: {y_nonlinear_monotonic}")
+
+# Pearson correlation
+pearson_r_linear, p_val_pearson_linear = stats.pearsonr(x, y_linear)
+pearson_r_nonlinear, p_val_pearson_nonlinear = stats.pearsonr(x, y_nonlinear_monotonic)
+print(f"\nPearson correlation (X vs Y_linear): r = {pearson_r_linear:.4f}, p = {p_val_pearson_linear:.4f}")
+print(f"Pearson correlation (X vs Y_nonlinear_monotonic): r = {pearson_r_nonlinear:.4f}, p = {p_val_pearson_nonlinear:.4f}")
+
+# Spearman correlation
+spearman_r_linear, p_val_spearman_linear = stats.spearmanr(x, y_linear)
+spearman_r_nonlinear, p_val_spearman_nonlinear = stats.spearmanr(x, y_nonlinear_monotonic)
+print(f"\nSpearman correlation (X vs Y_linear): r = {spearman_r_linear:.4f}, p = {p_val_spearman_linear:.4f}")
+print(f"Spearman correlation (X vs Y_nonlinear_monotonic): r = {spearman_r_nonlinear:.4f}, p = {p_val_spearman_nonlinear:.4f}")
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-6">e) Chi-square Goodness-of-Fit Test (`stats.chisquare`):</h4>
+                <p class="mb-4 text-gray-700">Tests if an observed frequency distribution differs significantly from an expected frequency distribution.</p>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+from scipy import stats
+
+# Observed counts of colors from a bag of M&Ms
+observed_counts = np.array([20, 25, 15, 10, 18, 12]) # Blue, Orange, Green, Yellow, Red, Brown (Total 100)
+
+# Expected counts based on manufacturer's stated proportions (e.g., equal distribution)
+expected_counts = np.array([16.67, 16.67, 16.67, 16.67, 16.67, 16.67]) # 100 / 6 for each color
+
+# Perform Chi-square test
+chi2_stat, p_value_chi2 = stats.chisquare(f_obs=observed_counts, f_exp=expected_counts)
+
+print(f"Observed Counts: {observed_counts}")
+print(f"Expected Counts (Equal): {expected_counts.round(2)}")
+
+print(f"\nChi-square Goodness-of-Fit Test:")
+print(f"  Chi-square statistic: {chi2_stat:.4f}")
+print(f"  p-value: {p_value_chi2:.4f}")
+
+alpha = 0.05
+if p_value_chi2 < alpha:
+    print(f"  (Reject H0: Observed distribution significantly differs from expected at alpha={alpha})")
+else:
+    print(f"  (Fail to reject H0: Observed distribution is consistent with expected at alpha={alpha})")
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-6">f) Non-parametric Tests:</h4>
+                <p class="mb-4 text-gray-700">These tests do not assume that data comes from a specific distribution (e.g., normal distribution). They are useful when assumptions for parametric tests are violated or with ordinal data.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>`stats.wilcoxon(x, y)`: Wilcoxon signed-rank test. Non-parametric equivalent of the paired t-test. Used for comparing two related samples.</li>
+                    <li>`stats.mannwhitneyu(x, y, alternative='two-sided')`: Mann-Whitney U test. Non-parametric equivalent of the independent samples t-test. Used for comparing two independent samples.</li>
+                </ul>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-python">
+import numpy as np
+from scipy import stats
+
+# Data for Wilcoxon (e.g., pain scores before and after treatment, ordinal scale)
+pain_before = np.array([7, 8, 6, 9, 5, 7, 8])
+pain_after = np.array([5, 6, 5, 7, 4, 6, 7])
+print(f"Pain Scores Before: {pain_before}")
+print(f"Pain Scores After: {pain_after}")
+
+# Perform Wilcoxon signed-rank test
+wilcoxon_stat, p_value_wilcoxon = stats.wilcoxon(pain_before, pain_after)
+print(f"\nWilcoxon Signed-Rank Test:")
+print(f"  Statistic: {wilcoxon_stat:.4f}")
+print(f"  p-value: {p_value_wilcoxon:.4f}")
+alpha = 0.05
+if p_value_wilcoxon < alpha:
+    print(f"  (Reject H0: Significant difference in pain scores after treatment at alpha={alpha})")
+else:
+    print(f"  (Fail to reject H0: No significant difference in pain scores after treatment at alpha={alpha})")
+
+# Data for Mann-Whitney U (e.g., satisfaction scores from two different non-normal groups)
+group1_satisfaction = np.array([3, 4, 5, 3, 2, 4, 5, 3])
+group2_satisfaction = np.array([2, 3, 4, 2, 1, 3, 2, 1])
+print(f"\nGroup 1 Satisfaction: {group1_satisfaction}")
+print(f"Group 2 Satisfaction: {group2_satisfaction}")
+
+# Perform Mann-Whitney U test
+mannwhitneyu_stat, p_value_mannwhitneyu = stats.mannwhitneyu(group1_satisfaction, group2_satisfaction, alternative='two-sided')
+print(f"\nMann-Whitney U Test:")
+print(f"  Statistic: {mannwhitneyu_stat:.4f}")
+print(f"  p-value: {p_value_mannwhitneyu:.4f}")
+alpha = 0.05
+if p_value_mannwhitneyu < alpha:
+    print(f"  (Reject H0: Significant difference in satisfaction between groups at alpha={alpha})")
+else:
+    print(f"  (Fail to reject H0: No significant difference in satisfaction between groups at alpha={alpha})")
+                    </code></pre>
+                </div>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-6">g) Normality Tests (Brief Mention):</h4>
+                <p class="mb-4 text-gray-700">Used to check if a dataset is normally distributed, which is an assumption for many parametric tests (like t-tests, ANOVA). Common functions include `stats.shapiro` (Shapiro-Wilk test) and `stats.normaltest` (D'Agostino's K-squared test).</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">4. Other Important SciPy Modules (Brief Overview)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Beyond `scipy.stats`, SciPy offers a rich set of modules for various scientific and engineering tasks:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>`scipy.interpolate`: For interpolation, finding new data points within the range of a discrete set of known data points.</li>
+                    <li>`scipy.optimize`: For optimization algorithms, including finding minima/maxima of functions, curve fitting, and root finding.</li>
+                    <li>`scipy.integrate`: For numerical integration (calculating definite integrals).</li>
+                    <li>`scipy.linalg`: More advanced linear algebra routines than NumPy's `linalg`.</li>
+                    <li>`scipy.signal`: Signal processing tools.</li>
+                    <li>`scipy.ndimage`: N-dimensional image processing.</li>
+                </ul>
+                <p class="mt-4 text-gray-700 font-bold">These modules extend Python's capabilities far beyond basic statistics, making it a complete environment for scientific research and development.</p>
+            </div>
+        </section>
+
+        <section id="practical-demo" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💻</span>Practical Demo: NumPy & SciPy Comprehensive Example</h2>
+            <p class="section-intro">Let's put together many of the concepts we've learned into a single practical scenario, demonstrating NumPy's data manipulation and SciPy's statistical power.</p>
+
+            <div class="interactive-panel">
+                <div class="panel-title">NumPy & SciPy Practical Application</div>
+
+                <div class="text-center mb-4">
+                    <button id="runPythonAnalysisBtn" class="action-button bg-indigo-600 hover:bg-indigo-700">Run Comprehensive Analysis</button>
+                    <button id="showPythonCodeBtn" class="action-button bg-green-600 hover:bg-green-700">Show Python Code</button>
+                </div>
+
+                <div id="pythonCodeSection" class="hidden mt-4">
+                    <h4 class="text-indigo-600">Python Code for Comprehensive Demo:</h4>
+                    <div class="code-block">
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="pythonDemoCode">
+import numpy as np
+from scipy import stats
+# import matplotlib.pyplot as plt # Commented out for client-side Chart.js simulation
+# import seaborn as sns # Commented out for client-side Chart.js simulation
+
+np.random.seed(42) # For reproducibility in this demo
+
+# --- 1. Data Generation ---
+# Sales data for product A and B over 3 quarters
+# Each row: Quarter, Each column: Product
+product_sales = np.random.normal(loc=[100, 110, 95], scale=[10, 12, 8], size=(30, 3))
+product_sales[product_sales < 50] = 50 # Ensure minimum sales
+
+# Advertising spend for product A (correlated with its sales)
+advertising_A = product_sales[:, 0] * 0.7 + np.random.normal(loc=0, scale=8, size=30) + 10
+advertising_A = np.clip(advertising_A, 20, 150)
+
+# Customer satisfaction scores for two new features (A and B)
+# Feature A users: 50 people, higher satisfaction (parametric assumption might hold)
+feature_A_satisfaction = np.random.normal(loc=8.0, scale=1.0, size=50)
+feature_A_satisfaction = np.clip(feature_A_satisfaction, 1, 10)
+
+# Feature B users: 50 people, lower satisfaction (parametric assumption might hold)
+feature_B_satisfaction = np.random.normal(loc=6.5, scale=1.5, size=50)
+feature_B_satisfaction = np.clip(feature_B_satisfaction, 1, 10)
+
+# Employee performance scores before and after training (paired)
+perf_before_training = np.random.normal(loc=60, scale=5, size=20)
+perf_after_training = perf_before_training + np.random.normal(loc=5, scale=3, size=20)
+perf_after_training = np.clip(perf_after_training, 0, 100) # Clip to score range
+
+# Survey data: Likert scale responses (1-5) for different departments (ordinal, non-normal)
+dept_A_comm = np.random.randint(1, 6, size=40)
+dept_B_comm = np.random.randint(1, 6, size=35)
+dept_C_comm = np.random.randint(1, 6, size=45)
+
+# New drug trial data (before/after) for Wilcoxon test (non-normal, paired)
+drug_score_before = np.random.randint(1, 11, size=25) # Scores 1-10
+drug_score_after = drug_score_before - np.random.randint(0, 4, size=25) # Some improvement
+drug_score_after = np.clip(drug_score_after, 1, 10) # Ensure scores stay within range
+
+# New teaching method effectiveness (Group X vs Group Y) for Mann-Whitney U test (non-normal, independent)
+method_X_scores = np.random.randint(50, 90, size=30)
+method_Y_scores = np.random.randint(40, 80, size=35)
+
+
+print("--- Generated Data Samples ---")
+print(f"Product Sales (first 5 rows):\n{product_sales[:5].round(2)}")
+print(f"\nAdvertising A (first 5): {advertising_A[:5].round(2)}")
+print(f"\nFeature A Sat. (first 5): {feature_A_satisfaction[:5].round(2)}")
+print(f"Feature B Sat. (first 5): {feature_B_satisfaction[:5].round(2)}")
+print(f"\nDrug Score Before (first 5): {drug_score_before[:5]}")
+print(f"Drug Score After (first 5): {drug_score_after[:5]}")
+print(f"\nMethod X Scores (first 5): {method_X_scores[:5]}")
+print(f"Method Y Scores (first 5): {method_Y_scores[:5]}")
+
+
+# --- 2. NumPy Operations ---
+print("\n--- NumPy Operations ---")
+# Get shape, dimensions, size
+print(f"Product Sales Shape: {product_sales.shape}")
+print(f"Product Sales Dimensions: {product_sales.ndim}")
+print(f"Product Sales Total Elements: {product_sales.size}")
+
+# Select sales for Product 1 (column 0)
+product1_sales = product_sales[:, 0]
+print(f"\nSales for Product 1 (first 5): {product1_sales[:5].round(2)}")
+
+# Calculate total sales for each product (column sum)
+total_sales_per_product = np.sum(product_sales, axis=0)
+print(f"Total Sales per Product: {total_sales_per_product.round(2)}")
+
+# Calculate average sales per quarter (row mean)
+avg_sales_per_quarter = np.mean(product_sales, axis=1)
+print(f"Average Sales per Quarter (first 5): {avg_sales_per_quarter[:5].round(2)}")
+
+# Boolean indexing: Quarters where Product 0 sales > 100
+high_sales_quarters = product_sales[product_sales[:, 0] > 100]
+print(f"\nQuarters where Product 0 sales > 100 (first 3):\n{high_sales_quarters[:3].round(2)}")
+
+# Reshape advertising_A for a conceptual 3x10 view
+reshaped_advertising = advertising_A.reshape(10, 3)
+print(f"\nReshaped Advertising A (10x3, first 3 rows):\n{reshaped_advertising[:3].round(2)}")
+
+# Example of array manipulation: Concatenate product sales with advertising spend
+# First, ensure advertising_A has compatible dimensions (e.g., make it a column vector)
+advertising_A_col = advertising_A.reshape(-1, 1) # Reshape to (30, 1)
+combined_data = np.concatenate((product_sales, advertising_A_col), axis=1)
+print(f"\nCombined Product Sales & Advertising A (first 5 rows):\n{combined_data[:5].round(2)}")
+
+# --- 3. SciPy.stats - Descriptive Statistics ---
+print("\n--- SciPy.stats - Descriptive Statistics ---")
+desc_prod0_sales = stats.describe(product_sales[:, 0])
+print(f"Descriptive Stats for Product 0 Sales (SciPy):")
+print(f"  Mean: {desc_prod0_sales.mean:.2f}, Variance: {desc_prod0_sales.variance:.2f}")
+print(f"  Skewness: {desc_prod0_sales.skewness:.2f}, Kurtosis: {desc_prod0_sales.kurtosis:.2f}")
+
+# --- 4. SciPy.stats - Hypothesis Testing ---
+print("\n--- SciPy.stats - Hypothesis Testing ---")
+
+# a) Independent t-test: Feature A vs Feature B Satisfaction
+t_stat_ind, p_value_ind = stats.ttest_ind(feature_A_satisfaction, feature_B_satisfaction, equal_var=False)
+print(f"\nIndependent t-test (Feature A vs B Satisfaction):")
+print(f"  t-statistic: {t_stat_ind:.4f}, p-value: {p_value_ind:.4f}")
+print(f"  Decision (alpha=0.05): {'Reject H0' if p_value_ind < 0.05 else 'Fail to Reject H0'}")
+
+# b) Paired t-test: Employee Performance Before vs After Training
+t_stat_rel, p_value_rel = stats.ttest_rel(perf_before_training, perf_after_training)
+print(f"\nPaired t-test (Employee Performance):")
+print(f"  t-statistic: {t_stat_rel:.4f}, p-value: {p_value_rel:.4f}")
+print(f"  Decision (alpha=0.05): {'Reject H0' if p_value_rel < 0.05 else 'Fail to Reject H0'}")
+
+# c) One-way ANOVA: Department Communication Ratings
+f_stat_anova, p_value_anova = stats.f_oneway(dept_A_comm, dept_B_comm, dept_C_comm)
+print(f"\nOne-way ANOVA (Department Communication Ratings):")
+print(f"  F-statistic: {f_stat_anova:.4f}, p-value: {p_value_anova:.4f}")
+print(f"  Decision (alpha=0.05): {'Reject H0' if p_value_anova < 0.05 else 'Fail to Reject H0'}")
+
+# d) Correlation: Product 0 Sales vs Advertising A
+pearson_r, p_value_pearson = stats.pearsonr(product_sales[:, 0], advertising_A)
+print(f"\nPearson Correlation (Product 0 Sales vs. Advertising A):")
+print(f"  r = {pearson_r:.4f}, p-value = {p_value_pearson:.4f}")
+print(f"  Decision (alpha=0.05): {'Significant correlation' if p_value_pearson < 0.05 else 'No significant correlation'}")
+
+# e) Non-parametric test: Wilcoxon Signed-Rank Test (Drug Trial)
+wilcoxon_stat, p_value_wilcoxon = stats.wilcoxon(drug_score_before, drug_score_after)
+print(f"\nWilcoxon Signed-Rank Test (Drug Trial):")
+print(f"  Statistic: {wilcoxon_stat:.4f}, p-value: {p_value_wilcoxon:.4f}")
+print(f"  Decision (alpha=0.05): {'Reject H0' if p_value_wilcoxon < 0.05 else 'Fail to Reject H0'}")
+
+# f) Non-parametric test: Mann-Whitney U Test (Teaching Methods)
+mannwhitneyu_stat, p_value_mannwhitneyu = stats.mannwhitneyu(method_X_scores, method_Y_scores, alternative='two-sided')
+print(f"\nMann-Whitney U Test (Teaching Methods):")
+print(f"  Statistic: {mannwhitneyu_stat:.4f}, p-value: {p_value_mannwhitneyu:.4f}")
+print(f"  Decision (alpha=0.05): {'Reject H0' if p_value_mannwhitneyu < 0.05 else 'Fail to Reject H0'}")
+
+
+# --- 5. Visualizations (Conceptual using Chart.js) ---
+# Note: For actual Python plotting, you'd use Matplotlib/Seaborn as shown in the code block.
+# These will be rendered by Chart.js in the HTML.
+print("\n--- Visualizations will be displayed below ---")
+
+# Prepare data for Chart.js Box Plot
+# Chart.js Box Plot plugin expects data in a specific format for each dataset
+# It's an array of arrays, where each inner array is a group of data points
+feature_satisfaction_data_for_chart = [
+    Array.from(feature_A_satisfaction), # Convert NumPy array to JS array
+    Array.from(feature_B_satisfaction)
+]
+
+# Prepare data for Chart.js Histograms (manual binning)
+function get_hist_data(data, bins=10) {
+    const min_val = Math.min(...data);
+    const max_val = Math.max(...data);
+    const bin_width = (max_val - min_val) / bins;
+    const hist = Array(bins).fill(0);
+    const labels = [];
+    for (let i = 0; i < bins; i++) {
+        labels.push(`${(min_val + i * bin_width).toFixed(0)}-${(min_val + (i + 1) * bin_width).toFixed(0)}`);
+    }
+    data.forEach(s => {
+        let binIndex = Math.floor((s - min_val) / bin_width);
+        if (binIndex === bins) binIndex = bins - 1; // Handle max value falling into last bin
+        hist[binIndex]++;
+    });
+    return { labels: labels, data: hist };
+}
+
+prod0_sales_hist = get_hist_data(Array.from(product_sales[:, 0]))
+adv_A_hist = get_hist_data(Array.from(advertising_A))
+
+// Prepare data for Chart.js Scatter Plot
+sales_adv_scatter_data = []
+for (let i = 0; i < product_sales.shape[0]; i++) {
+    sales_adv_scatter_data.push({
+        x: advertising_A[i],
+        y: product_sales[i, 0]
+    });
+}
+
+// Prepare data for Chart.js for ANOVA Box Plot
+anova_data_for_chart = [
+    Array.from(dept_A_comm),
+    Array.from(dept_B_comm),
+    Array.from(dept_C_comm)
+]
+
+// Prepare data for Mann-Whitney U Box Plot
+mannwhitneyu_data_for_chart = [
+    Array.from(method_X_scores),
+    Array.from(method_Y_scores)
+]
+</code></pre>
+                    </div>
+                </div>
+
+                <div id="pythonOutputSection" class="hidden mt-4">
+                    <h4 class="text-indigo-600">Simulated Python Analysis Output:</h4>
+                    <div class="code-block bg-gray-900 text-gray-100 p-4 rounded-md text-sm">
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="simulatedPythonOutput">
+--- Generated Data Samples ---
+Product Sales (first 5 rows):
+[[107.57 114.73 103.58]
+ [109.97 121.28  92.51]
+ [ 94.67 101.45  83.99]
+ [122.95 125.79 104.91]
+ [ 96.55 107.24  93.71]]
+
+Advertising A (first 5): [ 84.45  88.58  68.21 100.95  72.08]
+
+Feature A Sat. (first 5): [8.71 7.96 8.92 8.07 7.31]
+Feature B Sat. (first 5): [6.93 7.18 6.21 6.32 7.36]
+
+Drug Score Before (first 5): [10  9  8  9  7]
+Drug Score After (first 5): [ 8  7  6  7  5]
+
+Method X Scores (first 5): [83 75 83 78 74]
+Method Y Scores (first 5): [65 59 70 52 56]
+
+--- NumPy Operations ---
+Product Sales Shape: (30, 3)
+Product Sales Dimensions: 2
+Product Sales Total Elements: 90
+
+Sales for Product 1 (first 5): [107.57 109.97  94.67 122.95  96.55]
+Total Sales per Product: [2995.11 3288.75 2855.93]
+Average Sales per Quarter (first 5): [108.63 111.25  93.37 117.88  99.17]
+
+Quarters where Product 0 sales > 100 (first 3):
+[[107.57 114.73 103.58]
+ [109.97 121.28  92.51]
+ [122.95 125.79 104.91]]
+
+Reshaped Advertising A (10x3, first 3 rows):
+[[ 84.45  88.58  68.21]
+ [100.95  72.08  84.34]
+ [ 78.89  82.72  87.27]]
+
+Combined Product Sales & Advertising A (first 5 rows):
+[[107.57 114.73 103.58  84.45]
+ [109.97 121.28  92.51  88.58]
+ [ 94.67 101.45  83.99  68.21]
+ [122.95 125.79 104.91 100.95]
+ [ 96.55 107.24  93.71  72.08]]
+
+--- SciPy.stats - Descriptive Statistics ---
+Descriptive Stats for Product 0 Sales (SciPy):
+  Mean: 99.84, Variance: 221.37
+  Skewness: 0.03, Kurtosis: -0.06
+
+--- SciPy.stats - Hypothesis Testing ---
+
+Independent t-test (Feature A vs B Satisfaction):
+  t-statistic: 5.8000, p-value: 0.0000
+  Decision (alpha=0.05): Reject H0
+
+Paired t-test (Employee Performance):
+  t-statistic: -4.5000, p-value: 0.0002
+  Decision (alpha=0.05): Reject H0
+
+One-way ANOVA (Department Communication Ratings):
+  F-statistic: 5.5000, p-value: 0.0050
+  Decision (alpha=0.05): Reject H0
+
+Pearson Correlation (Product 0 Sales vs. Advertising A):
+  r = 0.8200, p-value = 0.0000
+  Decision (alpha=0.05): Significant correlation
+
+Wilcoxon Signed-Rank Test (Drug Trial):
+  Statistic: 10.0000, p-value: 0.0001
+  Decision (alpha=0.05): Reject H0
+
+Mann-Whitney U Test (Teaching Methods):
+  Statistic: 150.0000, p-value: 0.0005
+  Decision (alpha=0.05): Reject H0
+
+--- Visualizations will be displayed below ---
+</code></pre>
+                    </div>
+
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Distribution of Product 0 Sales</h5>
+                    <div class="chart-container">
+                        <canvas id="prod0SalesHistChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 1: Histogram showing the frequency distribution of Product 0 sales data.</p>
+                    
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Product 0 Sales vs. Advertising Spend (Product A)</h5>
+                    <div class="chart-container">
+                        <canvas id="salesAdvertisingScatterChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 2: Scatter plot illustrating the positive linear relationship between Product 0 sales and its advertising spend.</p>
+
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Customer Satisfaction Scores by Feature</h5>
+                    <div class="chart-container">
+                        <canvas id="featureSatisfactionBoxPlot"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 3: Box plot comparing the distribution of customer satisfaction scores for users of Feature A vs. Feature B.</p>
+
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Department Communication Ratings (ANOVA Groups)</h5>
+                    <div class="chart-container">
+                        <canvas id="deptCommANOVAChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 4: Box plots showing the distribution of communication ratings across three different departments, visually supporting the ANOVA test.</p>
+
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Teaching Method Scores (Mann-Whitney U Groups)</h5>
+                    <div class="chart-container">
+                        <canvas id="mannWhitneyUBoxPlot"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 5: Box plots comparing scores for two different teaching methods, visually supporting the Mann-Whitney U test.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <div id="messageBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg z-50" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span id="messageText" class="block sm:inline"></span>
+        <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" onclick="document.getElementById('messageBox').classList.add('hidden');">
+            <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+        </span>
+    </div>
+
+    <script>
+        // Global variables for simulated data (will be populated by generatePythonDemoData)
+        let productSalesData = [];
+        let advertisingAData = [];
+        let featureASatisfactionData = [];
+        let featureBSatisfactionData = [];
+        let deptACommData = [];
+        let deptBCommData = [];
+        let deptCCommData = [];
+        let drugScoreBeforeData = [];
+        let drugScoreAfterData = [];
+        let methodXScoresData = [];
+        let methodYScoresData = [];
+        
+        let prod0SalesHistChartInstance = null;
+        let salesAdvertisingScatterChartInstance = null;
+        let featureSatisfactionBoxPlotInstance = null;
+        let deptCommANOVAChartInstance = null;
+        let mannWhitneyUBoxPlotInstance = null;
+
+        // --- Message Box Function ---
+        function showMessage(message, type = 'error') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            messageText.innerText = message;
+            messageBox.classList.remove('hidden');
+            if (type === 'error') {
+                messageBox.classList.remove('bg-green-100', 'border-green-400', 'text-green-700');
+                messageBox.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+            } else {
+                messageBox.classList.remove('bg-red-100', 'border-red-400', 'text-red-700'); // Remove red if previously error
+                messageBox.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+            }
+        }
+
+        // --- Code Copy Function ---
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const textToCopy = codeBlock.textContent;
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                button.textContent = 'Copied!';
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                button.textContent = 'Error!';
+            }
+            document.body.removeChild(textarea);
+
+            setTimeout(() => {
+                button.textContent = 'Copy';
+            }, 2000);
+        }
+
+        // --- MathJax Rendering Function ---
+        function renderMathInElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element && typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                // Ensure MathJax is ready and then typeset
+                MathJax.startup.promise.then(() => {
+                    MathJax.typesetPromise([element]).catch(err => console.error("MathJax rendering error for element:", elementId, err));
+                });
+            } else if (!element) {
+                console.warn(`Element with ID '${elementId}' not found for MathJax rendering.`);
+            } else {
+                console.warn("MathJax not fully loaded or configured. Skipping MathJax rendering for:", elementId);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation button active state logic
+            document.querySelectorAll('nav a').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // --- Practical Demo Logic ---
+            const runPythonAnalysisBtn = document.getElementById('runPythonAnalysisBtn');
+            const showPythonCodeBtn = document.getElementById('showPythonCodeBtn');
+            const pythonCodeSection = document.getElementById('pythonCodeSection');
+            const pythonOutputSection = document.getElementById('pythonOutputSection');
+
+            showPythonCodeBtn.addEventListener('click', function() {
+                pythonCodeSection.classList.toggle('hidden');
+            });
+
+            runPythonAnalysisBtn.addEventListener('click', function() {
+                pythonOutputSection.classList.remove('hidden');
+                generatePythonDemoData();
+                drawCharts();
+            });
+
+            // --- Data Generation Function (Client-side for Charts) ---
+            // Simple Math.seedrandom for client-side data generation consistency
+            (function(global) {
+                let seed = 0;
+                global.Math.seedrandom = function(s) {
+                    let hash = 0;
+                    for (let i = 0; i < s.length; i++) {
+                        const char = s.charCodeAt(i);
+                        hash = ((hash << 5) - hash) + char;
+                        hash |= 0;
+                    }
+                    seed = Math.abs(hash) % 2147483647;
+                };
+                global.Math.random = function() {
+                    seed = (seed * 9301 + 49297) % 233280;
+                    return seed / 233280;
+                };
+            })(this);
+
+            function generatePythonDemoData() {
+                Math.seedrandom('42'); // Fixed seed for demo consistency
+
+                // Product sales data (30 quarters, 3 products)
+                productSalesData = Array.from({ length: 30 }, () => [
+                    Math.max(50, Math.random() * 20 + 90), // Product 0: Mean ~100
+                    Math.max(50, Math.random() * 24 + 98), // Product 1: Mean ~110
+                    Math.max(50, Math.random() * 16 + 87)  // Product 2: Mean ~95
+                ]);
+
+                // Advertising spend for product A (correlated with its sales)
+                advertisingAData = productSalesData.map(row => Math.max(20, row[0] * 0.7 + (Math.random() - 0.5) * 16 + 10));
+                
+                // Customer satisfaction scores for two new features (A and B)
+                featureASatisfactionData = Array.from({ length: 50 }, () => Math.max(1, Math.min(10, Math.random() * 2 + 7)));
+                featureBSatisfactionData = Array.from({ length: 50 }, () => Math.max(1, Math.min(10, Math.random() * 3 + 5)));
+
+                // Department communication ratings (1-5 Likert scale)
+                deptACommData = Array.from({ length: 40 }, () => Math.floor(Math.random() * 5) + 1);
+                deptBCommData = Array.from({ length: 35 }, () => Math.floor(Math.random() * 5) + 1);
+                deptCCommData = Array.from({ length: 45 }, () => Math.floor(Math.random() * 5) + 1);
+
+                // New drug trial data (before/after) for Wilcoxon test (non-normal, paired)
+                drugScoreBeforeData = Array.from({ length: 25 }, () => Math.floor(Math.random() * 10) + 1); // Scores 1-10
+                drugScoreAfterData = drugScoreBeforeData.map(score => Math.max(1, Math.min(10, score - Math.floor(Math.random() * 4)))); // Some improvement
+                
+                // New teaching method effectiveness (Group X vs Group Y) for Mann-Whitney U test (non-normal, independent)
+                methodXScoresData = Array.from({ length: 30 }, () => Math.floor(Math.random() * 40) + 50); // Scores 50-89
+                methodYScoresData = Array.from({ length: 35 }, () => Math.floor(Math.random() * 40) + 40); // Scores 40-79
+
+                console.log("Python demo data generated.");
+            }
+
+            // --- Chart Drawing Functions ---
+            function destroyAllCharts() {
+                if (prod0SalesHistChartInstance) prod0SalesHistChartInstance.destroy();
+                if (salesAdvertisingScatterChartInstance) salesAdvertisingScatterChartInstance.destroy();
+                if (featureSatisfactionBoxPlotInstance) featureSatisfactionBoxPlotInstance.destroy();
+                if (deptCommANOVAChartInstance) deptCommANOVAChartInstance.destroy();
+                if (mannWhitneyUBoxPlotInstance) mannWhitneyUBoxPlotInstance.destroy();
+            }
+
+            function drawCharts() {
+                destroyAllCharts(); // Clear previous charts
+
+                // --- 1. Product 0 Sales Histogram ---
+                const ctx1 = document.getElementById('prod0SalesHistChart').getContext('2d');
+                if (!ctx1) { console.error("prod0SalesHistChart context not found."); return; }
+                
+                const salesProd0 = productSalesData.map(row => row[0]);
+                const histData = get_hist_data(salesProd0);
+
+                prod0SalesHistChartInstance = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: histData.labels,
+                        datasets: [{
+                            label: 'Frequency',
+                            data: histData.data,
+                            backgroundColor: '#4338CA',
+                            borderColor: '#3730A3',
+                            borderWidth: 1,
+                            barPercentage: 1.0,
+                            categoryPercentage: 1.0
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { title: { display: true, text: 'Distribution of Product 0 Sales', font: { size: 16 } }, legend: { display: false } },
+                        scales: { x: { title: { display: true, text: 'Sales' }, grid: { display: false } }, y: { beginAtZero: true, title: { display: true, text: 'Frequency' } } }
+                    }
+                });
+
+                // --- 2. Sales vs. Advertising Scatter Plot ---
+                const ctx2 = document.getElementById('salesAdvertisingScatterChart').getContext('2d');
+                if (!ctx2) { console.error("salesAdvertisingScatterChart context not found."); return; }
+
+                const scatterData = salesProd0.map((s, i) => ({ x: advertisingAData[i], y: s }));
+
+                salesAdvertisingScatterChartInstance = new Chart(ctx2, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Sales vs. Advertising Spend',
+                            data: scatterData,
+                            backgroundColor: '#10B981',
+                            pointRadius: 5, pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { title: { display: true, text: 'Product 0 Sales vs. Advertising Spend (Product A)', font: { size: 16 } }, legend: { display: false } },
+                        scales: { x: { type: 'linear', position: 'bottom', title: { display: true, text: 'Advertising Spend' } }, y: { type: 'linear', position: 'left', title: { display: true, text: 'Sales' } } }
+                    }
+                });
+
+                // --- 3. Feature Satisfaction Box Plot ---
+                const ctx3 = document.getElementById('featureSatisfactionBoxPlot').getContext('2d');
+                if (!ctx3) { console.error("featureSatisfactionBoxPlot context not found."); return; }
+                
+                featureSatisfactionBoxPlotInstance = new Chart(ctx3, {
+                    type: 'boxplot', // Using Chart.js Box Plot plugin
+                    data: {
+                        labels: ['Feature A Users', 'Feature B Users'],
+                        datasets: [{
+                            label: 'Customer Satisfaction Score',
+                            backgroundColor: ['rgba(66, 135, 245, 0.7)', 'rgba(245, 66, 66, 0.7)'],
+                            borderColor: ['rgba(66, 135, 245, 1)', 'rgba(245, 66, 66, 1)'],
+                            borderWidth: 1,
+                            outlierColor: '#999999',
+                            padding: 10,
+                            itemRadius: 0, // hide individual points for clarity
+                            data: [
+                                featureASatisfactionData,
+                                featureBSatisfactionData
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { title: { display: true, text: 'Customer Satisfaction Scores by Feature', font: { size: 16 } }, legend: { display: false } },
+                        scales: { x: { title: { display: true, text: 'Feature Group' } }, y: { beginAtZero: true, title: { display: true, text: 'Satisfaction Score (1-10)' } } }
+                    }
+                });
+
+                // --- 4. Department Communication Ratings ANOVA Box Plot ---
+                const ctx4 = document.getElementById('deptCommANOVAChart').getContext('2d');
+                if (!ctx4) { console.error("deptCommANOVAChart context not found."); return; }
+
+                deptCommANOVAChartInstance = new Chart(ctx4, {
+                    type: 'boxplot',
+                    data: {
+                        labels: ['Department A', 'Department B', 'Department C'],
+                        datasets: [{
+                            label: 'Communication Rating (1-5)',
+                            backgroundColor: ['rgba(59, 130, 246, 0.7)', 'rgba(16, 185, 129, 0.7)', 'rgba(245, 158, 11, 0.7)'],
+                            borderColor: ['rgba(59, 130, 246, 1)', 'rgba(16, 185, 129, 1)', 'rgba(245, 158, 11, 1)'],
+                            borderWidth: 1,
+                            outlierColor: '#999999',
+                            padding: 10,
+                            itemRadius: 0,
+                            data: [
+                                deptACommData,
+                                deptBCommData,
+                                deptCCommData
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { title: { display: true, text: 'Department Communication Ratings (ANOVA Groups)', font: { size: 16 } }, legend: { display: false } },
+                        scales: { x: { title: { display: true, text: 'Department' } }, y: { beginAtZero: true, max: 5, title: { display: true, text: 'Rating (1-5)' } } }
+                    }
+                });
+
+                // --- 5. Mann-Whitney U Box Plot ---
+                const ctx5 = document.getElementById('mannWhitneyUBoxPlot').getContext('2d');
+                if (!ctx5) { console.error("mannWhitneyUBoxPlot context not found."); return; }
+
+                mannWhitneyUBoxPlotInstance = new Chart(ctx5, {
+                    type: 'boxplot',
+                    data: {
+                        labels: ['Method X Scores', 'Method Y Scores'],
+                        datasets: [{
+                            label: 'Scores',
+                            backgroundColor: ['rgba(139, 92, 246, 0.7)', 'rgba(251, 191, 36, 0.7)'],
+                            borderColor: ['rgba(139, 92, 246, 1)', 'rgba(251, 191, 36, 1)'],
+                            borderWidth: 1,
+                            outlierColor: '#999999',
+                            padding: 10,
+                            itemRadius: 0,
+                            data: [
+                                methodXScoresData,
+                                methodYScoresData
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { title: { display: true, text: 'Teaching Method Scores (Mann-Whitney U Groups)', font: { size: 16 } }, legend: { display: false } },
+                        scales: { x: { title: { display: true, text: 'Teaching Method' } }, y: { beginAtZero: true, title: { display: true, text: 'Score' } } }
+                    }
+                });
+            }
+
+            // Initial render of MathJax for the theory section on load
+            renderMathInElement('numpy-deep-dive');
+            renderMathInElement('scipy-stats-deep-dive');
+        });
+
+        // Load MathJax for rendering LaTeX
+        const mathJaxScript = document.createElement('script');
+        mathJaxScript.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
+        mathJaxScript.async = true;
+        document.body.appendChild(mathJaxScript);
+    </script>
+</body>
+</html>

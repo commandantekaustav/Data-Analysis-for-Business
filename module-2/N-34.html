@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S34: Advanced Excel for Data Prep & Intro to Python (Pandas)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices:
+        - VLOOKUP Demo (Excel): Report Info: Conceptual demo. Goal: Illustrate. Viz/Method: Detailed conceptual Excel table example showing VLOOKUP application, with formula explanation. Justification: Provides practical guidance for a common Excel task.
+        - Limitations of Excel for Large Data: Report Info: Discussion. Goal: Inform. Viz/Method: Detailed text explanation. Justification: Highlights the necessity of moving beyond Excel for scale.
+        - Why Python/Pandas for Prep: Report Info: Advantages. Goal: Inform. Viz/Method: Detailed bulleted list. Justification: Explains the benefits of programmatic data prep.
+        - DataFrame Basics (Selecting/Filtering): Report Info: Concepts. Goal: Inform. Viz/Method: Detailed Python code snippets with extensive comments and explanations for basic DataFrame operations. Justification: Provides foundational understanding of Pandas.
+        CONFIRMATION: No charts used (Chart.js/Plotly.js not needed as report is conceptual/textual).
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); /* Adjust based on header/footer height */ }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #CBD5E1; padding: 0.75rem; text-align: left; }
+        th { background-color: #E2E8F0; font-weight: 600; }
+        .excel-table-container { overflow-x: auto; margin-bottom: 1.5rem; }
+        .excel-table-container table { min-width: 600px; } /* Ensure table is wide enough for content */
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S34: Advanced Excel for Data Prep & Intro to Python (Pandas)</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#practical-excel" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">💡 Advanced Excel</a></li>
+                    <li><a href="#theory-python" class="nav-button text-sm sm:text-base font-medium py-2 px-3">🐍 Intro Python/Pandas</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="practical-excel" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Advanced Excel for Data Preparation</h2>
+            <p class="section-intro">While we've covered basic Excel cleaning functions, its true power for data integration often comes with lookup functions like VLOOKUP. However, it's equally important to understand when Excel reaches its limits, particularly when dealing with large and complex datasets. This section will provide a conceptual demo of VLOOKUP and then discuss Excel's inherent limitations for advanced data preparation tasks.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Demo: VLOOKUP in Excel - Combining Data from Multiple Tables</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">VLOOKUP is one of Excel's most frequently used functions for data preparation, allowing you to combine data from different tables based on a common identifier. Let's imagine a scenario where we have two separate tables: one with sales transaction details and another with customer information. We want to add customer names to our sales transaction data.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Conceptual Data Setup:</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h5 class="font-semibold text-amber-600 mb-2">Table 1: Sales Data (Sheet1)</h5>
+                        <div class="excel-table-container">
+                            <table>
+                                <thead>
+                                    <tr><th>OrderID</th><th>CustomerID</th><th>SalesAmount</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>101</td><td>C001</td><td>150.00</td></tr>
+                                    <tr><td>102</td><td>C002</td><td>75.50</td></tr>
+                                    <tr><td>103</td><td>C001</td><td>25.00</td></tr>
+                                    <tr><td>104</td><td>C003</td><td>300.00</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="font-semibold text-amber-600 mb-2">Table 2: Customer Data (Sheet2)</h5>
+                        <div class="excel-table-container">
+                            <table>
+                                <thead>
+                                    <tr><th>CustomerID</th><th>CustomerName</th><th>Region</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>C001</td><td>Alice Smith</td><td>North</td></tr>
+                                    <tr><td>C002</td><td>Bob Johnson</td><td>South</td></tr>
+                                    <tr><td>C003</td><td>Charlie Brown</td><td>West</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Goal: Add 'CustomerName' to Sales Data (Sheet1)</h4>
+                <p class="mb-4 text-gray-700 leading-relaxed">We want to use the common `CustomerID` to look up the `CustomerName` from `Sheet2` and bring it into `Sheet1` next to each order.</p>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Conceptual VLOOKUP Application:</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">In `Sheet1`, in a new column (e.g., Column D), you would enter the VLOOKUP formula. Let's assume `CustomerID` is in `B2` of `Sheet1` for the first record.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code>
+In Sheet1, Cell D2:
+=VLOOKUP(B2, Sheet2!A:C, 2, FALSE)
+                    </code></pre>
+                </div>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li>`B2`: This is our `lookup_value` – the `CustomerID` we want to find in `Sheet2`.</li>
+                    <li>`Sheet2!A:C`: This is our `table_array` – the range in `Sheet2` where VLOOKUP will search. It must start with the column containing the `lookup_value` (`CustomerID` in Column A).</li>
+                    <li>`2`: This is the `col_index_num` – `CustomerName` is the 2nd column in our `table_array` (A:C).</li>
+                    <li>`FALSE`: This specifies an exact match. We want to find an exact `CustomerID` match.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">After entering this formula in `D2` and dragging it down, `Sheet1` would look like this:</p>
+                <div class="excel-table-container">
+                    <table>
+                        <thead>
+                            <tr><th>OrderID</th><th>CustomerID</th><th>SalesAmount</th><th>CustomerName (New Column)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>101</td><td>C001</td><td>150.00</td><td>Alice Smith</td></tr>
+                            <tr><td>102</td><td>C002</td><td>75.50</td><td>Bob Johnson</td></tr>
+                            <tr><td>103</td><td>C001</td><td>25.00</td><td>Alice Smith</td></tr>
+                            <tr><td>104</td><td>C003</td><td>300.00</td><td>Charlie Brown</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">This demo illustrates how VLOOKUP efficiently retrieves related data, making it a powerful tool for enriching datasets in Excel. Remember its limitation: the `lookup_value` must always be in the leftmost column of the `table_array`.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Discussion: Limitations of Excel for Large and Complex Data Preparation</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">While Excel is excellent for quick analyses and smaller datasets, its capabilities for data preparation diminish significantly when dealing with large volumes of data, complex transformations, or the need for reproducibility and automation. Understanding these limitations is crucial for knowing when to transition to more robust tools.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Performance & Scalability:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Row Limit:</strong> Excel has a hard limit of just over 1 million rows. For datasets exceeding this, it simply cannot open the file.</li>
+                            <li><strong>Speed Degradation:</strong> Even well below the row limit, Excel becomes progressively slower and more prone to crashing as data volume increases, especially with complex formulas, multiple sheets, or large pivot tables.</li>
+                            <li><strong>Memory Intensive:</strong> It consumes significant RAM for large files, impacting overall system performance.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Reproducibility & Automation:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Manual Steps:</strong> Many data cleaning and preparation steps in Excel are performed manually (e.g., applying filters, copy-pasting, dragging formulas). These steps are not easily repeatable or auditable.</li>
+                            <li><strong>Lack of Scripting:</strong> While VBA macros exist, they are less flexible, harder to maintain, and less powerful for complex data transformations compared to dedicated scripting languages like Python.</li>
+                            <li><strong>Error Prone:</strong> Manual processes are highly susceptible to human error. A single misplaced click or formula overwrite can invalidate an entire analysis without easy rollback.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Data Integrity & Governance:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Limited Data Type Enforcement:</strong> Excel can sometimes incorrectly infer data types or allow mixed data types in a column, leading to calculation errors.</li>
+                            <li><strong>Version Control:</strong> Managing different versions of a spreadsheet among multiple users is cumbersome and prone to errors, leading to confusion about the "single source of truth."</li>
+                            <li><strong>Auditability:</strong> It's difficult to track who made what changes, when, and why, making it hard to audit data preparation steps.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Advanced Data Manipulation:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Complex Joins/Merges:</strong> While VLOOKUP/INDEX-MATCH work for simple lookups, complex joins involving multiple keys or non-exact matches are difficult or impossible.</li>
+                            <li><strong>Advanced Cleaning:</strong> Excel lacks built-in functions for sophisticated outlier detection (beyond visual), advanced missing value imputation (beyond mean/median/mode), or complex text parsing (e.g., regular expressions).</li>
+                            <li><strong>Unstructured Data:</strong> It's completely unsuitable for handling unstructured data (text documents, images, audio) or even complex semi-structured data (nested JSON).</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">In essence, Excel is a powerful personal productivity tool, but it quickly becomes a bottleneck for professional data preparation workflows that demand scalability, reproducibility, and advanced analytical capabilities. This is precisely where programmatic tools like Python with Pandas become indispensable.</p>
+            </div>
+        </section>
+
+        <section id="theory-python" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">🐍</span>Theory: Introduction to Python (Pandas) for Data Preparation</h2>
+            <p class="section-intro">As data volumes grow and analytical tasks become more complex, the limitations of spreadsheet software like Excel become apparent. This is where Python, particularly with its Pandas library, emerges as the industry-standard tool for robust, scalable, and reproducible data preparation. This section will explain why Python/Pandas are preferred and introduce the fundamental concept of a DataFrame and basic operations like selecting rows and columns, and filtering data.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Why Python/Pandas for Larger/Complex Data Preparation?</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Python, combined with its powerful libraries, has become the go-to choice for data professionals due to its versatility, scalability, and rich ecosystem. Pandas, in particular, is designed specifically for efficient data manipulation.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Scalability:</strong> Python can handle datasets far larger than Excel (limited only by your computer's memory or cloud resources). Pandas is optimized for performance with large tabular data.</li>
+                    <li><strong>Reproducibility:</strong> Data preparation steps are written as code. This means the entire process is documented, repeatable, and auditable. You can run the same script on new data, ensuring consistency.</li>
+                    <li><strong>Automation:</strong> Python scripts can be automated to run regularly, fetching new data, cleaning it, and preparing it for analysis without manual intervention.</li>
+                    <li><strong>Advanced Functionality:</strong> Python's extensive libraries (Pandas, NumPy, Scikit-learn, SciPy) offer a vast array of sophisticated functions for data cleaning, transformation, statistical analysis, and machine learning that are simply not available in Excel.</li>
+                    <li><strong>Integration:</strong> Python seamlessly integrates with various data sources (databases, APIs, web scraping) and can output data in multiple formats, making it a central hub in data pipelines.</li>
+                    <li><strong>Flexibility:</strong> You can write custom functions and logic to handle unique data cleaning challenges that would be impossible or extremely cumbersome in Excel.</li>
+                    <li><strong>Version Control:</strong> Code can be easily managed using version control systems like Git, facilitating collaborative development and tracking changes.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">In essence, Python with Pandas offers a professional, robust, and scalable environment for data preparation, making it an indispensable skill for modern data analysts.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">DataFrame Basics: Your Primary Data Structure in Pandas</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">The `DataFrame` is the most important data structure in Pandas. It's a two-dimensional, size-mutable, and potentially heterogeneous tabular data structure with labeled axes (rows and columns). Think of it as a powerful, flexible spreadsheet or a SQL table in Python.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">1. Creating a DataFrame (Conceptual)</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">DataFrames can be created from various sources (CSV, Excel, databases, JSON, etc.) or from Python dictionaries/lists.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <h5 class="font-semibold text-indigo-700 mb-2">Conceptual Code: Creating a DataFrame from a dictionary</h5>
+                    <pre><code class="language-python">
+import pandas as pd
+
+data = {
+    'Name': ['Alice', 'Bob', 'Charlie', 'David'],
+    'Age': [25, 30, 35, 40],
+    'City': ['New York', 'Los Angeles', 'Chicago', 'Houston'],
+    'Score': [85, 92, 78, 95]
+}
+df_students = pd.DataFrame(data)
+print(df_students)
+# Output:
+#        Name  Age         City  Score
+# 0     Alice   25     New York     85
+# 1       Bob   30  Los Angeles     92
+# 2   Charlie   35      Chicago     78
+# 3     David   40      Houston     95
+                    </code></pre>
+                </div>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">2. Selecting Columns (Series)</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">You can select one or more columns from a DataFrame. A single column in a DataFrame is a Pandas `Series`.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <h5 class="font-semibold text-indigo-700 mb-2">Conceptual Code: Selecting a single column</h5>
+                    <pre><code class="language-python">
+# Select a single column (returns a Pandas Series)
+ages = df_students['Age']
+print(ages)
+# Output:
+# 0    25
+# 1    30
+# 2    35
+# 3    40
+# Name: Age, dtype: int64
+
+# Select multiple columns (returns a DataFrame)
+name_city = df_students[['Name', 'City']]
+print(name_city)
+# Output:
+#        Name         City
+# 0     Alice     New York
+# 1       Bob  Los Angeles
+# 2   Charlie      Chicago
+# 3     David      Houston
+                    </code></pre>
+                </div>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">3. Selecting Rows (`.loc` and `.iloc`)</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Pandas offers powerful ways to select rows based on labels (`.loc`) or integer positions (`.iloc`).</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <h5 class="font-semibold text-indigo-700 mb-2">Conceptual Code: Selecting rows</h5>
+                    <pre><code class="language-python">
+# Select row by label (index) using .loc
+# Assuming default integer index
+first_row = df_students.loc[0]
+print(first_row)
+# Output:
+# Name        Alice
+# Age            25
+# City     New York
+# Score          85
+# Name: 0, dtype: object
+
+# Select row by integer position using .iloc
+second_row = df_students.iloc[1]
+print(second_row)
+# Output:
+# Name            Bob
+# Age              30
+# City    Los Angeles
+# Score            92
+# Name: 1, dtype: object
+
+# Select a slice of rows using .loc (inclusive of end label)
+rows_0_to_2_loc = df_students.loc[0:2]
+print(rows_0_to_2_loc)
+# Output:
+#        Name  Age         City  Score
+# 0     Alice   25     New York     85
+# 1       Bob   30  Los Angeles     92
+# 2   Charlie   35      Chicago     78
+
+# Select a slice of rows using .iloc (exclusive of end position)
+rows_0_to_2_iloc = df_students.iloc[0:3] # Selects rows at index 0, 1, 2
+print(rows_0_to_2_iloc)
+# Output:
+#        Name  Age         City  Score
+# 0     Alice   25     New York     85
+# 1       Bob   30  Los Angeles     92
+# 2   Charlie   35      Chicago     78
+                    </code></pre>
+                </div>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">4. Filtering Rows (Conditional Selection)</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">One of the most powerful features is filtering rows based on conditions, similar to Excel's filters but with much more flexibility.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <h5 class="font-semibold text-indigo-700 mb-2">Conceptual Code: Filtering rows</h5>
+                    <pre><code class="language-python">
+# Filter for students older than 30
+older_students = df_students[df_students['Age'] > 30]
+print(older_students)
+# Output:
+#        Name  Age       City  Score
+# 2   Charlie   35    Chicago     78
+# 3     David   40    Houston     95
+
+# Filter for students from 'New York'
+ny_students = df_students[df_students['City'] == 'New York']
+print(ny_students)
+# Output:
+#     Name  Age      City  Score
+# 0  Alice   25  New York     85
+
+# Filter with multiple conditions (using & for AND, | for OR)
+# Students from New York AND with a score greater than 80
+ny_high_score_students = df_students[(df_students['City'] == 'New York') & (df_students['Score'] > 80)]
+print(ny_high_score_students)
+# Output:
+#     Name  Age      City  Score
+# 0  Alice   25  New York     85
+
+# Filter for students whose city is in a list of cities
+selected_cities = ['New York', 'Houston']
+filtered_by_city_list = df_students[df_students['City'].isin(selected_cities)]
+print(filtered_by_city_list)
+# Output:
+#      Name  Age      City  Score
+# 0   Alice   25  New York     85
+# 3   David   40   Houston     95
+                    </code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">These basic DataFrame operations – creating, selecting, and filtering – form the bedrock of almost all data preparation and analysis tasks in Pandas. Mastering them is essential for efficiently manipulating structured data in Python.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-6 mt-auto">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        // No specific interactive elements beyond nav buttons for this module.
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scroll for nav links and initial active state
+            document.querySelectorAll('a.nav-button').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll('a.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Set initial active nav button based on URL hash or first section
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'practical-excel';
+            const initialNavButton = document.querySelector(`a.nav-button[href="#${initialSection}"]`);
+            if (initialNavButton) {
+                initialNavButton.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

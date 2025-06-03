@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S66: Communicating Statistical Findings (Enhanced)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+        .header-section { text-align: center; margin-bottom: 2rem; }
+        .header-section h1 { font-size: 2.5rem; font-weight: 700; color: #4338CA; margin-bottom: 0.5rem; }
+        .header-section p { font-size: 1.125rem; color: #4B5563; }
+        .content-block { background-color: white; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 2rem; margin-bottom: 2rem; }
+        .content-block h2 { font-size: 1.75rem; font-weight: 600; color: #1F2937; margin-bottom: 1.5rem; border-bottom: 2px solid #E5E7EB; padding-bottom: 0.75rem; }
+        .content-block h3 { font-size: 1.5rem; font-weight: 600; color: #4338CA; margin-top: 1.5rem; margin-bottom: 1rem; }
+        .content-block h4 { font-size: 1.25rem; font-weight: 600; color: #374151; margin-top: 1rem; margin-bottom: 0.75rem; }
+        .code-block {
+            background-color: #2D3748; /* Dark background for code */
+            color: #E2E8F0; /* Light text */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', monospace; /* Monospace font */
+            overflow-x: auto; /* Allow horizontal scrolling for long lines */
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+            font-size: 0.875rem; /* Smaller font for code blocks */
+        }
+        .code-block pre { margin: 0; }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #4A5568;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .copy-button:hover { background-color: #6366F1; }
+        .action-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+        }
+        .action-button:hover { background-color: #6366F1; transform: translateY(-1px); }
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            resize: vertical;
+            margin-top: 1rem;
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .feedback-box {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .feedback-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #4338CA;
+            margin-bottom: 1rem;
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4338CA;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+            display: none; /* Hidden by default */
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .hidden { display: none; }
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #D1FAE5;
+            border: 1px solid #34D399;
+            color: #065F46;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .message-box.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header-section">
+            <h1>N-S66: Generating Reports & Communicating Statistical Findings</h1>
+            <p>Translating complex data into clear, actionable business insights.</p>
+        </header>
+
+        <section class="content-block">
+            <h2>Theory: The Art of Effective Statistical Communication</h2>
+            <p class="mb-4 text-gray-700 leading-relaxed">
+                The true value of statistical analysis lies not just in its accuracy, but in its ability to drive informed decisions. This requires transforming raw data and complex models into clear, compelling narratives that resonate with diverse audiences. This section delves into the principles and practices of effective statistical reporting.
+            </p>
+
+            <h3>1. Deeply Understand Your Audience</h3>
+            <p class="mb-2 text-gray-700 leading-relaxed">
+                Before writing a single word, ask: "Who am I talking to, and what do they care about?"
+            </p>
+            <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                <li><strong>Roles & Responsibilities:</strong> An executive needs high-level strategic implications; a manager needs actionable tactics; a technical peer might want methodological details.</li>
+                <li><strong>Pain Points & Goals:</strong> Frame your findings around their challenges and objectives. How does your analysis help them solve a problem or achieve a goal?</li>
+                <li><strong>Prior Knowledge:</strong> Assume minimal statistical knowledge for non-technical audiences. Avoid jargon or explain it clearly.</li>
+                <li><strong>Decision-Making Context:</strong> What decisions will they make based on your report? This dictates the report's focus and recommendations.</li>
+            </ul>
+
+            <h3>2. Structure for Clarity and Impact</h3>
+            <p class="mb-2 text-gray-700 leading-relaxed">
+                A logical flow ensures your message is absorbed effectively. Consider these components for a business-oriented statistical report:
+            </p>
+            <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                <li><strong>Executive Summary (The "TL;DR"):</strong>
+                    <ul class="list-circle pl-5 mt-1">
+                        <li><strong>Key Finding:</strong> The single most important takeaway.</li>
+                        <li><strong>Business Implication:</strong> What does this mean for the business?</li>
+                        <li><strong>Recommendation:</strong> What action should be taken?</li>
+                    </ul>
+                    This section should be able to stand alone.
+                </li>
+                <li><strong>Introduction & Problem Statement:</strong>
+                    <ul class="list-circle pl-5 mt-1">
+                        <li>Briefly outline the business question or problem.</li>
+                        <li>State the objective of the analysis.</li>
+                    </ul>
+                </li>
+                <li><strong>Methodology (High-Level):</strong>
+                    <ul class="list-circle pl-5 mt-1">
+                        <li>Explain *what* you did (e.g., "We used a linear regression model...") without getting bogged down in statistical minutiae.</li>
+                        <li>Mention data sources and key variables used.</li>
+                    </ul>
+                </li>
+                <li><strong>Key Findings & Insights:</strong>
+                    <ul class="list-circle pl-5 mt-1">
+                        <li>Present the main results clearly.</li>
+                        <li>Translate statistical coefficients: "For every X increase in A, Y is expected to change by B."</li>
+                        <li>Explain model fit (e.g., R-squared) in simple terms: "Our model explains Z% of the variation in sales, indicating a strong relationship."</li>
+                        <li>Use clear, concise language.</li>
+                    </ul>
+                </li>
+                <li><strong>Business Implications:</strong>
+                    <ul class="list-circle pl-5 mt-1">
+                        <li>Bridge the gap between findings and business reality.</li>
+                        <li>How do these insights affect strategy, operations, revenue, customer experience, etc.?</li>
+                        <li>This is where you answer the "So what?" question.</li>
+                    </ul>
+                </li>
+                <li><strong>Recommendations & Next Steps:</strong>
+                    <ul class="list-circle pl-5 mt-1">
+                        <li>Provide concrete, actionable steps based on your findings.</li>
+                        <li>Suggest areas for further investigation or future analysis.</li>
+                    </ul>
+                </li>
+                <li><strong>Limitations & Assumptions:</strong>
+                    <ul class="list-circle pl-5 mt-1">
+                        <li>Briefly acknowledge any constraints (e.g., data quality, sample size, assumptions of the model).</li>
+                        <li>This builds credibility and manages expectations.</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h3>3. Master the Art of Storytelling with Data</h3>
+            <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                <li><strong>Narrative Arc:</strong> Start with the problem, introduce the data as characters, build to the climax (your findings), and conclude with the resolution (recommendations).</li>
+                <li><strong>Visuals as Tools:</strong> Use charts and graphs to illustrate your points, not just to display data. Each visual should have a clear message.</li>
+                <li><strong>Simplicity:</strong> A complex story is best told simply. Focus on one key message per slide or section.</li>
+            </ul>
+
+            <h3>4. Common Pitfalls to Avoid</h3>
+            <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                <li><strong>Jargon Overload:</strong> Using technical terms without explanation alienates your audience.</li>
+                <li><strong>Data Dump:</strong> Presenting raw tables or too many numbers without interpretation.</li>
+                <li><strong>Lack of Context:</strong> Presenting findings without explaining the business problem they address.</li>
+                <li><strong>Misleading Visuals:</strong> Poorly scaled axes, inappropriate chart types, or too much visual noise.</li>
+                <li><strong>Ignoring Limitations:</strong> Overstating certainty or failing to mention caveats.</li>
+                <li><strong>No Call to Action:</strong> Leaving the audience wondering what to do next.</li>
+            </ul>
+        </section>
+
+        <section class="content-block">
+            <h2>Practical Activity: Write and Get Feedback on Your Business Summary</h2>
+            <p class="mb-4 text-gray-700 leading-relaxed">
+                Let's apply these principles. Below is a simulated statistical output from a simple linear regression analysis. Your task is to write a short, non-technical business summary (2-3 paragraphs) for a marketing manager. Focus on the key findings and their business implications.
+            </p>
+            <p class="mb-6 text-gray-700 leading-relaxed font-bold">
+                Once you've written your summary, click "Get AI Feedback" to receive constructive criticism based on the best practices discussed above!
+            </p>
+
+            <div class="text-center mb-6">
+                <button id="showSimulatedOutputBtn" class="action-button bg-indigo-600 hover:bg-indigo-700">Show Simulated Output</button>
+                <button id="showExampleSummaryBtn" class="action-button bg-green-600 hover:bg-green-700">Show Example Summary</button>
+            </div>
+
+            <div id="simulatedOutputSection" class="hidden">
+                <h4>Simulated Regression Output:</h4>
+                <div class="code-block bg-gray-900 text-gray-100 p-4 rounded-md text-sm">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="activityOutputContent">
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                  Sales   R-squared:                       0.785
+Model:                            OLS   Adj. R-squared:                  0.782
+Method:                 Least Squares   F-statistic:                     359.2
+Date:                Thu, 29 May 2025   Prob (F-statistic):           2.15e-35
+Time:                        18:30:00   Log-Likelihood:                -410.56
+No. Observations:                 100   AIC:                             825.1
+Df Residuals:                      98   BIC:                             830.3
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+===================================================================================
+                        coef    std err          t      P>|t|      [0.025      0.975]
+-----------------------------------------------------------------------------------
+Intercept            35.1234      5.120      6.860      0.000      24.960      45.287
+Ad_Spend_Thousands    1.2567      0.066     19.000      0.000       1.126       1.387
+==============================================================================
+Omnibus:                        2.154   Durbin-Watson:                   1.987
+Prob(Omnibus):                  0.341   Jarque-Bera (JB):                1.876
+Skew:                           0.288   Prob(JB):                        0.391
+Kurtosis:                       2.650   Cond. No.                         250.
+==============================================================================
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+</code></pre>
+                </div>
+                <p class="text-sm text-gray-600 mt-2">
+                    <strong>Key Interpretations for a Marketing Manager:</strong>
+                    <ul class="list-disc pl-5 mt-1">
+                        <li><strong><code>R-squared: 0.785</code></strong> – This means 78.5% of the variation in Sales can be explained by Advertising Spend. A higher value indicates a better fit.</li>
+                        <li><strong><code>coef</code> for <code>Ad_Spend_Thousands: 1.2567</code></strong> – For every $1,000 increase in Advertising Spend, Sales are expected to increase by $1.26k.</li>
+                        <li><strong><code>P>|t|</code> for <code>Ad_Spend_Thousands: 0.000</code></strong> – This p-value is very low (less than 0.05), indicating that the relationship between Advertising Spend and Sales is statistically significant and not due to random chance.</li>
+                        <li><strong><code>Intercept: 35.1234</code></strong> – When Advertising Spend is zero, Sales are predicted to be $35.12. (Interpret with caution, as zero ad spend might be outside realistic range).</li>
+                    </ul>
+                </p>
+            </div>
+
+            <div id="exampleSummarySection" class="hidden">
+                <h4>Example Business Summary:</h4>
+                <div class="results-box">
+                    <p class="text-gray-700 leading-relaxed mb-4"><strong>Subject: Analysis of Advertising Spend Impact on Sales Performance</strong></p>
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        Our recent analysis has identified a strong and positive relationship between our advertising spend and product sales. Specifically, for every additional $1,000 invested in advertising, we can expect an average increase of approximately $1,257 in sales. This indicates a significant return on our advertising investment. Furthermore, our model explains about 78.5% of the variation in sales, suggesting that advertising is a major factor influencing our sales performance.
+                    </p>
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        These findings are crucial for optimizing our marketing strategy. Given the clear positive impact and the high explanatory power of advertising spend, we recommend evaluating opportunities to strategically increase our advertising budget, particularly in channels that have shown strong performance. We should also continue to monitor this relationship and explore other potential factors that might contribute to the remaining sales variations to further refine our overall sales growth initiatives.
+                    </p>
+                </div>
+            </div>
+
+            <h3 class="mt-8">Your Summary:</h3>
+            <textarea id="userSummaryInput" placeholder="Write your business summary here, focusing on clarity, business implications, and avoiding jargon."></textarea>
+            <div class="text-center mt-4">
+                <button id="getFeedbackBtn" class="action-button bg-purple-600 hover:bg-purple-700">Get AI Feedback</button>
+            </div>
+
+            <div id="feedbackSection" class="feedback-box hidden">
+                <h4>AI Feedback on Your Summary:</h4>
+                <div class="loading-spinner" id="loadingSpinner"></div>
+                <div id="aiFeedbackContent" class="text-gray-700 leading-relaxed"></div>
+            </div>
+        </section>
+    </div>
+
+    <div id="messageBox" class="message-box hidden">
+        <span id="messageText"></span>
+    </div>
+
+    <script>
+        function showMessage(message, duration = 2000, type = 'success') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            messageText.innerText = message;
+            
+            // Reset classes
+            messageBox.classList.remove('bg-red-100', 'border-red-400', 'text-red-700', 'bg-green-100', 'border-green-400', 'text-green-700');
+            
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+            } else { // default to success
+                messageBox.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+            }
+
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, duration);
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const textToCopy = codeBlock.textContent;
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                button.textContent = 'Copied!';
+                showMessage('Code copied to clipboard!', 1500);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                button.textContent = 'Error!';
+                showMessage('Failed to copy code.', 1500, 'error');
+            }
+            document.body.removeChild(textarea);
+
+            setTimeout(() => {
+                button.textContent = 'Copy';
+            }, 2000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const showSimulatedOutputBtn = document.getElementById('showSimulatedOutputBtn');
+            const showExampleSummaryBtn = document.getElementById('showExampleSummaryBtn');
+            const simulatedOutputSection = document.getElementById('simulatedOutputSection');
+            const exampleSummarySection = document.getElementById('exampleSummarySection');
+            const getFeedbackBtn = document.getElementById('getFeedbackBtn');
+            const userSummaryInput = document.getElementById('userSummaryInput');
+            const feedbackSection = document.getElementById('feedbackSection');
+            const aiFeedbackContent = document.getElementById('aiFeedbackContent');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+
+            if (showSimulatedOutputBtn) {
+                showSimulatedOutputBtn.addEventListener('click', function() {
+                    simulatedOutputSection.classList.toggle('hidden');
+                });
+            }
+
+            if (showExampleSummaryBtn) {
+                showExampleSummaryBtn.addEventListener('click', function() {
+                    exampleSummarySection.classList.toggle('hidden');
+                });
+            }
+
+            if (getFeedbackBtn) {
+                getFeedbackBtn.addEventListener('click', async function() {
+                    const userSummary = userSummaryInput.value.trim();
+                    if (userSummary.length < 50) {
+                        showMessage('Please write a more substantial summary (at least 50 characters) to get meaningful feedback.', 3000, 'error');
+                        return;
+                    }
+
+                    feedbackSection.classList.remove('hidden');
+                    loadingSpinner.style.display = 'block';
+                    aiFeedbackContent.innerHTML = ''; // Clear previous feedback
+
+                    const simulatedRegressionOutput = document.getElementById('activityOutputContent').textContent;
+
+                    const prompt = `You are an experienced data analyst reviewing a junior analyst's report for a marketing manager. The report summarizes findings from a linear regression analysis.\n\nHere is the regression output:\n\n${simulatedRegressionOutput}\n\nHere is the junior analyst's summary:\n\n${userSummary}\n\nPlease provide constructive feedback on the junior analyst's summary, focusing on:\n1.  **Clarity and Conciseness:** Is the language easy to understand for a non-technical marketing manager? Is it to the point?\n2.  **Focus on Business Implications:** Does it clearly explain what the findings mean for the business (e.g., revenue, strategy, action)?\n3.  **Avoidance of Jargon:** Are statistical terms translated into plain language?\n4.  **Completeness:** Does it cover the most important insights from the regression output relevant to a marketing manager?\n5.  **Suggestions for Improvement:** Provide specific, actionable suggestions to make the summary more impactful and business-oriented.\n\nKeep the feedback professional and encouraging, aiming for about 3-5 bullet points or a short paragraph. Format the feedback using Markdown.`;
+
+                    // Use OpenAI API as fallback if Gemini is not available
+                    let apiKey = '';
+                    let apiUrl = '';
+                    let isGemini = false;
+                    if (typeof __api_key !== 'undefined' && __api_key) {
+                        apiKey = __api_key;
+                        apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                        isGemini = true;
+                    } else if (typeof OPENAI_API_KEY !== 'undefined' && OPENAI_API_KEY) {
+                        apiKey = OPENAI_API_KEY;
+                        apiUrl = 'https://api.openai.com/v1/chat/completions';
+                        isGemini = false;
+                    } else {
+                        aiFeedbackContent.innerHTML = '<p class="text-red-600">Error: No API key found for Gemini or OpenAI. Please set your API key.</p>';
+                        loadingSpinner.style.display = 'none';
+                        return;
+                    }
+
+                    try {
+                        let resultText = '';
+                        if (isGemini) {
+                            // Gemini API
+                            let chatHistory = [];
+                            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                            const payload = { contents: chatHistory };
+                            const response = await fetch(apiUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+                            const result = await response.json();
+                            if (result.candidates && result.candidates.length > 0 &&
+                                result.candidates[0].content && result.candidates[0].content.parts &&
+                                result.candidates[0].content.parts.length > 0) {
+                                resultText = result.candidates[0].content.parts[0].text;
+                            } else {
+                                aiFeedbackContent.innerHTML = '<p class="text-red-600">Error: Could not retrieve feedback. Please try again. (No candidates or content in response)</p>';
+                                console.error('Unexpected API response structure:', result);
+                                loadingSpinner.style.display = 'none';
+                                return;
+                            }
+                        } else {
+                            // OpenAI API
+                            const payload = {
+                                model: 'gpt-3.5-turbo',
+                                messages: [
+                                    { role: 'system', content: 'You are an expert data analyst and business communicator.' },
+                                    { role: 'user', content: prompt }
+                                ]
+                            };
+                            const response = await fetch(apiUrl, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${apiKey}`
+                                },
+                                body: JSON.stringify(payload)
+                            });
+                            const result = await response.json();
+                            if (result.choices && result.choices.length > 0 && result.choices[0].message && result.choices[0].message.content) {
+                                resultText = result.choices[0].message.content;
+                            } else {
+                                aiFeedbackContent.innerHTML = '<p class="text-red-600">Error: Could not retrieve feedback. Please try again. (No choices or content in response)</p>';
+                                console.error('Unexpected OpenAI API response structure:', result);
+                                loadingSpinner.style.display = 'none';
+                                return;
+                            }
+                        }
+                        // Render markdown
+                        if (typeof marked !== 'undefined') {
+                            aiFeedbackContent.innerHTML = marked.parse(resultText);
+                        } else {
+                            aiFeedbackContent.innerText = resultText;
+                        }
+                    } catch (error) {
+                        aiFeedbackContent.innerHTML = `<p class="text-red-600">Error: Failed to connect to the AI service. ${error.message}. Check console for details.</p>`;
+                        console.error('API call failed:', error);
+                    } finally {
+                        loadingSpinner.style.display = 'none';
+                    }
+                });
+            }
+        });
+
+        // Load marked.js for Markdown rendering
+        const markedScript = document.createElement('script');
+        markedScript.src = "https://cdn.jsdelivr.net/npm/marked/marked.min.js";
+        markedScript.onload = () => {
+            // Initialize marked.js if needed (usually just marked.parse is enough)
+            console.log("marked.js loaded");
+        };
+        document.body.appendChild(markedScript);
+    </script>
+</body>
+</html>

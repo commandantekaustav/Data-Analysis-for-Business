@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S28: Introduction to Data Cleaning & Missing Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices:
+        - Why Data Cleaning is Crucial: Report Info: "GIGO". Goal: Inform. Viz/Method: Detailed text explanation. Justification: Emphasizes the fundamental importance of clean data.
+        - Common Data Quality Issues: Report Info: List of issues. Goal: Inform. Viz/Method: Detailed bulleted list with explanations. Justification: Provides a comprehensive overview of potential problems.
+        - Identifying Missing Data: Report Info: Definition, causes, impact. Goal: Inform. Viz/Method: Detailed text explanation. Justification: Focuses on a key data cleaning challenge.
+        - Pandas Demo (.isnull().sum(), .info()): Report Info: Tool demo. Goal: Illustrate, apply. Viz/Method: Detailed Python code snippets with extensive comments and explanations for programmatic missing data detection. Justification: Provides hands-on conceptual understanding.
+        - Conceptual Visualization of Missing Data: Report Info: Visualize missing data. Goal: Illustrate. Viz/Method: Detailed descriptive text. Justification: Explains how visual methods aid in understanding missingness patterns.
+        - Activity: Manually Identify Errors: Report Info: Activity prompt. Goal: Engage, apply. Viz/Method: HTML table with deliberate errors, clear instructions, and an expandable accordion for suggested solutions. Interaction: Click to expand. Justification: Reinforces understanding through practical, visual inspection.
+        CONFIRMATION: No charts used (Chart.js/Plotly.js not needed as report is conceptual/textual).
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); /* Adjust based on header/footer height */ }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+
+        .accordion-header { cursor: pointer; user-select: none; }
+        .accordion-content { display: none; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; }
+        .accordion-item.open .accordion-content { display: block; max-height: 1000px; /* Arbitrary large value */ padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .accordion-arrow { transition: transform 0.3s ease; }
+        .accordion-item.open .accordion-arrow { transform: rotate(180deg); }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #CBD5E1; padding: 0.75rem; text-align: left; }
+        th { background-color: #E2E8F0; font-weight: 600; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S28: Introduction to Data Cleaning & Identifying Missing Data</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Introduction to Data Cleaning & Missing Data</h2>
+            <p class="section-intro">Data cleaning is arguably the most critical, yet often overlooked, phase in the data analytics lifecycle. It's the process of detecting and correcting (or removing) corrupt or inaccurate records from a dataset. This section will explain why data cleaning is indispensable, detail common data quality issues, and specifically focus on the pervasive problem of missing data.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Why Data Cleaning is Crucial: The "Garbage In, Garbage Out" (GIGO) Principle</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">The fundamental principle underpinning the importance of data cleaning is "Garbage In, Garbage Out" (GIGO). This adage means that the quality of your analytical outputs (insights, predictions, reports) can never exceed the quality of your input data. If your data is flawed, inconsistent, or incomplete, any analysis performed on it will inevitably lead to unreliable, misleading, or even incorrect conclusions.</p>
+                <p class="mb-4 text-gray-700 leading-relaxed">Consider these critical reasons why investing time in data cleaning is non-negotiable:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Ensures Accuracy & Reliability:</strong> Clean data provides a true representation of the underlying reality, leading to accurate insights and reliable models. Without it, decisions based on analysis could be flawed, potentially leading to significant business losses or missed opportunities.</li>
+                    <li><strong>Improves Decision-Making:</strong> Data-driven decisions are only as good as the data they are based on. Clean data empowers confident, evidence-based decision-making, allowing organizations to optimize processes, target customers effectively, and mitigate risks.</li>
+                    <li><strong>Enhances Model Performance:</strong> Machine Learning models are highly sensitive to data quality. Noisy, inconsistent, or missing data can severely degrade model performance, leading to poor predictions and classifications. Clean data is a prerequisite for building robust and accurate predictive models.</li>
+                    <li><strong>Facilitates Efficient Analysis:</strong> Working with messy data is frustrating and time-consuming. Clean data simplifies the analytical process, allowing analysts to spend more time on actual analysis and less time on firefighting data issues.</li>
+                    <li><strong>Supports Data Integration:</strong> When combining data from multiple sources, inconsistencies and errors in one dataset can complicate or even prevent successful integration. Clean data ensures seamless merging and a unified view.</li>
+                    <li><strong>Builds Trust & Credibility:</strong> Reliable data builds trust in the analytical team and the insights they produce. If stakeholders repeatedly find errors or inconsistencies, confidence in data-driven initiatives erodes.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">In essence, data cleaning is not just a technical task; it's a foundational practice that ensures the integrity, utility, and trustworthiness of all data analytics efforts.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Common Data Quality Issues: Recognizing the Flaws</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Raw data, no matter its source, rarely arrives in a perfectly clean state. Analysts frequently encounter a range of issues that need to be addressed before any meaningful analysis can begin. Understanding these common problems is the first step towards effective data cleaning:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Missing Values:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> Gaps or blanks in the dataset where information is unavailable for certain observations or variables. Represented as `NaN` (Not a Number) in Pandas, `NULL` in databases, or empty cells in spreadsheets.</li>
+                            <li><em>Impact:</em> Can lead to biased results, reduced sample size, or inability to run certain analyses or models.</li>
+                            <li><em>Example:</em> A customer's age is missing in a survey response.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Inconsistent Data Formats:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> The same data is represented in different ways across records or columns.</li>
+                            <li><em>Impact:</em> Prevents accurate aggregation, filtering, and comparison. Can lead to incorrect counts or sums.</li>
+                            <li><em>Example:</em> Dates stored as "MM/DD/YYYY" in one column and "YYYY-MM-DD" in another; "USA", "U.S.A.", "United States" for the same country.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Duplicate Records:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> Identical or near-identical entries for the same observation, often due to data entry errors or merging multiple sources.</li>
+                            <li><em>Impact:</em> Skews counts, sums, and averages, leading to overestimation or incorrect statistical measures.</li>
+                            <li><em>Example:</em> The same customer appears twice in a customer list with slightly different contact details.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Outliers:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> Data points that significantly deviate from other observations in the dataset. They can be genuine extreme values or errors.</li>
+                            <li><em>Impact:</em> Can disproportionately influence statistical measures (like mean) and distort model training, leading to inaccurate predictions.</li>
+                            <li><em>Example:</em> A customer's purchase amount is $1,000,000 when most purchases are under $1,000.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Incorrect Data Types:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> Data stored in a format that doesn't match its true nature (e.g., numbers stored as text, dates as generic strings).</li>
+                            <li><em>Impact:</em> Prevents numerical calculations, chronological sorting, or proper interpretation by analytical tools.</li>
+                            <li><em>Example:</em> A "zip code" column stored as an integer (losing leading zeros) or a "revenue" column stored as a string.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Structural Errors:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> Issues arising from inconsistent naming conventions, typos, or incorrect categorization within categorical data.</li>
+                            <li><em>Impact:</em> Leads to miscounts, miscategorizations, and difficulty in grouping data accurately.</li>
+                            <li><em>Example:</em> "Product A", "product A", "Product_A" referring to the same product.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Identifying and addressing these issues is fundamental to preparing data for robust and reliable analysis.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Focus on Identifying Missing Data: The Pervasive Problem</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Missing data, also known as "NA" (Not Available) or "null values," is one of the most common and challenging data quality issues. It refers to the absence of a value for a particular variable in an observation where a value should logically exist.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Causes of Missing Data:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Data Entry Errors:</strong> Human mistakes during manual data input (e.g., forgetting to fill a field, accidental deletion).</li>
+                    <li><strong>System Glitches/Failures:</strong> Software bugs, hardware malfunctions, or data transmission errors can lead to incomplete data capture.</li>
+                    <li><strong>Non-Response:</strong> In surveys or forms, respondents might skip questions, or customers might not provide optional information.</li>
+                    <li><strong>Data Corruption:</strong> During storage, transfer, or transformation, data can become corrupted, leading to missing values.</li>
+                    <li><strong>Irrelevance/Not Applicable:</strong> A field might genuinely not apply to a particular record (e.g., "spouse's name" for a single person).</li>
+                    <li><strong>Data Loss:</strong> Information might be intentionally or unintentionally deleted.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Impact of Missing Data on Analysis:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Reduced Sample Size:</strong> Many analytical methods automatically exclude rows with missing values, reducing the amount of data available for analysis and potentially leading to less robust results.</li>
+                    <li><strong>Biased Results:</strong> If data is not missing randomly (e.g., people with lower incomes are more likely to skip income questions), then analyses performed on the remaining data might be biased and not representative of the full population.</li>
+                    <li><strong>Distorted Statistical Measures:</strong> Measures like mean, median, standard deviation can be inaccurate if calculated without accounting for missingness, especially if the missing data is systematic.</li>
+                    <li><strong>Algorithm Failure:</strong> Many machine learning algorithms cannot handle missing values directly and will throw errors unless the missing data is addressed.</li>
+                    <li><strong>Reduced Model Accuracy:</strong> Even if an algorithm can handle missing data, a large amount of missingness or specific patterns of missingness can significantly reduce the predictive power and accuracy of models.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">The first step in handling missing data is always identification. Before deciding on a strategy to treat missing values, you need to know exactly where they are and how prevalent they are within your dataset.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Identifying Missing Data & Manual Inspection</h2>
+            <p class="section-intro">Identifying missing data is the crucial first step in dealing with this common data quality issue. This section will demonstrate how to programmatically detect missing values using Python's Pandas library and then provide an activity to hone your skills in manually spotting various errors in a sample dataset.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Tool Demo: Programmatically Identifying Missing Data with Python (Pandas)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Pandas provides efficient and straightforward methods to detect missing values in a DataFrame. These methods are essential for quickly assessing the extent and pattern of missingness across your dataset.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800">
+                    <h4 class="font-semibold text-indigo-700 mb-2">Python Code Snippet (using Pandas for missing data identification)</h4>
+                    <pre><code class="language-python">
+import pandas as pd
+import numpy as np # Used for np.nan (Not a Number)
+
+# 1. Create a sample DataFrame with some missing values
+# We'll simulate a dataset, for example, customer survey responses.
+print("--- Step 1: Creating a Sample DataFrame with Missing Values ---")
+data = {
+    'CustomerID': [101, 102, 103, 104, 105, 106, 107],
+    'Age': [25, 34, np.nan, 45, 29, np.nan, 50],
+    'Gender': ['Male', 'Female', 'Female', 'Male', 'Female', 'Male', 'Female'],
+    'PurchaseAmount': [150.00, 230.50, 80.00, np.nan, 400.25, 120.00, 310.75],
+    'FeedbackScore': [4, 5, 3, 4, np.nan, 2, 5],
+    'City': ['New York', 'Los Angeles', 'Chicago', np.nan, 'Houston', 'Miami', 'Chicago']
+}
+df = pd.DataFrame(data)
+print(df)
+print("\n")
+
+# 2. Check for missing values across the entire DataFrame
+# df.isnull() returns a DataFrame of boolean values, indicating True for missing values.
+print("--- Step 2: Checking for Missing Values (df.isnull()) ---")
+print(df.isnull())
+print("\n")
+
+# 3. Count missing values per column (most common approach)
+# df.isnull().sum() sums the True values (which are treated as 1) for each column.
+# This gives a quick overview of how many missing values each column has.
+print("--- Step 3: Counting Missing Values Per Column (df.isnull().sum()) ---")
+print(df.isnull().sum())
+print("\n")
+
+# 4. Get the percentage of missing values per column
+# This helps in understanding the proportion of missingness relative to the total data.
+print("--- Step 4: Percentage of Missing Values Per Column ---")
+missing_percentage = (df.isnull().sum() / len(df)) * 100
+print(missing_percentage)
+print("\n")
+
+# 5. Get a concise summary of the DataFrame, including non-null counts
+# df.info() is invaluable as it shows the number of non-null entries for each column.
+# By comparing 'Non-Null Count' to 'Entries' (total rows), you can spot missing values.
+print("--- Step 5: DataFrame Information (df.info()) ---")
+df.info()
+print("\n")
+
+# 6. Check for any missing values in the entire DataFrame (True/False)
+# df.isnull().any().any() returns True if there is at least one missing value anywhere.
+print("--- Step 6: Are there ANY missing values in the DataFrame? ---")
+print(df.isnull().any().any())
+print("\n")
+                    </code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">The Pandas methods demonstrated above are indispensable for quickly identifying the presence, count, and percentage of missing values in your dataset. <code>df.isnull().sum()</code> is particularly useful for a rapid assessment of missingness per column, while <code>df.info()</code> provides a comprehensive summary including non-null counts, which helps confirm data completeness and types.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Conceptual Visualization of Missing Data Patterns</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">While numerical counts are useful, visualizing missing data can reveal patterns that are not immediately obvious from summary statistics. Although we won't generate a live chart here, imagine the following types of visualizations:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Missingness Heatmap (e.g., using Seaborn's `heatmap` or `missingno` library):</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> A grid where each row is an observation and each column is a variable. Cells are colored differently (e.g., black for missing, white for present).</li>
+                            <li><em>Insight:</em> Helps identify rows with many missing values, columns with high missingness, or specific patterns of missingness (e.g., if `Age` is missing, `Gender` is also often missing for the same record).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Bar Chart of Missing Values by Column:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> A simple bar chart showing the count or percentage of missing values for each column.</li>
+                            <li><em>Insight:</em> Provides a quick visual ranking of columns by their missingness severity, making it easy to prioritize which columns need attention.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Visualizing missing data helps in understanding the *nature* of missingness (e.g., completely random, random, or systematic), which in turn informs the most appropriate strategy for handling it.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Activity: Manually Identify Errors in a Sample Dataset</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Even with powerful tools, a keen eye for detail is essential in data cleaning. Below is a small dataset representing customer feedback for a new product. Your task is to manually inspect this data and identify as many data quality issues as you can (e.g., missing values, inconsistencies, duplicates, incorrect formats, outliers, structural errors). List the specific errors you find.</p>
+                
+                <div class="overflow-x-auto mb-6">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>FeedbackID</th>
+                                <th>CustomerID</th>
+                                <th>Rating (1-5)</th>
+                                <th>SubmissionDate</th>
+                                <th>ProductVersion</th>
+                                <th>Comments</th>
+                                <th>Region</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>F001</td><td>C101</td><td>4</td><td>2024-03-10</td><td>v1.0</td><td>Great product, very intuitive.</td><td>North</td></tr>
+                            <tr><td>F002</td><td>C102</td><td>5</td><td>2024/03/11</td><td>v1.0</td><td>Absolutely love the new features!</td><td>South</td></tr>
+                            <tr><td>F003</td><td>C103</td><td></td><td>2024-03-12</td><td>v1.0</td><td></td><td>East</td></tr>
+                            <tr><td>F004</td><td>C101</td><td>4</td><td>2024-03-10</td><td>v1.0</td><td>Great product, very intuitive.</td><td>North</td></tr>
+                            <tr><td>F005</td><td>C104</td><td>2</td><td>2024-03-13</td><td>V1.0</td><td>Battery life is disappointing.</td><td>West</td></tr>
+                            <tr><td>F006</td><td>C105</td><td>50</td><td>2024-03-14</td><td>v1.1</td><td>Amazing performance for the price.</td><td>Central</td></tr>
+                            <tr><td>F007</td><td>C106</td><td>3</td><td>2024-03-15</td><td>v1.1</td><td>Good, but needs improvements.</td><td>North</td></tr>
+                            <tr><td>F008</td><td>C107</td><td>4</td><td>2024-03-16</td><td>v1.1</td><td>Very happy with the purchase.</td><td>north</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="accordion-item border border-gray-200 rounded-md overflow-hidden">
+                    <div class="accordion-header bg-indigo-50 p-4 flex justify-between items-center hover:bg-indigo-100 transition-colors duration-200" onclick="toggleAccordion(this.parentElement)">
+                        <h4 class="font-medium text-indigo-700 flex items-center">
+                            <span class="text-xl mr-2">🔎</span>Suggested Errors & Issues Found (Click to reveal)
+                        </h4>
+                        <span class="accordion-arrow text-indigo-600 text-xl">&#9662;</span>
+                    </div>
+                    <div class="accordion-content px-4 bg-white">
+                        <ul class="list-disc pl-5 space-y-2 text-sm text-gray-700">
+                            <li><strong>Missing Values:</strong>
+                                <ul class="list-circle pl-5">
+                                    <li>`FeedbackID F003`: Missing value in 'Rating (1-5)' column.</li>
+                                    <li>`FeedbackID F003`: Missing value in 'Comments' column.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Duplicate Records:</strong>
+                                <ul class="list-circle pl-5">
+                                    <li>`FeedbackID F004` is a duplicate of `F001` (same CustomerID, Rating, Date, Version, Comments, Region).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Inconsistent Data Formats:</strong>
+                                <ul class="list-circle pl-5">
+                                    <li>`SubmissionDate`: `F001`, `F003`, `F004` have "YYYY-MM-DD" format, while `F002` has "YYYY/MM/DD".</li>
+                                </ul>
+                            </li>
+                            <li><strong>Outlier:</strong>
+                                <ul class="list-circle pl-5">
+                                    <li>`Rating (1-5)`: `F006` has a rating of `50`, which is outside the expected range of 1-5. This is likely a data entry error.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Structural/Typographical Errors:</strong>
+                                <ul class="list-circle pl-5">
+                                    <li>`ProductVersion`: `F005` has "V1.0" (uppercase 'V'), while others are "v1.0" (lowercase 'v'). This is an inconsistency.</li>
+                                    <li>`Region`: `F008` has "north" (lowercase 'n'), while `F001` and `F004` have "North" (uppercase 'N'). This is an inconsistency that would cause problems in grouping/counting regions.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="mt-4 text-sm text-gray-600">This exercise highlights how even in small datasets, multiple data quality issues can exist, requiring careful inspection and systematic cleaning.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-6 mt-auto">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        function toggleAccordion(itemElement) {
+            itemElement.classList.toggle('open');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scroll for nav links and initial active state
+            document.querySelectorAll('a.nav-button').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll('a.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Set initial active nav button based on URL hash or first section
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'theory';
+            const initialNavButton = document.querySelector(`a.nav-button[href="#${initialSection}"]`);
+            if (initialNavButton) {
+                initialNavButton.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

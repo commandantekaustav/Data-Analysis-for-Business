@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S33: Data Preparation with Excel - Functions & Filters</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices:
+        - Excel Cleaning Functions Demo: Report Info: TRIM, CLEAN, etc. Goal: Apply. Viz/Method: Detailed conceptual Excel table examples showing "Before" and "After" application of each function, with formula explanations. Justification: Provides clear, visual, and actionable guidance for Excel cleaning.
+        - Excel Filters, Sorting, Conditional Formatting: Report Info: Concepts. Goal: Inform. Viz/Method: Detailed text explanation for each feature. Justification: Explains core Excel data manipulation tools.
+        - Hands-on Excel (Filters, Sorting, CF): Report Info: Activity. Goal: Apply. Viz/Method: Text instructions with illustrative conceptual steps. Justification: Guides practical application.
+        - VLOOKUP/INDEX-MATCH (Conceptual): Report Info: Concepts. Goal: Inform. Viz/Method: Detailed text explanation with conceptual examples. Justification: Introduces powerful lookup functions.
+        CONFIRMATION: No charts used (Chart.js/Plotly.js not needed as report is conceptual/textual).
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); /* Adjust based on header/footer height */ }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #CBD5E1; padding: 0.75rem; text-align: left; }
+        th { background-color: #E2E8F0; font-weight: 600; }
+        .excel-table-container { overflow-x: auto; margin-bottom: 1.5rem; }
+        .excel-table-container table { min-width: 600px; } /* Ensure table is wide enough for content */
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S33: Data Preparation with Excel - Functions & Filters</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#practical-functions" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">💡 Functions Demo</a></li>
+                    <li><a href="#excel-features" class="nav-button text-sm sm:text-base font-medium py-2 px-3">📊 Filters & More</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="practical-functions" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Data Cleaning with Excel Functions</h2>
+            <p class="section-intro">Microsoft Excel, despite its limitations for large-scale data, is an incredibly powerful and accessible tool for performing basic data cleaning and standardization. This section will walk you through conceptual demonstrations of how to use Excel's built-in functions to clean common data quality issues, particularly those related to text data.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Demo: Cleaning Messy Data with Excel Functions</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">We'll illustrate common cleaning scenarios using a hypothetical "Customer Feedback" dataset, showing the "Before" and "After" states with the relevant Excel formulas.</p>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">1. Removing Extra Spaces with `TRIM()`</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Extra spaces (leading, trailing, or multiple spaces between words) are common culprits for inconsistencies. The `TRIM()` function is your go-to for this.</p>
+                <div class="excel-table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Original Text (A1)</th><th>Formula (B1)</th><th>Cleaned Text (Result)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>`  Product A   `</td><td>`=TRIM(A1)`</td><td>`Product A`</td></tr>
+                            <tr><td>`  Customer  Name  `</td><td>`=TRIM(A2)`</td><td>`Customer Name`</td></tr>
+                            <tr><td>`Service  Feedback`</td><td>`=TRIM(A3)`</td><td>`Service Feedback`</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="mt-2 text-sm text-gray-600"><em>Explanation:</em> `TRIM()` removes all spaces from text except for single spaces between words. This ensures consistency for matching and filtering.</p>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">2. Removing Non-Printable Characters with `CLEAN()`</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Sometimes, data imported from other systems contains hidden, non-printable characters (like line breaks or control characters) that can interfere with analysis. `CLEAN()` helps remove these.</p>
+                <div class="excel-table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Original Text (A1)</th><th>Formula (B1)</th><th>Cleaned Text (Result)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>`Product` & `CHAR(10)` & `Description`</td><td>`=CLEAN(A1)`</td><td>`ProductDescription`</td></tr>
+                            <tr><td>`Item` & `CHAR(13)` & `Code`</td><td>`=CLEAN(A2)`</td><td>`ItemCode`</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="mt-2 text-sm text-gray-600"><em>Explanation:</em> `CLEAN()` removes non-printable characters. Note: `CHAR(10)` is a Line Feed, `CHAR(13)` is a Carriage Return. In Excel, you might not see these characters directly, but they can cause issues.</p>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">3. Standardizing Text Case with `UPPER()`, `LOWER()`, `PROPER()`</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Inconsistent casing (e.g., "New York", "new york", "NEW YORK") can lead to duplicate entries when grouping or filtering. Standardizing case is crucial.</p>
+                <div class="excel-table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Original Text (A1)</th><th>UPPER() (B1)</th><th>LOWER() (C1)</th><th>PROPER() (D1)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>`New York`</td><td>`=UPPER(A1)` -> `NEW YORK`</td><td>`=LOWER(A1)` -> `new york`</td><td>`=PROPER(A1)` -> `New York`</td></tr>
+                            <tr><td>`london`</td><td>`=UPPER(A2)` -> `LONDON`</td><td>`=LOWER(A2)` -> `london`</td><td>`=PROPER(A2)` -> `London`</td></tr>
+                            <tr><td>`PARIS`</td><td>`=UPPER(A3)` -> `PARIS`</td><td>`=LOWER(A3)` -> `paris`</td><td>`=PROPER(A3)` -> `Paris`</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="mt-2 text-sm text-gray-600"><em>Explanation:</em> Choose the appropriate function based on your standardization needs. `PROPER()` is often useful for names and addresses.</p>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">4. Extracting Parts of Text with `LEFT()`, `RIGHT()`, `MID()`, `LEN()` (often with `FIND()`/`SEARCH()`)</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Sometimes, a single cell contains multiple pieces of information (e.g., "ProductCode-SKU-Color"). These functions help extract specific parts.</p>
+                <div class="excel-table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Original String (A1)</th><th>Formula (B1)</th><th>Result</th><th>Explanation</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>`PROD-XYZ-RED`</td><td>`=LEFT(A1, 4)`</td><td>`PROD`</td><td>Extracts first 4 characters.</td></tr>
+                            <tr><td>`PROD-XYZ-RED`</td><td>`=RIGHT(A1, 3)`</td><td>`RED`</td><td>Extracts last 3 characters.</td></tr>
+                            <tr><td>`PROD-XYZ-RED`</td><td>`=MID(A1, FIND("-",A1)+1, FIND("-",A1,FIND("-",A1)+1)-FIND("-",A1)-1)`</td><td>`XYZ`</td><td>Extracts text between the first and second hyphens. (More complex, often used with `FIND` or `SEARCH`).</td></tr>
+                            <tr><td>`PROD-XYZ-RED`</td><td>`=LEN(A1)`</td><td>`12`</td><td>Returns total length of the string.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="mt-2 text-sm text-gray-600"><em>Explanation:</em> These functions are powerful for parsing and restructuring text data. `FIND()` or `SEARCH()` are often nested within `MID()` to dynamically find starting points and lengths for extraction.</p>
+                <p class="mt-4 text-sm text-gray-600">By mastering these fundamental Excel functions, you can significantly improve the quality and consistency of your data for subsequent analysis, especially for smaller datasets where a programmatic approach might be overkill.</p>
+            </div>
+        </section>
+
+        <section id="excel-features" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📊</span>Theory & Practical: Excel Filters, Sorting, Conditional Formatting & VLOOKUP</h2>
+            <p class="section-intro">Beyond cleaning functions, Excel offers powerful built-in features for organizing, exploring, and enriching your data. This section will cover Filters, Sorting, and Conditional Formatting, followed by a conceptual introduction to the widely used lookup functions: VLOOKUP and INDEX-MATCH.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Excel Filters, Sorting, and Conditional Formatting</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">These features are essential for quick data exploration, subsetting, and visual anomaly detection directly within your spreadsheet.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">1. Filters</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><em>Purpose:</em> To display only the rows that meet specific criteria, temporarily hiding the rest. This is invaluable for focusing on subsets of your data.</li>
+                    <li><em>How to use (Conceptual):</em>
+                        <ul class="list-circle pl-5">
+                            <li>Select the header row of your data.</li>
+                            <li>Go to `Data` tab > `Filter`.</li>
+                            <li>Dropdown arrows appear next to each column header. Click an arrow to:
+                                <ul>
+                                    <li>Select/deselect specific values.</li>
+                                    <li>Apply text filters (e.g., "contains", "starts with").</li>
+                                    <li>Apply number filters (e.g., "greater than", "top 10").</li>
+                                    <li>Apply date filters (e.g., "this month", "between dates").</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><em>Use Case:</em> Viewing only sales from a specific region, filtering for customers who purchased a particular product, or isolating records with a specific status.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">2. Sorting</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Sorting allows you to arrange your data in a specific order based on the values in one or more columns.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><em>Purpose:</em> To arrange data in ascending or descending order, making patterns, extremes, or sequences easier to identify.</li>
+                    <li><em>How to use (Conceptual):</em>
+                        <ul class="list-circle pl-5">
+                            <li>Select any cell within your data range.</li>
+                            <li>Go to `Data` tab > `Sort`.</li>
+                            <li>Choose the column(s) to sort by and the order (A-Z, Z-A, oldest to newest, largest to smallest). You can add multiple levels of sorting.</li>
+                        </ul>
+                    </li>
+                    <li><em>Use Case:</em> Arranging sales data by date, identifying highest/lowest performers, grouping similar items together.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">3. Conditional Formatting</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Conditional formatting applies formatting (like colors, icons, or data bars) to cells based on their content, making patterns and outliers visually stand out.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><em>Purpose:</em> To visually highlight important data points, trends, or anomalies based on rules you define.</li>
+                    <li><em>How to use (Conceptual):</em>
+                        <ul class="list-circle pl-5">
+                            <li>Select the range of cells you want to format.</li>
+                            <li>Go to `Home` tab > `Conditional Formatting`.</li>
+                            <li>Choose a rule type (e.g., "Highlight Cells Rules", "Top/Bottom Rules", "Data Bars", "Color Scales", "Icon Sets").</li>
+                            <li>Define your criteria (e.g., highlight values greater than 100, show top 10%, apply a color scale based on value).</li>
+                        </ul>
+                    </li>
+                    <li><em>Use Case:</em> Highlighting sales figures above a target, identifying low-performing products, visually spotting duplicate entries, or emphasizing extreme values (potential outliers).</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Hands-on Exercise: Using Filters, Sorting, and Conditional Formatting</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Let's conceptually apply these powerful Excel features to a hypothetical sales dataset to see how they aid in data exploration and basic analysis.</p>
+                
+                <div class="excel-table-container mb-4">
+                    <table>
+                        <thead>
+                            <tr><th>OrderID</th><th>ProductCategory</th><th>SalesAmount</th><th>OrderDate</th><th>Region</th><th>CustomerRating</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>101</td><td>Electronics</td><td>150.00</td><td>2024-01-05</td><td>North</td><td>4</td></tr>
+                            <tr><td>102</td><td>Clothing</td><td>75.50</td><td>2024-01-06</td><td>South</td><td>5</td></tr>
+                            <tr><td>103</td><td>Books</td><td>25.00</td><td>2024-01-05</td><td>North</td><td>3</td></tr>
+                            <tr><td>104</td><td>Electronics</td><td>300.00</td><td>2024-01-07</td><td>West</td><td>5</td></tr>
+                            <tr><td>105</td><td>Clothing</td><td>120.00</td><td>2024-01-08</td><td>East</td><td>4</td></tr>
+                            <tr><td>106</td><td>Books</td><td>40.00</td><td>2024-01-07</td><td>South</td><td>2</td></tr>
+                            <tr><td>107</td><td>Electronics</td><td>80.00</td><td>2024-01-09</td><td>North</td><td>4</td></tr>
+                            <tr><td>108</td><td>Clothing</td><td>90.00</td><td>2024-01-08</td><td>West</td><td>5</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4 class="font-semibold text-indigo-700 mb-2">Conceptual Steps:</h4>
+                <ol class="list-decimal pl-5 space-y-3 text-gray-700">
+                    <li><strong>Apply Filters:</strong>
+                        <ul class="list-circle pl-5">
+                            <li>Imagine clicking on the filter dropdown for 'Region' and selecting only 'North'. You would now only see orders 101, 103, and 107.</li>
+                            <li>Then, imagine adding another filter on 'SalesAmount' to show only values greater than 100. Only order 101 would remain visible.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Sort Data:</strong>
+                        <ul class="list-circle pl-5">
+                            <li>Imagine removing all filters. Now, sort the data by 'OrderDate' from Oldest to Newest. The rows would reorder chronologically.</li>
+                            <li>Then, imagine adding a second sort level: for orders on the same date, sort by 'SalesAmount' from Largest to Smallest.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Apply Conditional Formatting:</strong>
+                        <ul class="list-circle pl-5">
+                            <li>Imagine selecting the 'SalesAmount' column. Apply a conditional formatting rule: "Highlight Cells Rules" > "Greater Than..." > enter `100` and choose a light red fill. Orders 101, 104, 105 would now be highlighted.</li>
+                            <li>Imagine selecting the 'CustomerRating' column. Apply an "Icon Set" rule (e.g., 3 arrows) to visually represent high, medium, and low ratings.</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p class="mt-4 text-sm text-gray-600">These conceptual steps demonstrate how filters, sorting, and conditional formatting work in tandem to help you quickly explore, organize, and visually analyze your data for initial insights and quality checks.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Conceptual Introduction to VLOOKUP / INDEX-MATCH</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Beyond basic cleaning, a common data preparation task is combining information from different tables or sheets based on a common identifier. Excel's lookup functions, particularly VLOOKUP and the more flexible INDEX-MATCH combination, are indispensable for this.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">1. VLOOKUP (Vertical Lookup)</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><em>Purpose:</em> To look up a value in the first column of a table array and return the value in the same row from a column you specify. It's used to bring corresponding data from one table to another based on a common identifier.</li>
+                    <li><em>Conceptual Scenario:</em> You have a list of `OrderIDs` and `SalesAmounts` in one sheet, and a separate sheet with `OrderID` and `CustomerName`. You want to add `CustomerName` to your sales data.</li>
+                    <li><em>Formula Structure:</em> `=VLOOKUP(lookup_value, table_array, col_index_num, [range_lookup])`
+                        <ul class="list-circle pl-5">
+                            <li>`lookup_value`: The value you want to look for (e.g., `OrderID`).</li>
+                            <li>`table_array`: The range of cells containing the data you want to search in (e.g., the customer sheet).</li>
+                            <li>`col_index_num`: The column number in the `table_array` from which to retrieve the value (e.g., 2 for 'CustomerName' if it's the second column).</li>
+                            <li>`range_lookup`: `TRUE` for approximate match (rarely used for exact lookups), `FALSE` for exact match (most common).</li>
+                        </ul>
+                    </li>
+                    <li><em>Limitation:</em> VLOOKUP can only look up values in the *first* column of the `table_array` and return values from columns to its *right*.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">2. INDEX-MATCH (More Flexible Lookup)</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">The `INDEX-MATCH` combination is a more robust and flexible alternative to VLOOKUP, overcoming its primary limitation.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><em>Purpose:</em> `INDEX` returns a value or the reference to a value from within a table or range. `MATCH` searches for a specified item in a range of cells, and then returns the relative position of that item. Combined, they allow you to look up values anywhere in a table.</li>
+                    <li><em>Conceptual Scenario:</em> Same as VLOOKUP, but `CustomerName` might be to the left of `OrderID` in the customer sheet.</li>
+                    <li><em>Formula Structure:</em> `=INDEX(return_range, MATCH(lookup_value, lookup_range, 0))`
+                        <ul class="list-circle pl-5">
+                            <li>`return_range`: The column from which you want to retrieve the value (e.g., the 'CustomerName' column).</li>
+                            <li>`lookup_value`: The value you want to look for (e.g., `OrderID`).</li>
+                            <li>`lookup_range`: The column where you want to find the `lookup_value` (e.g., the 'OrderID' column in the customer sheet).</li>
+                            <li>`0`: Specifies an exact match.</li>
+                        </ul>
+                    </li>
+                    <li><em>Advantage:</em> `INDEX-MATCH` can look up values in any column and return values from any other column, regardless of their position. It's also generally more performant on very large datasets than VLOOKUP.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">While `VLOOKUP` is simpler for basic rightward lookups, `INDEX-MATCH` provides superior flexibility and is often preferred by advanced Excel users for more complex data integration tasks.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-6 mt-auto">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        function toggleAccordion(itemElement) {
+            itemElement.classList.toggle('open');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scroll for nav links and initial active state
+            document.querySelectorAll('a.nav-button').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll('a.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Set initial active nav button based on URL hash or first section
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'practical-functions';
+            const initialNavButton = document.querySelector(`a.nav-button[href="#${initialSection}"]`);
+            if (initialNavButton) {
+                initialNavButton.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S47: Structuring a Data Story & Visuals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .chart-container { position: relative; height: 280px; width: 100%; margin-top: 1rem; margin-bottom: 1rem; }
+        .chart-description { margin-top: 0.5rem; font-size: 0.85rem; color: #555; text-align: center; }
+        .story-element { background-color: #ffffff; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+        .story-element h3 { font-size: 1.5rem; font-weight: 600; color: #4338CA; margin-bottom: 1rem; }
+        .story-element p { color: #374151; line-height: 1.6; }
+        .interactive-section {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-section label { font-weight: 600; color: #4338CA; margin-bottom: 0.5rem; display: block; }
+        .interactive-section select {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            transition: border-color 0.3s ease;
+        }
+        .interactive-section select:focus {
+            outline: none;
+            border-color: #6366F1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S47: Structuring a Data Story & Visuals</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Structuring a Data Story & Visuals</h2>
+            <p class="section-intro">A well-crafted data story is more than just a collection of facts; it's a journey that takes your audience from a problem to a solution, using data as the guide. This session focuses on the classic narrative arc and how each element can be effectively supported by carefully chosen data visualizations.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Elements of a Data Story: The Narrative Arc</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Just like a compelling movie or book, a data story benefits from a structured narrative. This structure helps maintain audience engagement, build a logical argument, and ensure your message is clearly understood and remembered.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>1. Setup (The Context/Beginning):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Purpose:</strong> Establish the background, current situation, and what the audience already knows. Set the stage for the problem or opportunity you're addressing.</li>
+                            <li><strong>Questions it answers:</strong> What is the business problem? Why is this important now? What's the status quo?</li>
+                            <li><strong>Supporting Visuals:</strong> Often high-level KPIs, simple trend lines, or summary statistics that provide a baseline understanding. You might use a simple text card or a gauge chart here.</li>
+                        </ul>
+                    </li>
+                    <li><strong>2. Inciting Incident / Conflict (The Problem/Question):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Purpose:</strong> Introduce the core problem, challenge, or question that your data analysis aims to solve. This creates tension and hooks the audience.</li>
+                            <li><strong>Questions it answers:</strong> What's the specific issue we're facing? What question are we trying to answer with data? What's the 'spark' that initiates the investigation?</li>
+                            <li><strong>Supporting Visuals:</strong> A chart highlighting a concerning trend (e.g., a sudden drop in sales on a line chart), a comparison showing underperformance (e.g., a bar chart comparing actual vs. target), or a simple number showing a negative metric.</li>
+                        </ul>
+                    </li>
+                    <li><strong>3. Rising Action (The Data Exploration & Evidence):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Purpose:</strong> This is the core of your data story, where you present the evidence and build your argument. Each visualization should reveal a piece of the puzzle, leading logically to your main insight.</li>
+                            <li><strong>Questions it answers:</strong> What data did we look at? What patterns did we find? What relationships exist?</li>
+                            <li><strong>Supporting Visuals:</strong> This is where you use a variety of charts (histograms, scatter plots, box plots, detailed line/bar charts) to explore different aspects of the data, break down the problem, and show contributing factors. Each chart should be accompanied by clear explanations of what it shows.</li>
+                        </ul>
+                    </li>
+                    <li><strong>4. Climax (The Key Insight / "Aha!" Moment):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Purpose:</strong> The most important finding or revelation from your analysis. It's the answer to the inciting incident. This should be presented clearly and powerfully.</li>
+                            <li><strong>Questions it answers:</strong> What is the single most important thing we learned? What's the core answer to our problem?</li>
+                            <li><strong>Supporting Visuals:</strong> Often a single, impactful chart that clearly illustrates the key insight, possibly with annotations to draw attention to the critical data points. This might be a highly focused version of a previous chart or a new summary visual.</li>
+                        </ul>
+                    </li>
+                    <li><strong>5. Falling Action (Implications & Secondary Findings):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Purpose:</strong> Elaborate on the implications of your key insight and discuss any secondary, but still important, findings. Address potential counter-arguments or nuances.</li>
+                            <li><strong>Questions it answers:</strong> What are the consequences of this insight? Are there other factors to consider?</li>
+                            <li><strong>Supporting Visuals:</strong> Charts that provide supporting details, show breakdown of the main insight, or explore related factors.</li>
+                        </ul>
+                    </li>
+                    <li><strong>6. Resolution (Recommendations / Call to Action):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Purpose:</strong> Conclude with clear, actionable recommendations or next steps based on your data-driven insights. What should the audience *do* now?</li>
+                            <li><strong>Questions it answers:</strong> What specific actions should we take? What's the path forward? What's the expected outcome?</li>
+                            <li><strong>Supporting Visuals:</strong> Might be a simple summary table of recommendations, a timeline for implementation, or a visual showing projected outcomes if recommendations are followed.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">By consciously structuring your presentation around this narrative arc, you transform a dry data presentation into a compelling and memorable story that drives understanding and action.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Interactive Data Story Builder</h2>
+            <p class="section-intro">This interactive exercise will allow you to explore how different business problems can be structured into a data story, complete with conceptual visualizations for each stage. Select a problem from the dropdown below to see a full data story outline come to life.</p>
+
+            <div class="interactive-section">
+                <label for="businessProblemSelect">Select a Business Problem:</label>
+                <select id="businessProblemSelect" class="rounded-md">
+                    <option value="customerChurn">Customer Churn</option>
+                    <option value="salesDecline">Sales Decline (QoQ)</option>
+                    <option value="marketingCampaign">Marketing Campaign Performance</option>
+                </select>
+
+                <div id="storyOutput" class="mt-8">
+                    </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('nav a').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Store Chart.js instances to destroy them before redrawing
+        let activeCharts = [];
+
+        // Function to destroy all active charts
+        function destroyCharts() {
+            activeCharts.forEach(chart => chart.destroy());
+            activeCharts = [];
+        }
+
+        // Data for different story scenarios
+        const storyScenarios = {
+            customerChurn: {
+                title: "Understanding and Reducing Customer Churn",
+                setup: "Our subscription service has observed a consistent churn rate of 5% monthly over the past year, directly impacting our recurring revenue growth and overall profitability. Acquiring new customers is significantly more expensive than retaining existing ones, making churn reduction a critical business objective.",
+                incitingIncident: "We need to identify the primary factors driving this customer attrition and pinpoint specific segments of customers who are at the highest risk of churning, so we can implement targeted retention strategies.",
+                risingAction: [
+                    {
+                        heading: "Overall Churn Rate Trend",
+                        description: "First, let's look at the overall churn rate trend to understand its stability and recent fluctuations.",
+                        chartType: "line",
+                        chartData: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                            datasets: [{
+                                label: 'Monthly Churn Rate (%)',
+                                data: [4.8, 5.1, 4.9, 5.2, 5.0, 5.3, 5.1, 5.4],
+                                borderColor: '#EF4444', // Red for churn
+                                backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                                fill: true,
+                                tension: 0.2
+                            }]
+                        },
+                        chartOptions: {
+                            scales: { y: { beginAtZero: false, min: 4.5, max: 6, title: { display: true, text: 'Churn Rate (%)' } } },
+                            plugins: { title: { display: true, text: 'Monthly Churn Rate Trend' } }
+                        }
+                    },
+                    {
+                        heading: "Feature Usage Frequency for Churned vs. Active Users",
+                        description: "Next, we compare the average feature usage frequency between customers who churned and those who remained active. This helps identify if low engagement with key features contributes to churn.",
+                        chartType: "bar",
+                        chartData: {
+                            labels: ['Feature A', 'Feature B', 'Feature C', 'Feature D'],
+                            datasets: [
+                                {
+                                    label: 'Churned Users',
+                                    data: [5, 12, 8, 3],
+                                    backgroundColor: 'rgba(239, 68, 68, 0.7)'
+                                },
+                                {
+                                    label: 'Active Users',
+                                    data: [15, 20, 18, 10],
+                                    backgroundColor: 'rgba(34, 197, 94, 0.7)'
+                                }
+                            ]
+                        },
+                        chartOptions: {
+                            scales: { y: { beginAtZero: true, title: { display: true, text: 'Avg. Usage Frequency (per month)' } } },
+                            plugins: { title: { display: true, text: 'Avg. Feature Usage: Churned vs. Active Users' } }
+                        }
+                    },
+                    {
+                        heading: "Customer Support Interactions vs. Churn Status",
+                        description: "We also examine the average number of customer support tickets submitted by churned versus active users. High support interaction could indicate unresolved issues leading to dissatisfaction.",
+                        chartType: "bar",
+                        chartData: {
+                            labels: ['Churned Users', 'Active Users'],
+                            datasets: [{
+                                label: 'Avg. Support Tickets (per quarter)',
+                                data: [2.5, 0.8],
+                                backgroundColor: ['rgba(239, 68, 68, 0.7)', 'rgba(34, 197, 94, 0.7)']
+                            }]
+                        },
+                        chartOptions: {
+                            scales: { y: { beginAtZero: true, title: { display: true, text: 'Avg. Support Tickets' } } },
+                            plugins: { title: { display: true, text: 'Avg. Support Tickets: Churned vs. Active Users' } }
+                        }
+                    }
+                ],
+                climax: "Our analysis reveals a strong correlation: customers who have not logged in for 30+ days AND have submitted 2 or more support tickets in the last quarter are 80% more likely to churn. This specific segment represents 15% of our current customer base.",
+                fallingAction: "Further qualitative analysis (e.g., exit surveys, support ticket content review) confirms that these at-risk users often cite 'lack of perceived value' or 'unresolved technical issues' as their primary reasons for cancellation. While overall product satisfaction is high, these specific pain points are critical for this segment.",
+                resolution: "Implement a targeted re-engagement campaign for customers inactive for 30+ days with high support interaction. This campaign should offer personalized tutorials highlighting underutilized features and provide direct access to dedicated technical support to proactively resolve their specific pain points. Expected outcome: 10-15% reduction in churn for this segment within 3 months."
+            },
+            salesDecline: {
+                title: "Addressing Quarterly Sales Decline",
+                setup: "Our Q2 sales figures show a concerning 10% decline compared to Q1, falling short of our projected growth targets. This unexpected downturn impacts our revenue forecasts and market position.",
+                incitingIncident: "We need to identify the specific regions and product categories contributing most to this sales decline, and understand the underlying reasons, to develop an effective recovery strategy.",
+                risingAction: [
+                    {
+                        heading: "Q1 vs. Q2 Sales by Region",
+                        description: "First, let's compare sales performance across different regions to see if the decline is widespread or localized.",
+                        chartType: "bar",
+                        chartData: {
+                            labels: ['North', 'South', 'East', 'West'],
+                            datasets: [
+                                { label: 'Q1 Sales ($M)', data: [12, 10, 15, 8], backgroundColor: 'rgba(67, 56, 202, 0.7)' },
+                                { label: 'Q2 Sales ($M)', data: [11, 9.5, 13, 6], backgroundColor: 'rgba(245, 158, 11, 0.7)' }
+                            ]
+                        },
+                        chartOptions: {
+                            scales: { y: { beginAtZero: true, title: { display: true, text: 'Sales ($ Million)' } } },
+                            plugins: { title: { display: true, text: 'Q1 vs. Q2 Sales by Region' } }
+                        }
+                    },
+                    {
+                        heading: "Q1 vs. Q2 Sales by Product Category",
+                        description: "Next, we'll analyze sales performance across our key product categories to identify which products are underperforming.",
+                        chartType: "bar",
+                        chartData: {
+                            labels: ['Electronics', 'Apparel', 'Home Goods', 'Books'],
+                            datasets: [
+                                { label: 'Q1 Sales ($M)', data: [6, 4, 3, 2], backgroundColor: 'rgba(67, 56, 202, 0.7)' },
+                                { label: 'Q2 Sales ($M)', data: [4, 3.8, 2.5, 1.8], backgroundColor: 'rgba(245, 158, 11, 0.7)' }
+                            ]
+                        },
+                        chartOptions: {
+                            scales: { y: { beginAtZero: true, title: { display: true, text: 'Sales ($ Million)' } } },
+                            plugins: { title: { display: true, text: 'Q1 vs. Q2 Sales by Product Category' } }
+                        }
+                    },
+                    {
+                        heading: "New Customer Acquisition vs. Repeat Customer Sales Trend",
+                        description: "Finally, we investigate if the decline is due to a drop in new customer acquisition or reduced sales from repeat customers.",
+                        chartType: "line",
+                        chartData: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                            datasets: [
+                                { label: 'New Customer Sales ($M)', data: [5, 5.5, 5.2, 4.8, 4.5, 4.2], borderColor: 'rgba(34, 197, 94, 0.7)', fill: false, tension: 0.2 },
+                                { label: 'Repeat Customer Sales ($M)', data: [7, 6.5, 6, 5.5, 5, 4.5], borderColor: 'rgba(239, 68, 68, 0.7)', fill: false, tension: 0.2 }
+                            ]
+                        },
+                        chartOptions: {
+                            scales: { y: { beginAtZero: true, title: { display: true, text: 'Sales ($ Million)' } } },
+                            plugins: { title: { display: true, text: 'Sales Trend: New vs. Repeat Customers' } }
+                        }
+                    }
+                ],
+                climax: "The sales decline is primarily driven by a significant 33% drop in 'Electronics' sales within the 'West' region, coupled with a consistent decrease in repeat customer purchases across all categories since March.",
+                fallingAction: "Further investigation suggests that a new aggressive competitor has entered the 'West' region, specifically targeting the electronics market with lower pricing. Additionally, recent changes to our customer loyalty program have negatively impacted repeat customer engagement, leading to reduced purchase frequency among our existing base.",
+                resolution: "Develop a targeted competitive pricing strategy for Electronics in the 'West' region. Simultaneously, revamp the loyalty program with enhanced, clearly communicated benefits to incentivize repeat purchases. Launch a focused re-engagement campaign for loyal customers who have shown reduced activity."
+            },
+            marketingCampaign: {
+                title: "Evaluating the Q1 Digital Marketing Campaign Performance",
+                setup: "Our Q1 digital marketing campaign aimed to increase website traffic by 20% and conversion rates by 5% for our new product line. This campaign involved a significant investment in paid ads and social media outreach.",
+                incitingIncident: "We need to assess if the campaign met its objectives, understand which channels performed best, and identify areas for optimization in future campaigns.",
+                risingAction: [
+                    {
+                        heading: "Website Traffic Trend During Campaign",
+                        description: "Let's first look at the daily website traffic during the campaign period to see if the target was met.",
+                        chartType: "line",
+                        chartData: {
+                            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8', 'Week 9', 'Week 10', 'Week 11', 'Week 12'],
+                            datasets: [{
+                                label: 'Daily Website Visitors',
+                                data: [1000, 1100, 1250, 1300, 1450, 1600, 1700, 1800, 1900, 2050, 2100, 2200],
+                                borderColor: '#3B82F6', // Blue
+                                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                                fill: true,
+                                tension: 0.2
+                            }]
+                        },
+                        chartOptions: {
+                            scales: { y: { beginAtZero: true, title: { display: true, text: 'Daily Visitors' } } },
+                            plugins: { title: { display: true, text: 'Website Traffic During Q1 Campaign' } }
+                        }
+                    },
+                    {
+                        heading: "Conversion Rate by Channel",
+                        description: "Next, we'll compare conversion rates across different marketing channels to see which ones were most effective.",
+                        chartType: "bar",
+                        chartData: {
+                            labels: ['Paid Search', 'Social Media', 'Email Marketing', 'Display Ads'],
+                            datasets: [{
+                                label: 'Conversion Rate (%)',
+                                data: [3.5, 2.8, 4.2, 1.9],
+                                backgroundColor: 'rgba(16, 185, 129, 0.7)' // Green
+                            }]
+                        },
+                        chartOptions: {
+                            scales: { y: { beginAtZero: true, max: 5, title: { display: true, text: 'Conversion Rate (%)' } } },
+                            plugins: { title: { display: true, text: 'Conversion Rate by Marketing Channel' } }
+                        }
+                    },
+                    {
+                        heading: "Cost Per Acquisition (CPA) by Channel",
+                        description: "Finally, we evaluate the cost-effectiveness of each channel by looking at the Cost Per Acquisition (CPA).",
+                        chartType: "bar",
+                        chartData: {
+                            labels: ['Paid Search', 'Social Media', 'Display Ads'],
+                            datasets: [{
+                                label: 'CPA ($)',
+                                data: [25, 35, 50],
+                                backgroundColor: 'rgba(249, 115, 22, 0.7)' // Orange
+                            }]
+                        },
+                        chartOptions: {
+                            scales: { y: { beginAtZero: true, title: { display: true, text: 'CPA ($)' } } },
+                            plugins: { title: { display: true, text: 'Cost Per Acquisition by Channel' } }
+                        }
+                    }
+                ],
+                climax: "The Q1 campaign successfully increased website traffic by 25%, exceeding our 20% target. However, the overall conversion rate only reached 3.1%, falling short of the 5% goal. Email marketing demonstrated the highest conversion rate (4.2%), while Display Ads had the highest CPA ($50).",
+                fallingAction: "While traffic generation was strong, the lower-than-expected conversion rate indicates a potential disconnect between ad messaging and landing page experience, or issues with the product page itself. The high CPA for Display Ads suggests inefficiency in targeting or ad creative for that channel. Email marketing, despite lower traffic volume, proved highly efficient in converting leads.",
+                resolution: "Optimize landing page content and product descriptions to better align with ad messaging. Reallocate budget from Display Ads to scale up Email Marketing efforts and explore A/B testing for ad creatives in Paid Search. Implement a dedicated funnel analysis to identify specific drop-off points in the conversion process."
+            }
+        };
+
+        // Function to render a Chart.js graph
+        function renderChart(canvasId, chartConfig) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const newChart = new Chart(ctx, {
+                type: chartConfig.chartType,
+                data: chartConfig.chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: chartConfig.chartData.datasets.length > 1 },
+                        ...chartConfig.chartOptions.plugins
+                    },
+                    scales: chartConfig.chartOptions.scales
+                }
+            });
+            activeCharts.push(newChart);
+        }
+
+        // Function to update the story content and charts
+        function updateStory() {
+            destroyCharts(); // Clear previous charts
+
+            const selectedProblem = document.getElementById('businessProblemSelect').value;
+            const scenario = storyScenarios[selectedProblem];
+            const storyOutputDiv = document.getElementById('storyOutput');
+
+            storyOutputDiv.innerHTML = `
+                <h2 class="text-3xl font-bold text-center text-indigo-700 mb-8">${scenario.title}</h2>
+                
+                <div class="story-element">
+                    <h3>1. Setup</h3>
+                    <p>${scenario.setup}</p>
+                </div>
+
+                <div class="story-element">
+                    <h3>2. Inciting Incident / Conflict</h3>
+                    <p>${scenario.incitingIncident}</p>
+                </div>
+
+                <div class="story-element">
+                    <h3>3. Rising Action (Data Exploration & Evidence)</h3>
+                    <p class="text-gray-700 mb-4">Here, we present the data and visualizations that build the case and lead to the main insight. Each visual answers a specific question.</p>
+                    <div id="risingActionCharts"></div>
+                </div>
+
+                <div class="story-element">
+                    <h3>4. Climax (The Key Insight / "Aha!" Moment)</h3>
+                    <p>${scenario.climax}</p>
+                </div>
+
+                <div class="story-element">
+                    <h3>5. Falling Action (Implications & Secondary Findings)</h3>
+                    <p>${scenario.fallingAction}</p>
+                </div>
+
+                <div class="story-element">
+                    <h3>6. Resolution (Recommendations / Call to Action)</h3>
+                    <p>${scenario.resolution}</p>
+                </div>
+            `;
+
+            // Render charts for Rising Action
+            const risingActionChartsDiv = document.getElementById('risingActionCharts');
+            scenario.risingAction.forEach((viz, index) => {
+                const chartId = `risingActionChart-${selectedProblem}-${index}`;
+                const chartHtml = `
+                    <div class="bg-gray-50 p-4 rounded-md mb-4 shadow-inner">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-2">${viz.heading}</h4>
+                        <p class="text-gray-600 text-sm mb-3">${viz.description}</p>
+                        <div class="chart-container">
+                            <canvas id="${chartId}"></canvas>
+                        </div>
+                    </div>
+                `;
+                risingActionChartsDiv.insertAdjacentHTML('beforeend', chartHtml);
+                renderChart(chartId, viz);
+            });
+        }
+
+        // Event listener for dropdown change
+        document.getElementById('businessProblemSelect').addEventListener('change', updateStory);
+
+        // Initial load of the first story scenario
+        document.addEventListener('DOMContentLoaded', updateStory);
+    </script>
+</body>
+</html>

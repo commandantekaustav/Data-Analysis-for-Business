@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S54: T-tests (One-sample, Two-sample)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="number"], select, textarea {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            max-width: 250px; /* Adjusted for better fit */
+            margin-bottom: 0.5rem;
+        }
+        textarea {
+            max-width: 100%;
+            min-height: 80px;
+            resize: vertical;
+        }
+        .calculate-button, .simulate-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .calculate-button:hover, .simulate-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .interpretation-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .chart-illustrative {
+            position: relative;
+            height: 250px;
+            width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .input-group label {
+            font-weight: 500;
+            color: #4B5563;
+            min-width: 120px; /* Align labels */
+        }
+        .test-type-selection {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .test-type-selection button {
+            background-color: #E0E7FF;
+            color: #4338CA;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #C7D2FE;
+        }
+        .test-type-selection button.active {
+            background-color: #4338CA;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-type-selection button:hover:not(.active) {
+            background-color: #C7D2FE;
+        }
+        .data-input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+        .data-input-section > div {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                packages: ['base', 'ams', 'noerrors', 'noundefined'],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                enableMenu: false,
+                messageStyle: "none",
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            },
+            startup: {
+                pageReady: () => {
+                    return MathJax.startup.defaultPageReady().then(() => {
+                        // Force re-render of MathJax content
+                        MathJax.typesetPromise();
+                    });
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S54: T-tests (One-sample, Two-sample)</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: T-tests (One-sample, Two-sample)</h2>
+            <p class="section-intro">In this session, we'll explore <strong>t-tests</strong>—statistical tests used to compare means and make inferences about populations from sample data. We'll cover one-sample and two-sample t-tests, and see how to interpret results using <strong>p-values</strong> and <strong>confidence intervals</strong>.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. Introduction to the T-Distribution</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">Before diving into t-tests, it's important to understand the **t-distribution** (also known as Student's t-distribution). This distribution is similar to the normal distribution but has fatter tails, especially for smaller sample sizes. This accounts for the increased uncertainty when estimating population parameters from small samples.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Degrees of Freedom (df):</strong> The shape of the t-distribution is determined by its degrees of freedom. For a single sample, $df = n - 1$, where $n$ is the sample size. As $df$ increases (i.e., as sample size increases), the t-distribution approaches the standard normal (Z) distribution.</li>
+                    <li><strong>When to use t-distribution instead of Z-distribution:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>When the population standard deviation ($\sigma$) is unknown and must be estimated from the sample standard deviation ($s$).</li>
+                            <li>When the sample size ($n$) is small (typically $n < 30$). For larger samples, the t-distribution becomes very similar to the Z-distribution, and either can be used, though t-tests are generally preferred when $\sigma$ is unknown.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="chart-illustrative">
+                    <canvas id="tDistributionChart"></canvas>
+                </div>
+                <p class="chart-description text-center text-sm text-gray-600"><em>Comparison of T-distributions with different degrees of freedom and the Standard Normal (Z) distribution. Notice how t-distributions have fatter tails for smaller df.</em></p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. One-Sample T-test</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">The one-sample t-test is used to determine whether a sample mean ($\bar{x}$) is significantly different from a hypothesized population mean ($\mu_0$).</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Hypotheses:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Null Hypothesis ($H_0$):</strong> The sample mean is equal to the hypothesized population mean.
+                                <br> $H_0: \mu = \mu_0$
+                            </li>
+                            <li><strong>Alternative Hypothesis ($H_a$):</strong> The sample mean is different from, greater than, or less than the hypothesized population mean.
+                                <br> $H_a: \mu \ne \mu_0$ (Two-tailed)
+                                <br> $H_a: \mu > \mu_0$ (Right-tailed)
+                                <br> $H_a: \mu < \mu_0$ (Left-tailed)
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Formula for the t-statistic:</strong>
+                        $$t = \frac{\bar{x} - \mu_0}{s / \sqrt{n}}$$
+                        Where:
+                        <ul>
+                            <li>$\bar{x}$ = sample mean</li>
+                            <li>$\mu_0$ = hypothesized population mean</li>
+                            <li>$s$ = sample standard deviation</li>
+                            <li>$n$ = sample size</li>
+                        </ul>
+                    </li>
+                    <li><strong>Assumptions:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>The sample is randomly selected from the population.</li>
+                            <li>The data are continuous (interval or ratio scale).</li>
+                            <li>The population from which the sample is drawn is approximately normally distributed. (This assumption becomes less critical with larger sample sizes due to the CLT).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Applications:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Testing if the average weight of products from a new machine is still 500g.</li>
+                            <li>Determining if the average customer satisfaction score has changed from a benchmark of 7.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. Two-Sample T-test (Independent Samples)</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">The independent samples t-test (also known as Student's t-test or unpaired t-test) is used to compare the means of two independent groups to determine if there is a statistically significant difference between them.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Hypotheses:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Null Hypothesis ($H_0$):</strong> The means of the two populations are equal.
+                                <br> $H_0: \mu_1 = \mu_2$ (or $H_0: \mu_1 - \mu_2 = 0$)
+                            </li>
+                            <li><strong>Alternative Hypothesis ($H_a$):</strong> The means of the two populations are different, or one is greater/less than the other.
+                                <br> $H_a: \mu_1 \ne \mu_2$ (Two-tailed)
+                                <br> $H_a: \mu_1 > \mu_2$ (Right-tailed)
+                                <br> $H_a: \mu_1 < \mu_2$ (Left-tailed)
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Formula for the t-statistic (assuming equal variances - pooled variance):</strong>
+                        $$t = \frac{(\bar{x}_1 - \bar{x}_2)}{s_p \sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}$$
+                        Where $s_p$ (pooled standard deviation) is:
+                        $$s_p = \sqrt{\frac{(n_1 - 1)s_1^2 + (n_2 - 1)s_2^2}{n_1 + n_2 - 2}}$$
+                        And:
+                        <ul>
+                            <li>$\bar{x}_1, \bar{x}_2$ = sample means of group 1 and group 2</li>
+                            <li>$s_1^2, s_2^2$ = sample variances of group 1 and group 2</li>
+                            <li>$n_1, n_2$ = sample sizes of group 1 and group 2</li>
+                        </ul>
+                        *(Note: There is also a formula for unequal variances, often called Welch's t-test, which adjusts the degrees of freedom. Most software automatically handles this.)*
+                    </li>
+                    <li><strong>Assumptions:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>The two samples are independent.</li>
+                            <li>The data are continuous (interval or ratio scale).</li>
+                            <li>The populations from which the samples are drawn are approximately normally distributed. (Less critical with larger sample sizes).</li>
+                            <li>**Homogeneity of Variances:** The variances of the two populations are approximately equal (for the standard Student's t-test). If not, Welch's t-test is more appropriate.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Applications:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Comparing the effectiveness of two different teaching methods on student test scores.</li>
+                            <li>Determining if a new drug significantly lowers blood pressure compared to a placebo.</li>
+                            <li>Assessing if there's a difference in average sales between two different store layouts.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">4. Paired Samples T-test (Brief Mention)</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">While not the primary focus, it's important to know about the paired samples t-test. This test is used when the two samples are related or dependent (e.g., before-and-after measurements on the same individuals, or matched pairs).</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>It analyzes the differences between paired observations, effectively reducing variability and increasing statistical power for detecting an effect.</li>
+                    <li><em>Example:</em> Comparing blood pressure before and after a treatment on the *same* patients.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Choosing the correct t-test is crucial for valid statistical inference. Always consider your research question, data structure, and assumptions before applying a test.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Perform T-tests & Interpret Results</h2>
+            <p class="section-intro">Use this interactive tool to perform one-sample and two-sample independent t-tests. Input your data, specify your hypotheses, and interpret the calculated t-statistic and p-value to draw conclusions.</p>
+
+            <div class="interactive-panel">
+                <div class="panel-title">T-test Calculator</div>
+                
+                <div class="test-type-selection">
+                    <button id="oneSampleBtn" class="active">One-Sample T-test</button>
+                    <button id="twoSampleBtn">Two-Sample T-test</button>
+                </div>
+
+                <div id="oneSampleInputs" class="data-input-section">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">One-Sample Test</h4>
+                    <div class="input-group">
+                        <label for="sample1Data">Sample Data (comma-separated):</label>
+                        <textarea id="sample1Data" placeholder="e.g., 22, 25, 23, 27, 26, 24, 28, 25"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="hypothesizedMean">Hypothesized Population Mean ($\mu_0$):</label>
+                        <input type="number" id="hypothesizedMean" value="25" step="0.1">
+                    </div>
+                </div>
+
+                <div id="twoSampleInputs" class="data-input-section hidden">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">Two-Sample Independent Test</h4>
+                    <div class="input-group">
+                        <label for="group1Data">Group 1 Data (comma-separated):</label>
+                        <textarea id="group1Data" placeholder="e.g., 22, 25, 23, 27, 26"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="group2Data">Group 2 Data (comma-separated):</label>
+                        <textarea id="group2Data" placeholder="e.g., 28, 30, 29, 31, 27"></textarea>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="alphaLevel">Significance Level ($\alpha$):</label>
+                    <input type="number" id="alphaLevel" value="0.05" step="0.01" min="0.01" max="0.1">
+                </div>
+                <div class="input-group">
+                    <label for="alternativeHypothesis">Alternative Hypothesis ($H_a$):</label>
+                    <select id="alternativeHypothesis">
+                        <option value="two-sided">Two-sided ($\ne$)</option>
+                        <option value="greater">Greater than ($>$)</option>
+                        <option value="less">Less than ($<$)</option>
+                    </select>
+                </div>
+                
+                <button id="runTestBtn" class="calculate-button">Run T-test</button>
+
+                <div id="testResults" class="results-box hidden">
+                    <h4>T-test Results:</h4>
+                    <div class="result-item">
+                        <span class="result-label">Test Type:</span>
+                        <span id="testTypeResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">T-statistic:</span>
+                        <span id="tStatisticResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Degrees of Freedom (df):</span>
+                        <span id="dfResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">P-value:</span>
+                        <span id="pValueResult" class="result-value"></span>
+                    </div>
+                    <div id="testInterpretationBox" class="interpretation-box mt-4">
+                        <h5 class="font-semibold text-base mb-1">Interpretation:</h5>
+                        <p id="testInterpretationText" class="text-sm"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mt-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Discussion Points:</h3>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>Try the "One-Sample T-test" with the default data (22, 25, 23, 27, 26, 24, 28, 25) and a hypothesized mean of 25. What is your conclusion? Now change the hypothesized mean to 22. How does the p-value change?</li>
+                    <li>Switch to the "Two-Sample T-test". Input data for Group 1: `10, 12, 11, 13, 10` and Group 2: `15, 14, 16, 17, 15`. What is your conclusion about the difference in means?</li>
+                    <li>How does changing the "Significance Level ($\alpha$)" affect your decision to reject or fail to reject the null hypothesis?</li>
+                    <li>When would you choose a one-tailed alternative hypothesis over a two-tailed one in a business scenario? Provide an example.</li>
+                    <li>What are the practical implications of violating the assumptions of the t-test (e.g., non-normal data, non-independent samples)?</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">T-tests are powerful tools for comparing means, but their proper application requires careful consideration of the research question, data characteristics, and underlying assumptions.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        // --- T-Distribution Chart (Theory Section) ---
+        let tDistributionChartInstance = null;
+
+        function renderTDistributionChart() {
+            if (tDistributionChartInstance) {
+                tDistributionChartInstance.destroy();
+            }
+            const ctx = document.getElementById('tDistributionChart').getContext('2d');
+
+            // Function to generate t-distribution data using a more accurate approximation
+            function generateTDistributionData(df, numPoints = 100) {
+                const data = [];
+                const maxVal = 4;
+                const minVal = -maxVal;
+                const step = (maxVal - minVal) / numPoints;
+
+                for (let i = 0; i <= numPoints; i++) {
+                    const x = minVal + i * step;
+                    let y;
+                    if (df === Infinity) { // Standard Normal (Z)
+                        y = Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+                    } else {
+                        // More accurate t-distribution PDF approximation
+                        const gamma = (n) => {
+                            if (n === 1) return 1;
+                            if (n === 0.5) return Math.sqrt(Math.PI);
+                            return (n - 1) * gamma(n - 1);
+                        };
+                        const numerator = gamma((df + 1) / 2);
+                        const denominator = Math.sqrt(df * Math.PI) * gamma(df / 2);
+                        y = (numerator / denominator) * Math.pow(1 + (x * x) / df, -(df + 1) / 2);
+                    }
+                    data.push({ x: x, y: y });
+                }
+                return data;
+            }
+
+            try {
+                tDistributionChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'df = 1 (T-distribution)',
+                                data: generateTDistributionData(1),
+                                borderColor: '#EF4444',
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0.4,
+                                pointRadius: 0
+                            },
+                            {
+                                label: 'df = 5 (T-distribution)',
+                                data: generateTDistributionData(5),
+                                borderColor: '#F97316',
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0.4,
+                                pointRadius: 0
+                            },
+                            {
+                                label: 'df = 20 (T-distribution)',
+                                data: generateTDistributionData(20),
+                                borderColor: '#3B82F6',
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0.4,
+                                pointRadius: 0
+                            },
+                            {
+                                label: 'Z-distribution (df = ∞)',
+                                data: generateTDistributionData(Infinity),
+                                borderColor: '#22C55E',
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0.4,
+                                pointRadius: 0,
+                                borderDash: [5, 5]
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            title: { display: true, text: 'T-Distribution vs. Z-Distribution', font: { size: 14 } },
+                            tooltip: { enabled: false }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                title: { display: true, text: 't-value / Z-value' },
+                                min: -4, max: 4,
+                                grid: { display: false }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Probability Density' },
+                                ticks: { display: false },
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error rendering t-distribution chart:', error);
+                const chartContainer = document.getElementById('tDistributionChart').parentElement;
+                chartContainer.innerHTML = '<p class="text-red-500 text-center">Error rendering chart. Please refresh the page.</p>';
+            }
+        }
+
+        renderTDistributionChart(); // Initial render of theory chart
+
+        // --- T-test Calculator Logic (Practical Section) ---
+        const oneSampleBtn = document.getElementById('oneSampleBtn');
+        const twoSampleBtn = document.getElementById('twoSampleBtn');
+        const oneSampleInputs = document.getElementById('oneSampleInputs');
+        const twoSampleInputs = document.getElementById('twoSampleInputs');
+
+        const sample1DataInput = document.getElementById('sample1Data');
+        const hypothesizedMeanInput = document.getElementById('hypothesizedMean');
+        const group1DataInput = document.getElementById('group1Data');
+        const group2DataInput = document.getElementById('group2Data');
+
+        const alphaLevelInput = document.getElementById('alphaLevel');
+        const alternativeHypothesisSelect = document.getElementById('alternativeHypothesis');
+        const runTestBtn = document.getElementById('runTestBtn');
+
+        const testResultsDiv = document.getElementById('testResults');
+        const testTypeResultSpan = document.getElementById('testTypeResult');
+        const tStatisticResultSpan = document.getElementById('tStatisticResult');
+        const dfResultSpan = document.getElementById('dfResult');
+        const pValueResultSpan = document.getElementById('pValueResult');
+        const testInterpretationText = document.getElementById('testInterpretationText');
+
+        let currentTestType = 'one-sample'; // Default
+
+        // Set default data for one-sample
+        sample1DataInput.value = "22, 25, 23, 27, 26, 24, 28, 25";
+        // Set default data for two-sample (hidden initially)
+        group1DataInput.value = "10, 12, 11, 13, 10";
+        group2DataInput.value = "15, 14, 16, 17, 15";
+
+
+        oneSampleBtn.addEventListener('click', () => {
+            currentTestType = 'one-sample';
+            oneSampleBtn.classList.add('active');
+            twoSampleBtn.classList.remove('active');
+            oneSampleInputs.classList.remove('hidden');
+            twoSampleInputs.classList.add('hidden');
+            testResultsDiv.classList.add('hidden'); // Hide results on type change
+        });
+
+        twoSampleBtn.addEventListener('click', () => {
+            currentTestType = 'two-sample';
+            twoSampleBtn.classList.add('active');
+            oneSampleBtn.classList.remove('active');
+            oneSampleInputs.classList.add('hidden');
+            twoSampleInputs.classList.remove('hidden'); 
+            testResultsDiv.classList.add('hidden'); // Hide results on type change
+        });
+
+        runTestBtn.addEventListener('click', runTTest);
+
+        function parseData(dataString) {
+            return dataString.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+        }
+
+        function calculateMean(arr) {
+            if (arr.length === 0) return 0;
+            return arr.reduce((sum, val) => sum + val, 0) / arr.length;
+        }
+
+        function calculateSampleStdDev(arr, mean) {
+            if (arr.length < 2) return 0; // Need at least 2 for sample std dev
+            const sumOfSquaredDifferences = arr.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0);
+            return Math.sqrt(sumOfSquaredDifferences / (arr.length - 1));
+        }
+
+        // More accurate t-distribution CDF approximation
+        function tCDF(t, df) {
+            if (df <= 0) return 0.5;
+            if (df > 1000) return normalCDF(t);
+
+            // Beta function approximation
+            const beta = (x, y) => {
+                const gamma = (n) => {
+                    if (n === 1) return 1;
+                    if (n === 0.5) return Math.sqrt(Math.PI);
+                    return (n - 1) * gamma(n - 1);
+                };
+                return (gamma(x) * gamma(y)) / gamma(x + y);
+            };
+
+            // Regularized incomplete beta function
+            const ibeta = (x, a, b) => {
+                const term = Math.pow(x, a) * Math.pow(1 - x, b) / (a * beta(a, b));
+                return term * (1 + (a + b) * x / (a + 1) + (a + b) * (a + b + 1) * x * x / (2 * (a + 1) * (a + 2)));
+            };
+
+            const x = df / (df + t * t);
+            const a = df / 2;
+            const b = 0.5;
+
+            if (t < 0) {
+                return 0.5 * ibeta(x, a, b);
+            } else {
+                return 1 - 0.5 * ibeta(x, a, b);
+            }
+        }
+
+        // Improved normal CDF approximation
+        function normalCDF(x) {
+            const a1 = 0.254829592;
+            const a2 = -0.284496736;
+            const a3 = 1.421413741;
+            const a4 = -1.453152027;
+            const a5 = 1.061405429;
+            const p = 0.3275911;
+
+            const sign = (x < 0) ? -1 : 1;
+            x = Math.abs(x) / Math.sqrt(2.0);
+
+            const t = 1.0 / (1.0 + p * x);
+            const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+            return 0.5 * (1.0 + sign * y);
+        }
+
+        function runTTest() {
+            let data1, data2, hypothesizedMean;
+            let n1, n2;
+            let mean1, mean2;
+            let stdDev1, stdDev2;
+            let tStatistic, df, pValue;
+            let testTypeDisplay = "";
+
+            const alpha = parseFloat(alphaLevelInput.value);
+            const alternative = alternativeHypothesisSelect.value;
+
+            try {
+                // Validate alpha level
+                if (isNaN(alpha) || alpha <= 0 || alpha >= 1) {
+                    throw new Error("Significance level (α) must be between 0 and 1.");
+                }
+
+                if (currentTestType === 'one-sample') {
+                    data1 = parseData(sample1DataInput.value);
+                    hypothesizedMean = parseFloat(hypothesizedMeanInput.value);
+
+                    if (data1.length < 2 || isNaN(hypothesizedMean)) {
+                        throw new Error("Please enter at least 2 numbers for sample data and a valid hypothesized mean.");
+                    }
+
+                    // Check for outliers using IQR method
+                    const sortedData = [...data1].sort((a, b) => a - b);
+                    const q1 = sortedData[Math.floor(sortedData.length * 0.25)];
+                    const q3 = sortedData[Math.floor(sortedData.length * 0.75)];
+                    const iqr = q3 - q1;
+                    const lowerBound = q1 - 1.5 * iqr;
+                    const upperBound = q3 + 1.5 * iqr;
+                    const outliers = data1.filter(x => x < lowerBound || x > upperBound);
+
+                    if (outliers.length > 0) {
+                        console.warn(`Warning: ${outliers.length} potential outliers detected in the data.`);
+                    }
+
+                    if (data1.every(val => val === data1[0])) {
+                        if (data1[0] === hypothesizedMean) {
+                            tStatistic = 0;
+                            pValue = 1;
+                            df = data1.length - 1;
+                            testTypeDisplay = "One-Sample T-test";
+                            testInterpretationText.innerHTML = `All sample values are identical and equal to the hypothesized mean. No statistical difference detected.`;
+                            displayResults(testTypeDisplay, tStatistic, df, pValue, alpha, alternative);
+                            return;
+                        } else {
+                            throw new Error("Cannot calculate t-statistic: Sample standard deviation is zero (all values are the same) and not equal to hypothesized mean.");
+                        }
+                    }
+
+                    n1 = data1.length;
+                    mean1 = calculateMean(data1);
+                    stdDev1 = calculateSampleStdDev(data1, mean1);
+
+                    tStatistic = (mean1 - hypothesizedMean) / (stdDev1 / Math.sqrt(n1));
+                    df = n1 - 1;
+                    testTypeDisplay = "One-Sample T-test";
+
+                } else { // two-sample
+                    data1 = parseData(group1DataInput.value);
+                    data2 = parseData(group2DataInput.value);
+
+                    if (data1.length < 2 || data2.length < 2) {
+                        throw new Error("Please enter at least 2 numbers for each group's data.");
+                    }
+
+                    // Check for outliers in both groups
+                    const checkOutliers = (data) => {
+                        const sorted = [...data].sort((a, b) => a - b);
+                        const q1 = sorted[Math.floor(sorted.length * 0.25)];
+                        const q3 = sorted[Math.floor(sorted.length * 0.75)];
+                        const iqr = q3 - q1;
+                        return data.filter(x => x < q1 - 1.5 * iqr || x > q3 + 1.5 * iqr);
+                    };
+
+                    const outliers1 = checkOutliers(data1);
+                    const outliers2 = checkOutliers(data2);
+
+                    if (outliers1.length > 0 || outliers2.length > 0) {
+                        console.warn(`Warning: ${outliers1.length} outliers in Group 1 and ${outliers2.length} outliers in Group 2 detected.`);
+                    }
+
+                    n1 = data1.length;
+                    n2 = data2.length;
+                    mean1 = calculateMean(data1);
+                    mean2 = calculateMean(data2);
+                    stdDev1 = calculateSampleStdDev(data1, mean1);
+                    stdDev2 = calculateSampleStdDev(data2, mean2);
+
+                    // Check for zero standard deviations
+                    if (stdDev1 === 0 && stdDev2 === 0) {
+                        if (mean1 === mean2) {
+                            tStatistic = 0;
+                            pValue = 1;
+                            df = n1 + n2 - 2;
+                            testTypeDisplay = "Two-Sample Independent T-test";
+                            testInterpretationText.innerHTML = `All values in both samples are identical, and their means are equal. No statistical difference detected.`;
+                            displayResults(testTypeDisplay, tStatistic, df, pValue, alpha, alternative);
+                            return;
+                        } else {
+                            throw new Error("Cannot calculate t-statistic: Standard deviations are zero (all values are the same within each group) but means are different.");
+                        }
+                    } else if (stdDev1 === 0 || stdDev2 === 0) {
+                        throw new Error("Cannot calculate t-statistic: One or both sample standard deviations are zero. Ensure there's variability in your data.");
+                    }
+
+                    // Welch's t-test (unequal variances)
+                    const se = Math.sqrt((stdDev1 * stdDev1 / n1) + (stdDev2 * stdDev2 / n2));
+                    tStatistic = (mean1 - mean2) / se;
+                    
+                    // Welch-Satterthwaite equation for degrees of freedom
+                    const df1 = n1 - 1;
+                    const df2 = n2 - 1;
+                    const v1 = stdDev1 * stdDev1 / n1;
+                    const v2 = stdDev2 * stdDev2 / n2;
+                    df = Math.pow(v1 + v2, 2) / (Math.pow(v1, 2) / df1 + Math.pow(v2, 2) / df2);
+                    
+                    testTypeDisplay = "Two-Sample Independent T-test (Welch's)";
+                }
+
+                // Calculate p-value based on t-statistic, df, and alternative hypothesis
+                let rawP = tCDF(tStatistic, df);
+                if (alternative === 'two-sided') {
+                    pValue = 2 * Math.min(rawP, 1 - rawP);
+                } else if (alternative === 'greater') {
+                    pValue = 1 - rawP;
+                } else { // 'less'
+                    pValue = rawP;
+                }
+
+                displayResults(testTypeDisplay, tStatistic, df, pValue, alpha, alternative);
+
+            } catch (error) {
+                alert("Error: " + error.message);
+                testResultsDiv.classList.add('hidden');
+            }
+        }
+
+        function displayResults(type, tStat, df, pVal, alpha, alternative) {
+            testTypeResultSpan.innerText = type;
+            tStatisticResultSpan.innerText = tStat.toFixed(4);
+            dfResultSpan.innerText = df.toFixed(2);
+            pValueResultSpan.innerText = pVal.toFixed(4);
+
+            let decision = "";
+            let interpretation = "";
+
+            if (pVal <= alpha) {
+                decision = "Reject H₀";
+                interpretation = `Since the p-value (${pVal.toFixed(4)}) is less than or equal to the significance level ($\\alpha = ${alpha}$), we **reject the null hypothesis ($H_0$)**. This means there is sufficient statistical evidence to conclude that the observed difference is statistically significant.`;
+                
+                if (type.includes("One-Sample")) {
+                    if (alternative === 'two-sided') interpretation += ` The sample mean is significantly different from the hypothesized population mean.`;
+                    else if (alternative === 'greater') interpretation += ` The sample mean is significantly greater than the hypothesized population mean.`;
+                    else interpretation += ` The sample mean is significantly less than the hypothesized population mean.`;
+                } else { // Two-Sample
+                    if (alternative === 'two-sided') interpretation += ` There is a significant difference between the means of Group 1 and Group 2.`;
+                    else if (alternative === 'greater') interpretation += ` The mean of Group 1 is significantly greater than the mean of Group 2.`;
+                    else interpretation += ` The mean of Group 1 is significantly less than the mean of Group 2.`;
+                }
+
+            } else {
+                decision = "Fail to Reject H₀";
+                interpretation = `Since the p-value (${pVal.toFixed(4)}) is greater than the significance level ($\\alpha = ${alpha}$), we **fail to reject the null hypothesis ($H_0$)**. This means there is not sufficient statistical evidence to conclude that the observed difference is statistically significant. We do not have enough evidence to support the alternative hypothesis ($H_a$).`;
+                
+                if (type.includes("One-Sample")) {
+                    interpretation += ` The sample mean is not significantly different from the hypothesized population mean.`;
+                } else { // Two-Sample
+                    interpretation += ` There is no significant difference detected between the means of Group 1 and Group 2.`;
+                }
+            }
+
+            testInterpretationText.innerHTML = interpretation;
+            testResultsDiv.classList.remove('hidden');
+
+            // Render MathJax for interpretation text
+            if (typeof MathJax !== 'undefined') {
+                MathJax.typesetPromise([testInterpretationText]).catch(function (err) {
+                    console.error('MathJax error:', err);
+                });
+            }
+        }
+
+        // Load MathJax for rendering LaTeX
+        const script = document.createElement('script');
+        script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
+        script.async = true;
+        document.head.appendChild(script);
+        script.onload = () => {
+            // Initial typeset after MathJax loads
+            MathJax.typesetPromise();
+        };
+
+    </script>
+</body>
+</html>

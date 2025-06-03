@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S41: Tableau/Power BI - Building Interactive Dashboards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .chart-container { position: relative; height: 300px; width: 100%; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+        .kpi-card { background-color: #EEF2FF; border-radius: 0.5rem; padding: 1rem; text-align: center; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .kpi-value { font-size: 2.5rem; font-weight: 700; color: #4338CA; }
+        .kpi-label { font-size: 0.9rem; color: #4B5563; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S41: Tableau/Power BI - Building Interactive Dashboards</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Building Interactive Dashboards</h2>
+            <p class="section-intro">Dashboards are powerful tools for communicating data insights, but their true value often comes from their interactivity. Interactive dashboards allow users to explore data dynamically, drill down into details, and customize their view without needing to create new reports. This session will delve into the concepts of interactivity in BI tools and outline best practices for designing effective dashboards.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Dashboard Actions & Interactivity</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Interactivity transforms a static report into a dynamic exploration tool. In Tableau and Power BI, this is primarily achieved through various "actions" or interactive elements.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Filters:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Purpose:</strong> Allow users to narrow down the data displayed on the dashboard based on selected criteria (e.g., specific region, date range, product category).</li>
+                            <li><strong>Mechanism:</strong> You can expose filters as dropdowns, sliders, or lists on the dashboard. Charts can also act as filters, where clicking on a bar or a segment automatically filters other related charts.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Drill-downs:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Purpose:</strong> Enable users to move from a high-level summary to more granular details.</li>
+                            <li><strong>Mechanism:</strong> Often achieved by clicking on a data point (e.g., a year in a time series chart) to reveal data for quarters or months within that year. Hierarchies (e.g., Year > Quarter > Month > Day) are key to effective drill-downs.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Tooltips:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Purpose:</strong> Provide additional, detailed information about a specific data point when a user hovers their mouse over it.</li>
+                            <li><strong>Mechanism:</strong> Customizable pop-up boxes that can display raw values, calculated fields, or even miniature charts related to the hovered data point.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Highlight Actions:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Purpose:</strong> Emphasize specific data points across multiple charts without filtering out other data.</li>
+                            <li><strong>Mechanism:</strong> Clicking on a data point in one chart highlights (e.g., changes color) that same data point across all other relevant charts on the dashboard, while dimming the rest.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Navigation Actions:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Purpose:</strong> Allow users to navigate between different dashboards or reports within a single workbook/file.</li>
+                            <li><strong>Mechanism:</strong> Often triggered by clicking a button or a specific chart element, taking the user to a more detailed view or a different analytical perspective.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">By strategically incorporating these interactive elements, dashboards become powerful tools for dynamic data exploration, empowering users to find answers to their own questions.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Best Practices for Dashboard Design</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">A well-designed dashboard is not just about aesthetics; it's about clarity, usability, and effectiveness in conveying insights. Adhering to best practices ensures your dashboards are impactful.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>1. Understand Your Audience and Purpose:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Who is it for?</strong> (Executives, managers, analysts, operations staff).</li>
+                            <li><strong>What questions do they need answered?</strong> Focus on key metrics relevant to their decision-making.</li>
+                            <li><strong>What action should they take?</strong> Design to facilitate specific actions.</li>
+                        </ul>
+                    </li>
+                    <li><strong>2. Keep it Simple & Clutter-Free:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Minimalism:</strong> Avoid unnecessary elements (chartjunk). Maximize the data-ink ratio.</li>
+                            <li><strong>One Screen:</strong> Ideally, fit all critical information on a single screen without scrolling, especially for executive dashboards.</li>
+                            <li><strong>Limit Charts:</strong> Don't cram too many charts. Focus on 3-5 key visualizations that tell a cohesive story.</li>
+                        </ul>
+                    </li>
+                    <li><strong>3. Logical Layout & Visual Hierarchy:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Z-Pattern/F-Pattern:</strong> Users typically scan from top-left to bottom-right. Place most important KPIs/charts at the top-left.</li>
+                            <li><strong>Grouping:</strong> Group related charts together. Use white space effectively.</li>
+                            <li><strong>Size & Prominence:</strong> Give more space and prominence to the most critical metrics or charts.</li>
+                        </ul>
+                    </li>
+                    <li><strong>4. Use Appropriate Chart Types:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Select charts that best represent the data and answer the specific question. (Refer to N-S37, N-S38).</li>
+                        </ul>
+                    </li>
+                    <li><strong>5. Consistency in Design:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Colors:</strong> Use a consistent color palette. Avoid too many colors. Reserve bright/contrasting colors for highlighting key information.</li>
+                            <li><strong>Fonts:</strong> Use legible fonts and consistent sizing for titles, labels, and text.</li>
+                            <li><strong>Labels & Titles:</strong> Clear, concise, and informative titles for the dashboard and each chart. Label axes clearly.</li>
+                        </ul>
+                    </li>
+                    <li><strong>6. Enable Interactivity (Judiciously):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Provide filters and drill-downs that empower users to explore, but don't overwhelm them with too many options.</li>
+                            <li>Ensure interactive elements are intuitive and easy to use.</li>
+                        </ul>
+                    </li>
+                    <li><strong>7. Performance:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Optimize data sources and calculations to ensure the dashboard loads quickly. Slow dashboards frustrate users.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">By following these best practices, you can create dashboards that are not only visually appealing but also highly functional, providing clear, actionable insights to drive business decisions.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Hands-on (Tableau/Power BI) - Building a Multi-Chart Dashboard & Exploring Interactive Features</h2>
+            <p class="section-intro">This practical session will conceptually guide you through building a multi-chart dashboard in a BI tool like Tableau or Power BI, focusing on arranging visualizations and adding interactive elements. We'll use a hypothetical sales dataset to illustrate the process and show simulated interactive outputs using Chart.js.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Conceptual Dataset: Global Sales Performance</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Imagine you have a dataset with sales information including `OrderDate`, `ProductCategory`, `SalesAmount`, `Profit`, and `Region`. We'll use this to build a dashboard.</p>
+                
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Conceptual Dashboard Layout:</h4>
+                <div class="bg-gray-100 p-4 rounded-md text-sm font-mono text-gray-800 mb-4">
+                    <pre><code>
++-----------------------------------------------------+
+| Dashboard Title: Global Sales Overview              |
++-----------------------------------------------------+
+| KPI Card: Total Sales       | KPI Card: Total Profit|
++-----------------------------+-----------------------+
+| Chart 1: Sales by Category (Bar Chart)              |
++-----------------------------------------------------+
+| Chart 2: Monthly Sales Trend (Line Chart)           |
++-----------------------------------------------------+
+| Filter: Region (Dropdown/Slicer)                    |
++-----------------------------------------------------+
+                    </code></pre>
+                </div>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Step 1: Create Individual Charts/KPIs (Conceptual)</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">First, you would create the individual visualizations on separate "sheets" or "pages" within your BI tool, as you learned in N-S40 and N-S38.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>KPI 1: Total Sales</strong> (Sum of `SalesAmount`)</li>
+                    <li><strong>KPI 2: Total Profit</strong> (Sum of `Profit`)</li>
+                    <li><strong>Chart 1: Sales by Category</strong> (Bar chart of `SalesAmount` by `ProductCategory`)</li>
+                    <li><strong>Chart 2: Monthly Sales Trend</strong> (Line chart of `SalesAmount` over `OrderDate` aggregated by month)</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Step 2: Assemble the Dashboard</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">In Tableau, you'd create a new 'Dashboard' tab. In Power BI, you'd be working on a 'Report' page. You then drag and drop the individual sheets/visuals onto the canvas and arrange them.</p>
+                <p class="mt-4 text-sm text-gray-600"><em>Conceptual UI Action:</em> You'd see a blank canvas, and a list of your created charts/KPIs. You'd drag them onto the canvas and resize/reposition them to fit the desired layout.</p>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Step 3: Add Interactivity and Dashboard Actions</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">This is where the dashboard comes alive. We'll add a global filter and make one chart filter the others.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Global Filter: Region Slicer/Filter</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Action:</strong> Add `Region` as a filter/slicer to the dashboard. Make sure it applies to all relevant charts.</li>
+                            <li><strong>Purpose:</strong> Allows users to select one or more regions to see their specific sales performance.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Chart as a Filter: Sales by Category</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Action:</strong> Configure the 'Sales by Category' bar chart to act as a filter for the 'Monthly Sales Trend' chart.</li>
+                            <li><strong>Purpose:</strong> When a user clicks on 'Electronics' in the bar chart, the line chart will automatically update to show only the monthly sales trend for 'Electronics'.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Tooltips Customization:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Action:</strong> For the 'Monthly Sales Trend' line chart, customize the tooltip to show `OrderDate`, `SalesAmount`, and `Profit` when hovering over a point.</li>
+                            <li><strong>Purpose:</strong> Provide quick, detailed context without cluttering the main chart.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Simulated Interactive Dashboard View:</h4>
+                <p class="mb-4 text-gray-700 leading-relaxed">Below is a conceptual representation of how the dashboard might look and behave. Imagine selecting "North" in the region filter, and then clicking on "Electronics" in the bar chart. The numbers and the line chart would dynamically update.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total Sales</div>
+                        <div class="kpi-value" id="totalSalesKPI">$10,500</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total Profit</div>
+                        <div class="kpi-value" id="totalProfitKPI">$3,150</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="dashboardCategorySalesChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="dashboardSalesTrendChart"></canvas>
+                </div>
+
+                <div class="mt-4 p-4 bg-blue-50 rounded-lg text-blue-800">
+                    <h4 class="font-semibold text-lg mb-2">Interactive Filter Simulation:</h4>
+                    <p class="text-sm">Select a Region to filter the charts:</p>
+                    <select id="regionFilter" class="mt-2 p-2 border rounded-md w-full sm:w-auto">
+                        <option value="All">All Regions</option>
+                        <option value="North">North</option>
+                        <option value="South">South</option>
+                        <option value="East">East</option>
+                        <option value="West">West</option>
+                    </select>
+                    <p class="text-sm mt-2">Click on a bar in the "Sales by Category" chart to simulate filtering the "Monthly Sales Trend" chart for that category.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('nav a').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Sample Data for Dashboard Simulation
+        const fullSalesData = [
+            { orderDate: '2024-01-01', category: 'Electronics', sales: 1500, profit: 450, region: 'North' },
+            { orderDate: '2024-01-05', category: 'Apparel', sales: 250, profit: 75, region: 'South' },
+            { orderDate: '2024-01-10', category: 'Home Goods', sales: 500, profit: 150, region: 'East' },
+            { orderDate: '2024-01-15', category: 'Electronics', sales: 800, profit: 240, region: 'West' },
+            { orderDate: '2024-02-01', category: 'Apparel', sales: 300, profit: 90, region: 'North' },
+            { orderDate: '2024-02-05', category: 'Electronics', sales: 1200, profit: 360, region: 'South' },
+            { orderDate: '2024-02-10', category: 'Home Goods', sales: 600, profit: 180, region: 'East' },
+            { orderDate: '2024-02-15', category: 'Apparel', sales: 400, profit: 120, region: 'West' },
+            { orderDate: '2024-03-01', category: 'Electronics', sales: 900, profit: 270, region: 'North' },
+            { orderDate: '2024-03-05', category: 'Apparel', sales: 350, profit: 105, region: 'South' },
+            { orderDate: '2024-03-10', category: 'Home Goods', sales: 700, profit: 210, region: 'East' },
+            { orderDate: '2024-03-15', category: 'Electronics', sales: 1000, profit: 300, region: 'West' },
+            { orderDate: '2024-04-01', category: 'Apparel', sales: 450, profit: 135, region: 'North' },
+            { orderDate: '2024-04-05', category: 'Electronics', sales: 1100, profit: 330, region: 'South' },
+            { orderDate: '2024-04-10', category: 'Home Goods', sales: 800, profit: 240, region: 'East' },
+            { orderDate: '2024-04-15', category: 'Apparel', sales: 500, profit: 150, region: 'West' },
+            { orderDate: '2024-05-01', category: 'Electronics', sales: 1300, profit: 390, region: 'North' },
+            { orderDate: '2024-05-05', category: 'Apparel', sales: 550, profit: 165, region: 'South' },
+            { orderDate: '2024-05-10', category: 'Home Goods', sales: 950, profit: 285, region: 'East' },
+            { orderDate: '2024-05-15', category: 'Electronics', sales: 1400, profit: 420, region: 'West' },
+        ];
+
+        let categorySalesChart;
+        let salesTrendChart;
+
+        function updateDashboard(selectedRegion = 'All', selectedCategory = 'All') {
+            let filteredData = fullSalesData;
+
+            if (selectedRegion !== 'All') {
+                filteredData = filteredData.filter(d => d.region === selectedRegion);
+            }
+            if (selectedCategory !== 'All') {
+                filteredData = filteredData.filter(d => d.category === selectedCategory);
+            }
+
+            // Update KPIs
+            const totalSales = filteredData.reduce((sum, d) => sum + d.sales, 0);
+            const totalProfit = filteredData.reduce((sum, d) => sum + d.profit, 0);
+            document.getElementById('totalSalesKPI').innerText = `$${totalSales.toLocaleString()}`;
+            document.getElementById('totalProfitKPI').innerText = `$${totalProfit.toLocaleString()}`;
+
+            // Update Category Sales Chart
+            const categoryAgg = filteredData.reduce((acc, item) => {
+                acc[item.category] = (acc[item.category] || 0) + item.sales;
+                return acc;
+            }, {});
+            const categoryLabels = Object.keys(categoryAgg);
+            const categoryValues = Object.values(categoryAgg);
+
+            if (categorySalesChart) {
+                categorySalesChart.data.labels = categoryLabels;
+                categorySalesChart.data.datasets[0].data = categoryValues;
+                categorySalesChart.update();
+            } else {
+                const categorySalesCtx = document.getElementById('dashboardCategorySalesChart').getContext('2d');
+                categorySalesChart = new Chart(categorySalesCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: categoryLabels,
+                        datasets: [{
+                            label: 'Total Sales ($)',
+                            data: categoryValues,
+                            backgroundColor: [
+                                'rgba(67, 56, 202, 0.8)', // Electronics
+                                'rgba(245, 158, 11, 0.8)', // Apparel
+                                'rgba(75, 192, 192, 0.8)'  // Home Goods
+                            ],
+                            borderColor: [
+                                'rgba(67, 56, 202, 1)',
+                                'rgba(245, 158, 11, 1)',
+                                'rgba(75, 192, 192, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: 'Total Sales by Product Category',
+                                font: { size: 14 }
+                            }
+                        },
+                        scales: {
+                            x: { title: { display: true, text: 'Product Category' } },
+                            y: { beginAtZero: true, title: { display: true, text: 'Total Sales ($)' } }
+                        },
+                        onClick: (evt, element) => {
+                            if (element.length > 0) {
+                                const clickedCategory = categorySalesChart.data.labels[element[0].index];
+                                updateDashboard(document.getElementById('regionFilter').value, clickedCategory);
+                            } else {
+                                // If no bar is clicked, reset category filter
+                                updateDashboard(document.getElementById('regionFilter').value, 'All');
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Update Sales Trend Chart
+            const monthOrder = ['Jan', 'Feb', 'Mar', 'Apr', 'May'];
+            const monthlyAgg = filteredData.reduce((acc, item) => {
+                const month = new Date(item.orderDate).toLocaleString('en-us', { month: 'short' });
+                acc[month] = (acc[month] || 0) + item.sales;
+                return acc;
+            }, {});
+            
+            const monthlyLabels = monthOrder;
+            const monthlyValues = monthOrder.map(month => monthlyAgg[month] || 0);
+
+            if (salesTrendChart) {
+                salesTrendChart.data.labels = monthlyLabels;
+                salesTrendChart.data.datasets[0].data = monthlyValues;
+                salesTrendChart.update();
+            } else {
+                const salesTrendCtx = document.getElementById('dashboardSalesTrendChart').getContext('2d');
+                salesTrendChart = new Chart(salesTrendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: monthlyLabels,
+                        datasets: [{
+                            label: 'Total Sales ($)',
+                            data: monthlyValues,
+                            fill: false,
+                            borderColor: 'rgb(63, 131, 248)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: `Monthly Sales Trend ${selectedCategory !== 'All' ? `for ${selectedCategory}` : ''}`,
+                                font: { size: 14 }
+                            }
+                        },
+                        scales: {
+                            x: { title: { display: true, text: 'Month' } },
+                            y: { beginAtZero: true, title: { display: true, text: 'Total Sales ($)' } }
+                        }
+                    }
+                });
+            }
+        }
+
+        document.getElementById('regionFilter').addEventListener('change', (event) => {
+            updateDashboard(event.target.value);
+        });
+
+        // Initial load of the dashboard
+        updateDashboard();
+    </script>
+</body>
+</html>

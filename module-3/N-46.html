@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S46: Principles of Data Storytelling - Context & Narrative</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .chart-container { position: relative; height: 350px; width: 100%; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+        .chart-description { margin-top: 1rem; font-size: 0.9rem; color: #555; text-align: center; }
+        .toggle-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 1rem;
+        }
+        .toggle-button:hover {
+            background-color: #6366F1;
+        }
+        .chart-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .chart-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            width: 100%;
+        }
+        .chart-info.good { background-color: #D1FAE5; color: #065F46; border: 1px solid #34D399; } /* Green for good */
+        .chart-info.bad { background-color: #FEE2E2; color: #991B1B; border: 1px solid #EF4444; } /* Red for bad */
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S46: Principles of Data Storytelling - Context & Narrative</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Principles of Data Storytelling - Context & Narrative</h2>
+            <p class="section-intro">In the world of data analytics, simply presenting charts and numbers is often not enough. To truly drive action and influence decisions, you need to transform your findings into a compelling narrative. This is the essence of data storytelling: combining data, visuals, and narrative to communicate insights effectively and persuade your audience.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">What is Data Storytelling?</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Data storytelling is the art of creating a compelling narrative around your data visualizations to provide context, explain insights, and guide your audience toward a specific conclusion or action. It's about translating complex analytical findings into a language that resonates with your audience, making the data memorable and actionable.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>More than just charts:</strong> It's not just about showing a graph; it's about explaining *what* the graph means, *why* it's important, and *what should be done* about it.</li>
+                    <li><strong>Combines three elements:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Data:</strong> The factual information that provides the foundation.</li>
+                            <li><strong>Visuals:</strong> Charts, graphs, and dashboards that make the data accessible and engaging.</li>
+                            <li><strong>Narrative:</strong> The verbal or written explanation that provides context, highlights insights, and guides the audience through the findings.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Importance of Context, Audience, and Crafting a Clear Narrative</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">For a data story to be effective, it must be tailored to its audience and delivered within a clear, logical narrative structure.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>1. Context: The "Why" and "So What?"</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Data without context is just numbers. Context explains the background, the business problem, and the implications of the findings.</li>
+                            <li>It answers questions like: "Why are we looking at this data?", "What was the initial problem or question?", "What's the current situation?", "What are the broader business implications?".</li>
+                            <li>Providing context helps the audience understand the relevance and significance of your insights.</li>
+                        </ul>
+                    </li>
+                    <li><strong>2. Audience: Tailoring Your Message</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Who are you talking to?</strong> Executives need high-level summaries and actionable recommendations. Managers need more detail to implement strategies. Analysts might want to see the methodology.</li>
+                            <li><strong>What do they already know?</strong> Avoid jargon if your audience is non-technical. Don't oversimplify if they are experts.</li>
+                            <li><strong>What do they care about?</strong> Focus on insights that directly impact their goals and responsibilities.</li>
+                            <li>Tailoring your language, level of detail, and choice of visuals to your audience is paramount for effective communication.</li>
+                        </ul>
+                    </li>
+                    <li><strong>3. Crafting a Clear Narrative: The Story Arc</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>A good data story follows a logical flow, much like a traditional story. It guides the audience from the problem to the solution.</li>
+                            <li><strong>Beginning (Setup):</strong> Introduce the business problem or question. Set the scene and provide necessary background context.</li>
+                            <li><strong>Middle (Rising Action & Climax):</strong> Present your data and visualizations as evidence. Build a logical argument, leading the audience through your findings. The "climax" is the key insight or "aha!" moment.</li>
+                            <li><strong>End (Resolution):</strong> Conclude with clear, actionable recommendations or next steps based on your insights. What should the audience *do* now?</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">By mastering context, audience awareness, and narrative structure, you can transform your data into a powerful tool for driving business decisions.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Activity - Analyze Good and Bad Examples of Data Visualizations</h2>
+            <p class="section-intro">In this activity, we will analyze examples of data visualizations to understand how context and narrative impact their effectiveness. We'll examine both a "good" and a "bad" example of a common business chart, focusing on how they tell (or fail to tell) a clear story.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Scenario: Monthly Website Traffic</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Imagine you are a marketing analyst presenting website traffic data to your team. You want to show the trend over the last 6 months.</p>
+
+                <div class="flex justify-center mb-4">
+                    <button id="toggleChartBtn" class="toggle-button">Show Bad Example</button>
+                </div>
+
+                <div id="goodChartWrapper" class="chart-wrapper">
+                    <h4 class="text-lg font-medium text-gray-800 mb-2">Good Example: Clear & Actionable Traffic Trend</h4>
+                    <div class="chart-container">
+                        <canvas id="goodTrafficChart"></canvas>
+                    </div>
+                    <div class="chart-info good">
+                        <h5 class="font-semibold text-base mb-1">Why this is a GOOD example:</h5>
+                        <ul class="list-disc pl-5 text-sm">
+                            <li><strong>Clear Title & Labels:</strong> Immediately understandable.</li>
+                            <li><strong>Appropriate Chart Type:</strong> Line chart is perfect for time series.</li>
+                            <li><strong>Contextual Annotation:</strong> Highlights the key insight (marketing campaign impact).</li>
+                            <li><strong>Actionable Insight:</strong> Suggests the campaign had a positive effect.</li>
+                            <li><strong>Clean Design:</strong> No unnecessary chartjunk.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="badChartWrapper" class="chart-wrapper hidden">
+                    <h4 class="text-lg font-medium text-gray-800 mb-2">Bad Example: Misleading & Cluttered Traffic Trend</h4>
+                    <div class="chart-container">
+                        <canvas id="badTrafficChart"></canvas>
+                    </div>
+                    <div class="chart-info bad">
+                        <h5 class="font-semibold text-base mb-1">Why this is a BAD example:</h5>
+                        <ul class="list-disc pl-5 text-sm">
+                            <li><strong>Truncated Y-axis:</strong> Misleadingly exaggerates the growth.</li>
+                            <li><strong>Missing Labels/Units:</strong> Difficult to interpret exact values.</li>
+                            <li><strong>Cluttered Background:</strong> Gridlines are too prominent.</li>
+                            <li><strong>No Clear Message:</strong> Just data, no insight or conclusion.</li>
+                            <li><strong>Poor Color Choice:</strong> Hard to distinguish from background.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Class Discussion: "The Story Each Chart Tells"</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">After observing both examples, participate in a class discussion focusing on:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>How does the "good" example effectively convey a message or insight, beyond just showing numbers?</li>
+                    <li>What specific elements in the "bad" example make it difficult to understand or potentially misleading?</li>
+                    <li>How important is the title and any annotations in guiding the audience's interpretation?</li>
+                    <li>What are the potential business consequences of presenting a "bad" visualization?</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">This discussion will help you internalize the principles of effective data storytelling and recognize common pitfalls to avoid in your own visualizations.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('nav a').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleChartBtn = document.getElementById('toggleChartBtn');
+            const goodChartWrapper = document.getElementById('goodChartWrapper');
+            const badChartWrapper = document.getElementById('badChartWrapper');
+            let isGoodChartVisible = true;
+
+            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+
+            // Good Chart Data
+            const goodTrafficData = [10000, 11000, 10500, 12000, 14000, 15500];
+            const goodCtx = document.getElementById('goodTrafficChart').getContext('2d');
+            const goodChart = new Chart(goodCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Website Visitors',
+                        data: goodTrafficData,
+                        borderColor: '#4338CA',
+                        backgroundColor: 'rgba(67, 56, 202, 0.2)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#4338CA'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Monthly Website Visitors Trend (Jan - Jun 2024)',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Visitors: ${context.raw.toLocaleString()}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Month' }
+                        },
+                        y: {
+                            beginAtZero: false,
+                            min: 9000, // Not truncated, but starts slightly below min for good practice
+                            title: { display: true, text: 'Number of Visitors' },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Bad Chart Data (truncated Y-axis, less clear)
+            const badTrafficData = [10000, 11000, 10500, 12000, 14000, 15500]; // Same data, different presentation
+            const badCtx = document.getElementById('badTrafficChart').getContext('2d');
+            const badChart = new Chart(badCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Data', // Vague label
+                        data: badTrafficData,
+                        borderColor: 'rgb(201, 203, 207)', // Grey, less impactful
+                        backgroundColor: 'transparent',
+                        fill: false,
+                        tension: 0.1,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Website Traffic', // Vague title
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.3)', // Heavy gridlines
+                                borderWidth: 2
+                            }
+                        },
+                        y: {
+                            beginAtZero: false,
+                            min: 9900, // Truncated Y-axis to exaggerate growth
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.3)', // Heavy gridlines
+                                borderWidth: 2
+                            }
+                        }
+                    }
+                }
+            });
+
+            toggleChartBtn.addEventListener('click', () => {
+                if (isGoodChartVisible) {
+                    goodChartWrapper.classList.add('hidden');
+                    badChartWrapper.classList.remove('hidden');
+                    toggleChartBtn.innerText = 'Show Good Example';
+                } else {
+                    goodChartWrapper.classList.remove('hidden');
+                    badChartWrapper.classList.add('hidden');
+                    toggleChartBtn.innerText = 'Show Bad Example';
+                }
+                isGoodChartVisible = !isGoodChartVisible;
+            });
+        });
+    </script>
+</body>
+</html>

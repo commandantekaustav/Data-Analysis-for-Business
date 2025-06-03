@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S55: Chi-Squared Tests & ANOVA Introduction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="number"], select, textarea {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            max-width: 250px;
+            margin-bottom: 0.5rem;
+        }
+        textarea {
+            max-width: 100%;
+            min-height: 80px;
+            resize: vertical;
+        }
+        .calculate-button, .simulate-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .calculate-button:hover, .simulate-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .interpretation-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .chart-illustrative {
+            position: relative;
+            height: 250px;
+            width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .input-group label {
+            font-weight: 500;
+            color: #4B5563;
+            min-width: 120px; /* Align labels */
+        }
+        .test-type-selection {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .test-type-selection button {
+            background-color: #E0E7FF;
+            color: #4338CA;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #C7D2FE;
+        }
+        .test-type-selection button.active {
+            background-color: #4338CA;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-type-selection button:hover:not(.active) {
+            background-color: #C7D2FE;
+        }
+        .data-input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+        .data-input-section > div {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .contingency-table-input {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 1rem;
+        }
+        .contingency-table-input textarea {
+            width: 100%;
+            max-width: none;
+            min-height: 60px;
+            font-family: monospace;
+        }
+        /* Message Box Styling */
+        #messageBox {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+    </style>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                packages: ['base', 'ams', 'noerrors', 'noundefined'],
+                processEscapes: true
+            },
+            options: {
+                enableMenu: false,
+                messageStyle: "none"
+            },
+            startup: {
+                pageReady: () => {
+                    return MathJax.startup.defaultPageReady().then(() => {
+                        // Initial typeset
+                        MathJax.typesetPromise();
+                    });
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S55: Chi-Squared Tests & ANOVA Introduction</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Chi-Squared Tests & ANOVA Introduction</h2>
+            <p class="section-intro">While t-tests are used for comparing means of numerical data, <strong>Chi-Squared (\(\chi^2\) tests</strong>) are powerful tools for analyzing <strong>categorical data</strong>. They allow us to assess relationships between categorical variables or determine if observed frequencies match expected frequencies. Additionally, we'll introduce <strong>Analysis of Variance (ANOVA)</strong>, a technique for comparing means across three or more groups.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. The Chi-Squared (\(\chi^2\)) Distribution</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">The Chi-Squared distribution is a continuous probability distribution that arises in the context of sums of squared standard normal variates. It is a fundamental distribution for many statistical tests, particularly those involving categorical data.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Shape:</strong> The \(\chi^2\) distribution is asymmetric and skewed to the right. Its shape depends on a single parameter: the <strong>degrees of freedom (df)</strong>.</li>
+                    <li><strong>Degrees of Freedom (df):</strong> As the degrees of freedom increase, the \(\chi^2\) distribution becomes more symmetrical and approaches a normal distribution.</li>
+                    <li><strong>Values:</strong> The \(\chi^2\) statistic can only take non-negative values (since it's based on squared differences).</li>
+                    <li><strong>Applications:</strong> It is used to test hypotheses about population variances, to construct confidence intervals for population variances, and most commonly, for Chi-Squared tests for categorical data.</li>
+                </ul>
+                <div class="chart-illustrative">
+                    <canvas id="chiSquaredDistributionChart"></canvas>
+                </div>
+                <p class="chart-description text-center text-sm text-gray-600"><em>Illustration of Chi-Squared distributions with varying degrees of freedom. Notice the right skew and how it approaches normality with higher df.</em></p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. Chi-Squared Goodness-of-Fit Test</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">The Chi-Squared Goodness-of-Fit test is used to determine if an observed frequency distribution of a categorical variable differs significantly from an expected frequency distribution. In simpler terms, it checks if sample data "fits" a hypothesized distribution.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Purpose:</strong> To compare observed frequencies in categories with frequencies that would be expected under a specific theoretical distribution or a prior assumption.</li>
+                    <li><strong>Hypotheses:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Null Hypothesis (\(H_0\)):</strong> The observed frequencies are consistent with the expected frequencies (i.e., there is no significant difference between the observed and expected distributions).
+                                <br> \(H_0\): The data fits the hypothesized distribution.
+                            </li>
+                            <li><strong>Alternative Hypothesis (\(H_a\)):</strong> The observed frequencies are not consistent with the expected frequencies (i.e., there is a significant difference).
+                                <br> \(H_a\): The data does not fit the hypothesized distribution.
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Formula for the Chi-Squared Test Statistic:</strong>
+                        \[\chi^2 = \sum \frac{(O_i - E_i)^2}{E_i}\]
+                        Where:
+                        <ul>
+                            <li>\(O_i\) = observed frequency for category \(i\)</li>
+                            <li>\(E_i\) = expected frequency for category \(i\)</li>
+                            <li>The sum is over all categories.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Degrees of Freedom (df):</strong> \(df = k - 1\), where \(k\) is the number of categories.</li>
+                    <li><strong>Assumptions:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Random sampling.</li>
+                            <li>Categorical data.</li>
+                            <li>Expected frequency (\(E_i\)) for each category must be at least 5 (some sources say 1, but 5 is safer). If not, categories may need to be combined.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Applications:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Testing if customer preferences for product colors are evenly distributed.</li>
+                            <li>Checking if the proportion of different types of defects matches a historical standard.</li>
+                            <li>Determining if the distribution of grades in a course follows a pre-defined expected distribution.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. Chi-Squared Test of Independence</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">The Chi-Squared Test of Independence is used to determine if there is a statistically significant association between two categorical variables. In other words, it checks if the two variables are independent of each other.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Purpose:</strong> To examine if the distribution of one categorical variable is independent of the distribution of another categorical variable. Data is typically organized in a contingency table (cross-tabulation).</li>
+                    <li><strong>Hypotheses:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Null Hypothesis (\(H_0\)):</strong> The two categorical variables are independent (i.e., there is no association between them in the population).
+                                <br> \(H_0\): Variable A and Variable B are independent.
+                            </li>
+                            <li><strong>Alternative Hypothesis (\(H_a\)):</strong> The two categorical variables are not independent (i.e., there is an association between them).
+                                <br> \(H_a\): Variable A and Variable B are not independent.
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Formula for the Chi-Squared Test Statistic:</strong>
+                        \[\chi^2 = \sum \frac{(O_{ij} - E_{ij})^2}{E_{ij}}\]
+                        Where:
+                        <ul>
+                            <li>\(O_{ij}\) = observed frequency in cell (row \(i\), column \(j\))</li>
+                            <li>\(E_{ij}\) = expected frequency in cell (row \(i\), column \(j\)), calculated as \(\frac{(\text{row total}) \times (\text{column total})}{\text{grand total}}\)</li>
+                            <li>The sum is over all cells in the contingency table.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Degrees of Freedom (df):</strong> \(df = (r - 1)(c - 1)\), where \(r\) is the number of rows and \(c\) is the number of columns in the contingency table.</li>
+                    <li><strong>Assumptions:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Random sampling.</li>
+                            <li>Categorical data.</li>
+                            <li>Expected frequency (\(E_{ij}\)) for each cell must be at least 5 (some sources say 1, but 5 is safer). If not, categories may need to be combined.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Applications:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Is there a relationship between customer gender and preferred payment method?</li>
+                            <li>Is job satisfaction independent of department?</li>
+                            <li>Does the success rate of a marketing campaign depend on the region it was launched in?</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">4. Introduction to Analysis of Variance (ANOVA)</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">While t-tests compare means of two groups, <strong>Analysis of Variance (ANOVA)</strong> is a statistical technique used to compare the means of <strong>three or more independent groups</strong> simultaneously. It determines if there are any statistically significant differences between the means of these groups.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Purpose:</strong> To test if the means of multiple populations are equal. Instead of performing multiple t-tests (which increases the chance of Type I error), ANOVA provides a single test.</li>
+                    <li><strong>Core Idea:</strong> ANOVA works by partitioning the total variance in a dataset into different components: variance *between* groups and variance *within* groups.
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Between-group variance:</strong> Reflects differences among the group means.</li>
+                            <li><strong>Within-group variance:</strong> Reflects random error or variability within each group.</li>
+                        </ul>
+                    </li>
+                    <li><strong>The F-statistic:</strong> ANOVA calculates an F-statistic, which is the ratio of the between-group variance to the within-group variance.
+                        \[F = \frac{\text{Variance between groups}}{\text{Variance within groups}}\]
+                        A large F-statistic suggests that the differences between group means are greater than what would be expected by chance.
+                    </li>
+                    <li><strong>Hypotheses (One-Way ANOVA):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Null Hypothesis (\(H_0\)):</strong> All population means are equal.
+                                <br> \(H_0: \mu_1 = \mu_2 = \dots = \mu_k\)
+                            </li>
+                            <li><strong>Alternative Hypothesis (\(H_a\)):</strong> At least one population mean is different from the others.
+                                <br> \(H_a\): Not all \(\mu_i\) are equal.
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Assumptions:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Independence:</strong> Observations within and between groups are independent.</li>
+                            <li><strong>Normality:</strong> The dependent variable is approximately normally distributed for each group.</li>
+                            <li><strong>Homogeneity of Variances:</strong> The variances of the dependent variable are approximately equal across all groups (homoscedasticity).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Applications:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Comparing the average sales performance of three different marketing strategies.</li>
+                            <li>Assessing if there's a significant difference in crop yield across four different fertilizer types.</li>
+                            <li>Determining if customer satisfaction scores vary significantly among five different product versions.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">5. Key Considerations for Chi-Squared Tests & ANOVA</h3>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Sample Size:</strong> Both tests are sensitive to sample size. With very large samples, even small, practically insignificant differences can appear statistically significant.</li>
+                    <li><strong>Expected Frequencies (Chi-Squared):</strong> The assumption of adequate expected frequencies (at least 5 per cell) is critical for \(\chi^2\) tests.</li>
+                    <li><strong>Causation:</strong> A significant result from either test indicates an association or difference, but it does NOT imply causation.</li>
+                    <li><strong>Post-Hoc Tests (ANOVA):</strong> If ANOVA yields a significant result, it only tells us that *at least one* group mean is different. To find *which* specific groups differ, post-hoc tests (e.g., Tukey's HSD) are needed.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Chi-Squared tests and ANOVA are fundamental for drawing insights from categorical and multiple-group numerical data, respectively, helping you make informed decisions about distributions, relationships, and group differences.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Perform Chi-Squared Tests & Conceptual ANOVA</h2>
+            <p class="section-intro">Use these interactive tools to perform Chi-Squared Goodness of Fit and Chi-Squared Test of Independence. We'll also explore a conceptual example for ANOVA.</p>
+
+            <div class="interactive-panel">
+                <div class="panel-title">Chi-Squared Test Calculator</div>
+                
+                <div class="test-type-selection">
+                    <button id="goodnessOfFitBtn" class="active">Goodness of Fit Test</button>
+                    <button id="independenceBtn">Test of Independence</button>
+                </div>
+
+                <div id="goodnessOfFitInputs" class="data-input-section">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">Goodness of Fit Test</h4>
+                    <p class="text-sm text-gray-600 mb-2 text-center">Enter observed frequencies and expected proportions (or frequencies) for each category. Separate values by commas.</p>
+                    <div class="input-group">
+                        <label for="observedFreqGoF">Observed Frequencies:</label>
+                        <textarea id="observedFreqGoF" placeholder="e.g., 30, 40, 30"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="expectedPropGoF">Expected Proportions (sum to 1) or Frequencies:</label>
+                        <textarea id="expectedPropGoF" placeholder="e.g., 0.33, 0.33, 0.34 OR 33, 33, 34"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="alphaLevelGoF">Significance Level (\(\alpha\)):</label>
+                        <input type="number" id="alphaLevelGoF" value="0.05" step="0.01" min="0.01" max="0.1">
+                    </div>
+                </div>
+
+                <div id="independenceInputs" class="data-input-section hidden">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">Test of Independence</h4>
+                    <p class="text-sm text-gray-600 mb-2 text-center">Enter your contingency table data. Each row represents a category of the first variable, and values within a row (comma-separated) represent categories of the second variable. Use a new line for each row.</p>
+                    <div class="contingency-table-input">
+                        <label for="contingencyTableData">Contingency Table (rows separated by new lines, columns by commas):</label>
+                        <textarea id="contingencyTableData" placeholder="e.g.,
+20, 30, 10
+15, 25, 5
+10, 10, 5"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="alphaLevelInd">Significance Level (\(\alpha\)):</label>
+                        <input type="number" id="alphaLevelInd" value="0.05" step="0.01" min="0.01" max="0.1">
+                    </div>
+                </div>
+                
+                <button id="runChiSquaredTestBtn" class="calculate-button">Run Chi-Squared Test</button>
+
+                <div id="chiSquaredResults" class="results-box hidden">
+                    <h4>Chi-Squared Test Results:</h4>
+                    <div class="result-item">
+                        <span class="result-label">Test Type:</span>
+                        <span id="chiTestTypeResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Chi-Squared Statistic (\(\chi^2\)):</span>
+                        <span id="chiStatisticResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Degrees of Freedom (df):</span>
+                        <span id="chiDfResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">P-value:</span>
+                        <span id="chiPValueResult" class="result-value"></span>
+                    </div>
+                    <div id="chiTestInterpretationBox" class="interpretation-box mt-4">
+                        <h5 class="font-semibold text-base mb-1">Interpretation:</h5>
+                        <p id="chiTestInterpretationText" class="text-sm"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interactive-panel mt-8">
+                <div class="panel-title">Conceptual ANOVA Example</div>
+                <p class="section-intro">This section illustrates a conceptual scenario where ANOVA would be used and how its results might be interpreted. It does not perform live calculations but demonstrates the application.</p>
+                
+                <h4 class="text-lg font-semibold text-gray-700 mb-2 text-center">Scenario: Comparing Sales Performance Across Three Marketing Channels</h4>
+                <p class="text-gray-700 mb-4 leading-relaxed">Imagine a company wants to determine if there's a significant difference in average daily sales generated by three different marketing channels: 'Social Media Ads', 'Email Campaigns', and 'Search Engine Marketing'. They collect daily sales data for a month from each channel.</p>
+                
+                <div class="bg-white p-4 rounded-lg shadow-sm mb-4">
+                    <h5 class="font-semibold text-indigo-600 mb-2">Hypotheses:</h5>
+                    <p>\(H_0\): The average daily sales are equal across all three marketing channels (\(\mu_{\text{Social Media}} = \mu_{\text{Email}} = \mu_{\text{Search Engine}}\)).</p>
+                    <p>\(H_a\): At least one marketing channel has a different average daily sales performance.</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow-sm mb-4">
+                    <h5 class="font-semibold text-indigo-600 mb-2">Hypothetical ANOVA Output:</h5>
+                    <pre class="bg-gray-100 p-3 rounded-md text-sm overflow-x-auto"><code>Source of Variation | DF | Sum of Squares | Mean Square | F-statistic | P-value
+--------------------|----|----------------|-------------|-------------|---------
+Between Groups      | 2  | 1200           | 600         | 7.50        | 0.0015
+Within Groups       | 87 | 6960           | 80          |             |
+Total               | 89 | 8160           |             |             |
+</code></pre>
+                </div>
+
+                <div class="interpretation-box">
+                    <h5 class="font-semibold text-base mb-1">Interpretation of this Conceptual ANOVA:</h5>
+                    <p class="text-sm">
+                        Given the hypothetical F-statistic of 7.50 and a p-value of 0.0015, and assuming a significance level (\(\alpha\)) of 0.05:
+                        <br><br>
+                        Since the p-value (0.0015) is less than \(\alpha\) (0.05), we <strong>reject the null hypothesis (\(H_0\))</strong>.
+                        <br><br>
+                        This means there is <strong>sufficient statistical evidence to conclude that there is a significant difference in average daily sales among the three marketing channels</strong>. At least one marketing channel performs differently from the others.
+                        <br><br>
+                        To identify <em>which</em> specific channels differ, a post-hoc test (like Tukey's HSD) would be required. For example, a post-hoc test might reveal that 'Social Media Ads' generate significantly higher sales than 'Email Campaigns', but 'Email Campaigns' and 'Search Engine Marketing' do not differ significantly from each other.
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mt-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Discussion Points:</h3>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>For the Goodness of Fit test, try `Observed: 25, 25, 25, 25` and `Expected: 0.25, 0.25, 0.25, 0.25`. What does the result tell you? Now change observed to `40, 10, 20, 30`. How does the $\chi^2$ value and p-value change?</li>
+                    <li>For the Test of Independence, input a table like:
+                        `20, 30`
+                        `30, 20`
+                        What is your conclusion? Now try:
+                        `20, 30`
+                        `40, 60`
+                        How does the interpretation change, and why? (Hint: consider the proportions within rows/columns).
+                    </li>
+                    <li>Why is it important for expected frequencies to be at least 5 in Chi-Squared tests? What happens if this assumption is violated?</li>
+                    <li>Can a significant Chi-Squared test of independence prove that one variable *causes* another? Explain.</li>
+                    <li>In a business context, when would you use a Goodness of Fit test versus a Test of Independence? Provide examples.</li>
+                    <li>Based on the conceptual ANOVA example, why is ANOVA preferred over multiple t-tests when comparing more than two groups?</li>
+                    <li>What would a very small F-statistic and a large p-value imply in an ANOVA test?</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Chi-Squared tests and ANOVA are fundamental for drawing insights from categorical and multiple-group numerical data, helping you make informed decisions about distributions, relationships, and group differences.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <div id="messageBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg z-50" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span id="messageText" class="block sm:inline"></span>
+        <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" onclick="document.getElementById('messageBox').classList.add('hidden');">
+            <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+        </span>
+    </div>
+
+    <script>
+        // --- Message Box Function ---
+        function showMessage(message, type = 'error') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            messageText.innerText = message;
+            messageBox.classList.remove('hidden');
+            if (type === 'error') {
+                messageBox.classList.remove('bg-green-100', 'border-green-400', 'text-green-700');
+                messageBox.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+            } else {
+                messageBox.classList.remove('bg-red-100', 'border-red-400', 'text-green-700');
+                messageBox.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+            }
+        }
+
+        // --- Chi-Squared Distribution Chart (Theory Section) ---
+        let chiSquaredDistributionChartInstance = null;
+
+        function renderChiSquaredDistributionChart() {
+            if (chiSquaredDistributionChartInstance) {
+                chiSquaredDistributionChartInstance.destroy();
+            }
+            const ctx = document.getElementById('chiSquaredDistributionChart').getContext('2d');
+
+            // Conceptual Chi-Squared PDF data generation (not mathematically precise, but illustrative)
+            function generateChiSquaredData(df, numPoints = 100) {
+                const data = [];
+                const maxVal = df * 2 + 10; // Adjust max x-value based on df
+                const step = maxVal / numPoints;
+
+                for (let i = 0; i <= numPoints; i++) {
+                    const x = i * step;
+                    let y;
+                    // This is a simplified conceptual representation of the PDF shape
+                    // A true Chi-Squared PDF requires gamma functions and is complex.
+                    // This approximation aims to show the right skew and how it shifts with df.
+                    if (x === 0) {
+                        y = 0; // PDF is 0 at x=0
+                    } else {
+                        y = Math.pow(x, (df / 2) - 1) * Math.exp(-x / 2);
+                        // Scale for visualization
+                        if (df === 1) y *= 0.5;
+                        else if (df === 3) y *= 0.8;
+                        else if (df === 10) y *= 1.2;
+                        else y *= 1; // Default scaling
+                    }
+                    data.push({ x: x, y: y });
+                }
+                return data;
+            }
+
+            chiSquaredDistributionChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'df = 1',
+                            data: generateChiSquaredData(1),
+                            borderColor: '#EF4444', // Red
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'df = 3',
+                            data: generateChiSquaredData(3),
+                            borderColor: '#F97316', // Orange
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'df = 10',
+                            data: generateChiSquaredData(10),
+                            borderColor: '#3B82F6', // Blue
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.4,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: { display: true, text: 'Chi-Squared Distribution', font: { size: 14 } },
+                        tooltip: { enabled: false }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { display: true, text: '$\chi^2$ Value' },
+                            min: 0, max: 25, // Adjusted max for better visualization of different dfs
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Probability Density' },
+                            ticks: { display: false },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        renderChiSquaredDistributionChart(); // Initial render of theory chart
+
+        // --- Chi-Squared Test Calculator Logic (Practical Section) ---
+        const goodnessOfFitBtn = document.getElementById('goodnessOfFitBtn');
+        const independenceBtn = document.getElementById('independenceBtn');
+        const goodnessOfFitInputs = document.getElementById('goodnessOfFitInputs');
+        const independenceInputs = document.getElementById('independenceInputs');
+
+        const observedFreqGoFInput = document.getElementById('observedFreqGoF');
+        const expectedPropGoFInput = document.getElementById('expectedPropGoF');
+        const alphaLevelGoFInput = document.getElementById('alphaLevelGoF');
+
+        const contingencyTableDataInput = document.getElementById('contingencyTableData');
+        const alphaLevelIndInput = document.getElementById('alphaLevelInd');
+
+        const runChiSquaredTestBtn = document.getElementById('runChiSquaredTestBtn');
+
+        const chiSquaredResultsDiv = document.getElementById('chiSquaredResults');
+        const chiTestTypeResultSpan = document.getElementById('chiTestTypeResult');
+        const chiStatisticResultSpan = document.getElementById('chiStatisticResult');
+        const chiDfResultSpan = document.getElementById('chiDfResult');
+        const chiPValueResultSpan = document.getElementById('chiPValueResult');
+        const chiTestInterpretationText = document.getElementById('chiTestInterpretationText');
+
+        let currentChiTestType = 'goodness-of-fit'; // Default
+
+        // Set default data for Goodness of Fit
+        observedFreqGoFInput.value = "30, 40, 30";
+        expectedPropGoFInput.value = "0.33, 0.33, 0.34";
+
+        // Set default data for Independence (example table)
+        contingencyTableDataInput.value = "20, 30\n15, 25"; // Example: 2x2 table
+
+        goodnessOfFitBtn.addEventListener('click', () => {
+            currentChiTestType = 'goodness-of-fit';
+            goodnessOfFitBtn.classList.add('active');
+            independenceBtn.classList.remove('active');
+            goodnessOfFitInputs.classList.remove('hidden');
+            independenceInputs.classList.add('hidden');
+            chiSquaredResultsDiv.classList.add('hidden'); // Hide results on type change
+            document.getElementById('messageBox').classList.add('hidden'); // Hide any previous messages
+        });
+
+        independenceBtn.addEventListener('click', () => {
+            currentChiTestType = 'independence';
+            independenceBtn.classList.add('active');
+            goodnessOfFitBtn.classList.remove('active');
+            goodnessOfFitInputs.classList.add('hidden');
+            independenceInputs.classList.remove('hidden'); 
+            chiSquaredResultsDiv.classList.add('hidden'); // Hide results on type change
+            document.getElementById('messageBox').classList.add('hidden'); // Hide any previous messages
+        });
+
+        runChiSquaredTestBtn.addEventListener('click', runChiSquaredTest);
+
+        function parseCommaSeparatedNumbers(dataString) {
+            return dataString.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n) && n >= 0);
+        }
+
+        // Simplified Chi-Squared CDF for p-value calculation.
+        // This is a conceptual approximation for demonstration, not mathematically precise.
+        // A real application would use a robust statistical library.
+        function chiSquaredCDF(chiSq, df) {
+            if (df <= 0) return 0.5; // Invalid df
+            if (chiSq < 0) return 0; // Chi-squared cannot be negative
+
+            // These are very rough approximations based on common critical values.
+            // They are NOT precise CDF calculations.
+            // They serve to demonstrate the p-value concept.
+            if (df === 1) {
+                if (chiSq > 6.63) return 0.99; // p < 0.01
+                if (chiSq > 3.84) return 0.95; // p < 0.05
+                if (chiSq > 2.71) return 0.90; // p < 0.10
+                if (chiSq < 0.01) return 0.05; // Very small chi-sq
+                return 0.5 + (chiSq / 10); // Linear approximation for small range
+            } else if (df === 2) {
+                if (chiSq > 9.21) return 0.99;
+                if (chiSq > 5.99) return 0.95;
+                if (chiSq > 4.61) return 0.90;
+                if (chiSq < 0.02) return 0.05;
+                return 0.5 + (chiSq / 15);
+            } else if (df === 3) {
+                if (chiSq > 11.34) return 0.99;
+                if (chiSq > 7.81) return 0.95;
+                if (chiSq > 6.25) return 0.90;
+                if (chiSq < 0.05) return 0.05;
+                return 0.5 + (chiSq / 20);
+            } else if (df === 4) {
+                if (chiSq > 13.28) return 0.99;
+                if (chiSq > 9.49) return 0.95;
+                if (chiSq > 7.78) return 0.90;
+                if (chiSq < 0.1) return 0.05;
+                return 0.5 + (chiSq / 25);
+            } else { // General approximation for higher df, closer to normal CDF
+                // For very high df, chi-squared approaches normal distribution
+                // Mean = df, Variance = 2*df
+                // Z = (chiSq - df) / sqrt(2*df)
+                const z = (chiSq - df) / Math.sqrt(2 * df);
+                return normalCDF(z);
+            }
+        }
+
+        // Standard Normal CDF (reused from N-S54)
+        function normalCDF(x) {
+            const erf = (z) => {
+                const a1 = 0.254829592; const a2 = -0.284496736; const a3 = 1.421413741;
+                const a4 = -1.453152027; const a5 = 1.061405429; const p = 0.3275911;
+                const sign = (z < 0) ? -1 : 1;
+                z = Math.abs(z);
+                const t = 1.0 / (1.0 + p * z);
+                const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-z * z);
+                return sign * y;
+            };
+            return 0.5 * (1 + erf(x / Math.sqrt(2)));
+        }
+
+
+        function runChiSquaredTest() {
+            let chiStatistic, df, pValue;
+            let testTypeDisplay = "";
+            let alpha;
+
+            document.getElementById('messageBox').classList.add('hidden'); // Hide any previous messages
+
+            try {
+                if (currentChiTestType === 'goodness-of-fit') {
+                    const observed = parseCommaSeparatedNumbers(observedFreqGoFInput.value);
+                    let expectedInput = parseCommaSeparatedNumbers(expectedPropGoFInput.value);
+                    alpha = parseFloat(alphaLevelGoFInput.value);
+
+                    if (observed.length === 0 || expectedInput.length === 0 || observed.length !== expectedInput.length) {
+                        throw new Error("Observed and Expected data must be non-empty and have the same number of categories.");
+                    }
+                    if (observed.some(val => val < 0) || expectedInput.some(val => val < 0)) {
+                         throw new Error("Frequencies/proportions cannot be negative.");
+                    }
+                    if (isNaN(alpha) || alpha <= 0 || alpha >= 1) {
+                        throw new Error("Please enter a valid significance level (e.g., 0.05).");
+                    }
+
+                    const totalObserved = observed.reduce((sum, val) => sum + val, 0);
+                    let expectedFrequencies = [];
+
+                    // Determine if expected input is proportions or frequencies
+                    const sumExpectedInput = expectedInput.reduce((sum, val) => sum + val, 0);
+                    if (Math.abs(sumExpectedInput - 1) < 0.001) { // It's proportions
+                        expectedFrequencies = expectedInput.map(prop => prop * totalObserved);
+                    } else { // It's frequencies
+                        if (sumExpectedInput !== totalObserved) {
+                            throw new Error("If providing expected frequencies, their sum must match the total observed frequency.");
+                        }
+                        expectedFrequencies = expectedInput;
+                    }
+
+                    // Check expected frequency assumption
+                    if (expectedFrequencies.some(val => val < 5)) {
+                        showMessage("Warning: Some expected frequencies are less than 5. Chi-Squared approximation may be inaccurate.", 'warning');
+                    }
+
+                    chiStatistic = 0;
+                    for (let i = 0; i < observed.length; i++) {
+                        if (expectedFrequencies[i] === 0) {
+                            throw new Error(`Expected frequency for category ${i+1} is zero. Cannot compute chi-squared.`);
+                        }
+                        chiStatistic += Math.pow(observed[i] - expectedFrequencies[i], 2) / expectedFrequencies[i];
+                    }
+
+                    df = observed.length - 1;
+                    testTypeDisplay = "Goodness of Fit Test";
+
+                } else { // independence
+                    const rows = contingencyTableDataInput.value.trim().split('\n');
+                    const observedTable = rows.map(row => parseCommaSeparatedNumbers(row));
+                    alpha = parseFloat(alphaLevelIndInput.value);
+
+                    if (observedTable.length < 2) {
+                        throw new Error("Please enter at least 2 rows for the contingency table.");
+                    }
+                    const numCols = observedTable[0].length;
+                    if (numCols < 2) {
+                        throw new Error("Please enter at least 2 columns for the contingency table.");
+                    }
+                    if (observedTable.some(row => row.length !== numCols)) {
+                        throw new Error("All rows in the contingency table must have the same number of columns.");
+                    }
+                    if (observedTable.flat().some(val => val < 0)) {
+                        throw new Error("Observed frequencies cannot be negative.");
+                    }
+                    if (isNaN(alpha) || alpha <= 0 || alpha >= 1) {
+                        throw new Error("Please enter a valid significance level (e.g., 0.05).");
+                    }
+
+                    const numRows = observedTable.length;
+                    const rowTotals = Array(numRows).fill(0);
+                    const colTotals = Array(numCols).fill(0);
+                    let grandTotal = 0;
+
+                    for (let i = 0; i < numRows; i++) {
+                        for (let j = 0; j < numCols; j++) {
+                            rowTotals[i] += observedTable[i][j];
+                            colTotals[j] += observedTable[i][j];
+                            grandTotal += observedTable[i][j];
+                        }
+                    }
+
+                    if (grandTotal === 0) {
+                        throw new Error("Grand total of observed frequencies cannot be zero.");
+                    }
+
+                    chiStatistic = 0;
+                    for (let i = 0; i < numRows; i++) {
+                        for (let j = 0; j < numCols; j++) {
+                            const expected = (rowTotals[i] * colTotals[j]) / grandTotal;
+                            if (expected < 5) {
+                                showMessage(`Warning: Expected frequency for cell (${i+1}, ${j+1}) is ${expected.toFixed(2)} (less than 5). Chi-Squared approximation may be inaccurate.`, 'warning');
+                            }
+                            if (expected === 0) {
+                                throw new Error(`Calculated expected frequency for cell (${i+1}, ${j+1}) is zero. Cannot compute chi-squared.`);
+                            }
+                            chiStatistic += Math.pow(observedTable[i][j] - expected, 2) / expected;
+                        }
+                    }
+
+                    df = (numRows - 1) * (numCols - 1);
+                    testTypeDisplay = "Test of Independence";
+                }
+
+                // Calculate p-value
+                pValue = 1 - chiSquaredCDF(chiStatistic, df); // Chi-squared is always right-tailed
+
+                displayChiSquaredResults(testTypeDisplay, chiStatistic, df, pValue, alpha);
+
+            } catch (error) {
+                showMessage("Error: " + error.message, 'error');
+                chiSquaredResultsDiv.classList.add('hidden');
+            }
+        }
+
+        function displayChiSquaredResults(type, chiStat, df, pVal, alpha) {
+            chiTestTypeResultSpan.innerText = type;
+            chiStatisticResultSpan.innerText = chiStat.toFixed(4);
+            chiDfResultSpan.innerText = df.toFixed(0);
+            chiPValueResultSpan.innerText = pVal.toFixed(4);
+
+            let decision = "";
+            let interpretation = "";
+
+            if (pVal <= alpha) {
+                decision = "Reject H₀";
+                interpretation = `Since the p-value (${pVal.toFixed(4)}) is less than or equal to the significance level (\\(\\alpha = ${alpha}\\)), we <strong>reject the null hypothesis (\\(H_0\\))</strong>.`;
+                
+                if (type.includes("Goodness of Fit")) {
+                    interpretation += ` This means there is sufficient statistical evidence to conclude that the observed distribution of frequencies is <strong>not consistent with the expected distribution</strong>. The data does not fit the hypothesized pattern.`;
+                } else { // Independence
+                    interpretation += ` This means there is sufficient statistical evidence to conclude that the two categorical variables are <strong>not independent</strong> (i.e., there is a statistically significant association or relationship between them).`;
+                }
+
+            } else {
+                decision = "Fail to Reject H₀";
+                interpretation = `Since the p-value (${pVal.toFixed(4)}) is greater than the significance level (\\(\\alpha = ${alpha}\\)), we <strong>fail to reject the null hypothesis (\\(H_0\\))</strong>.`;
+                
+                if (type.includes("Goodness of Fit")) {
+                    interpretation += ` This means there is not sufficient statistical evidence to conclude that the observed distribution of frequencies is significantly different from the expected distribution. The data <strong>fits the hypothesized pattern</strong>.`;
+                } else { // Independence
+                    interpretation += ` This means there is not sufficient statistical evidence to conclude that the two categorical variables are dependent. We <strong>cannot conclude there is a statistically significant association</strong> between them. They appear to be independent.`;
+                }
+            }
+
+            chiTestInterpretationText.innerHTML = interpretation;
+            chiSquaredResultsDiv.classList.remove('hidden');
+
+            // Render MathJax for interpretation text
+            if (typeof MathJax !== 'undefined') {
+                MathJax.typesetPromise([chiTestInterpretationText]);
+            }
+        }
+    </script>
+</body>
+</html>

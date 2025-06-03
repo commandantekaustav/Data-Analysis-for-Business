@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed: Chi-Squared & ANOVA Interactive Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Updated library versions -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                packages: ['base', 'ams', 'noerrors', 'noundefined'],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                enableMenu: false,
+                messageStyle: "none",
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            },
+            startup: {
+                pageReady: () => {
+                    return MathJax.startup.defaultPageReady().then(() => {
+                        // Initial chart renders - delay to ensure DOM is ready
+                        setTimeout(() => {
+                            if (typeof renderChiSquaredDistributionChart === 'function') {
+                                renderChiSquaredDistributionChart(3);
+                            }
+                            if (typeof updateChiSimulation === 'function') {
+                                updateChiSimulation();
+                            }
+                            if (typeof updateAnovaSimulation === 'function') {
+                                updateAnovaSimulation();
+                            }
+                            // Force re-render of MathJax content
+                            MathJax.typesetPromise();
+                        }, 100);
+                    });
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); } /* Adjusted for header/footer */
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="number"], select, textarea {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            max-width: 250px; /* Default max-width */
+            margin-bottom: 0.5rem;
+        }
+        textarea {
+            max-width: 100%; /* Allow textarea to be wider if needed by parent */
+            min-height: 80px;
+            resize: vertical;
+        }
+        .calculate-button, .simulate-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: block; /* Changed from inline-block */
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            border: none;
+        }
+        .calculate-button:hover, .simulate-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .interpretation-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5; /* Default to green for positive interpretation */
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .interpretation-box.significant { /* For significant results */
+             background-color: #D1FAE5; color: #065F46; border: 1px solid #34D399;
+        }
+        .interpretation-box.not-significant { /* For non-significant results */
+             background-color: #FEF3C7; color: #92400E; border: 1px solid #FBBF24;
+        }
+
+        .chart-illustrative {
+            position: relative;
+            height: 250px;
+            width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center; /* Center items within group */
+            margin-bottom: 1rem;
+        }
+        .input-group label {
+            font-weight: 500;
+            color: #4B5563;
+            min-width: 120px; /* Ensure label text doesn't wrap too soon */
+            text-align: right; /* Align label text to the right for consistency */
+            flex-shrink: 0;
+        }
+        .input-group input[type="number"], .input-group textarea, .input-group select {
+             flex-grow: 1; /* Allow input to grow */
+        }
+        .test-type-selection {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .test-type-selection button {
+            background-color: #E0E7FF;
+            color: #4338CA;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #C7D2FE;
+        }
+        .test-type-selection button.active {
+            background-color: #4338CA;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-type-selection button:hover:not(.active) {
+            background-color: #C7D2FE;
+        }
+        .data-input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center; /* Center the input groups */
+        }
+         .data-input-section > .input-group, .data-input-section > .contingency-table-input {
+            width: 100%;
+            max-width: 600px; /* Max width for input areas */
+        }
+        .contingency-table-input {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 1rem;
+             align-items: center;
+        }
+        .contingency-table-input label {
+            width: 100%; text-align: center;
+        }
+        .contingency-table-input textarea {
+            width: 100%;
+            max-width: none; /* Override default max-width for this specific textarea */
+            min-height: 60px;
+            font-family: monospace;
+        }
+        #messageBox {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .simulation-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .simulation-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .chart-container { /* General container for multiple charts if needed */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            margin: 2rem 0;
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .example-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+        }
+        .example-card h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #4338CA;
+            margin-bottom: 1rem;
+        }
+        .example-card p {
+            margin-bottom: 1rem;
+        }
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            justify-content: center; /* Center tabs */
+        }
+        .tab-button {
+            padding: 0.5rem 1rem;
+            background-color: #E0E7FF;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        .tab-button.active {
+            background-color: #4338CA;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .distribution-slider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+        .distribution-slider input {
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">Fixed: Chi-Squared & ANOVA Interactive Guide</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                    <li><a href="#simulations" class="nav-button text-sm sm:text-base font-medium py-2 px-3">🎮 Simulations</a></li>
+                    <li><a href="#examples" class="nav-button text-sm sm:text-base font-medium py-2 px-3">📝 Examples</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Theory Section -->
+        <section id="theory" class="content-section">
+            <div class="text-center">
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                    <span class="header-icon">📊</span>Statistical Theory
+                </h2>
+                <p class="section-intro">
+                    Understanding the theoretical foundations of Chi-Squared tests and ANOVA is crucial for proper statistical analysis.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 mt-8">
+                <!-- Chi-Squared Theory -->
+                <div class="bg-white rounded-xl p-6 shadow-lg">
+                    <h3 class="text-2xl font-semibold text-indigo-700 mb-4">Chi-Squared Test</h3>
+                    <p class="text-gray-600 mb-4">
+                        The Chi-Squared test is used to determine whether there is a significant association between two categorical variables.
+                    </p>
+                    
+                    <h4 class="text-lg font-semibold mb-2">Test Statistic:</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        $$\chi^2 = \sum \frac{(O_i - E_i)^2}{E_i}$$
+                        <p class="text-sm text-gray-600 mt-2">
+                            Where $O_i$ is observed frequency and $E_i$ is expected frequency
+                        </p>
+                    </div>
+
+                    <h4 class="text-lg font-semibold mb-2">Assumptions:</h4>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1">
+                        <li>Independence of observations</li>
+                        <li>Expected frequency ≥ 5 in each cell</li>
+                        <li>Categorical variables</li>
+                    </ul>
+
+                    <h4 class="text-lg font-semibold mb-2 mt-4">Types:</h4>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1">
+                        <li><strong>Goodness of Fit:</strong> One variable vs. expected distribution</li>
+                        <li><strong>Independence:</strong> Relationship between two variables</li>
+                    </ul>
+                </div>
+
+                <!-- ANOVA Theory -->
+                <div class="bg-white rounded-xl p-6 shadow-lg">
+                    <h3 class="text-2xl font-semibold text-indigo-700 mb-4">ANOVA (Analysis of Variance)</h3>
+                    <p class="text-gray-600 mb-4">
+                        ANOVA tests whether there are significant differences between the means of three or more groups.
+                    </p>
+
+                    <h4 class="text-lg font-semibold mb-2">F-Statistic:</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        $$F = \frac{MS_{between}}{MS_{within}} = \frac{SS_{between}/(k-1)}{SS_{within}/(N-k)}$$
+                        <p class="text-sm text-gray-600 mt-2">
+                            Where $k$ is number of groups and $N$ is total sample size
+                        </p>
+                    </div>
+
+                    <h4 class="text-lg font-semibold mb-2">Assumptions:</h4>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1">
+                        <li>Independence of observations</li>
+                        <li>Normal distribution within groups</li>
+                        <li>Homogeneity of variances (homoscedasticity)</li>
+                    </ul>
+
+                    <h4 class="text-lg font-semibold mb-2 mt-4">Components:</h4>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1">
+                        <li><strong>Between-group variance:</strong> Variation due to treatment effect</li>
+                        <li><strong>Within-group variance:</strong> Random variation (error)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Distribution Visualization -->
+            <div class="interactive-panel">
+                <h3 class="panel-title">Chi-Squared Distribution Explorer</h3>
+                <div class="distribution-slider">
+                    <label for="dfSlider" class="font-medium">Degrees of Freedom:</label>
+                    <input type="range" id="dfSlider" min="1" max="20" value="3" 
+                           oninput="document.getElementById('dfValue').textContent = this.value; renderChiSquaredDistributionChart(parseInt(this.value));">
+                    <span id="dfValue" class="font-semibold text-indigo-600">3</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chiDistributionChart"></canvas>
+                </div>
+                <p class="text-center text-gray-600 mt-4">
+                    Adjust the degrees of freedom to see how the Chi-Squared distribution shape changes.
+                </p>
+            </div>
+        </section>
+
+        <!-- Practical Section -->
+        <section id="practical" class="content-section hidden">
+            <div class="text-center">
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                    <span class="header-icon">🧮</span>Practical Calculator
+                </h2>
+                <p class="section-intro">
+                    Perform actual Chi-Squared and ANOVA calculations with your data.
+                </p>
+            </div>
+
+            <!-- Test Type Selection -->
+            <div class="test-type-selection">
+                <button onclick="switchTestType('chi-squared')" id="chiSquaredBtn" class="active">Chi-Squared Test</button>
+                <button onclick="switchTestType('anova')" id="anovaBtn">ANOVA</button>
+            </div>
+
+            <!-- Chi-Squared Calculator -->
+            <div id="chiSquaredCalculator" class="interactive-panel">
+                <h3 class="panel-title">Chi-Squared Test Calculator</h3>
+                
+                <div class="tabs">
+                    <button class="tab-button active" onclick="switchChiTab('goodness-of-fit')">Goodness of Fit</button>
+                    <button class="tab-button" onclick="switchChiTab('independence')">Test of Independence</button>
+                </div>
+
+                <!-- Goodness of Fit Tab -->
+                <div id="goodness-of-fit" class="tab-content active">
+                    <div class="data-input-section">
+                        <div class="input-group">
+                            <label for="observedFreq">Observed Frequencies (comma-separated):</label>
+                            <textarea id="observedFreq" placeholder="e.g., 10, 15, 8, 12"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="expectedFreq">Expected Frequencies (comma-separated):</label>
+                            <textarea id="expectedFreq" placeholder="e.g., 11, 11, 11, 11"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="chiAlpha">Significance Level (α):</label>
+                            <select id="chiAlpha">
+                                <option value="0.05">0.05</option>
+                                <option value="0.01">0.01</option>
+                                <option value="0.10">0.10</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="calculate-button" onclick="calculateChiSquaredGoodness()">Calculate Chi-Squared</button>
+                </div>
+
+                <!-- Independence Tab -->
+                <div id="independence" class="tab-content">
+                    <div class="data-input-section">
+                        <div class="contingency-table-input">
+                            <label for="contingencyTable">Contingency Table (rows separated by newlines, values by commas):</label>
+                            <textarea id="contingencyTable" placeholder="e.g.&#10;10, 15, 8&#10;12, 20, 6&#10;8, 10, 15"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="chiAlphaIndep">Significance Level (α):</label>
+                            <select id="chiAlphaIndep">
+                                <option value="0.05">0.05</option>
+                                <option value="0.01">0.01</option>
+                                <option value="0.10">0.10</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="calculate-button" onclick="calculateChiSquaredIndependence()">Calculate Chi-Squared</button>
+                </div>
+
+                <div id="chiResults"></div>
+            </div>
+
+            <!-- ANOVA Calculator -->
+            <div id="anovaCalculator" class="interactive-panel hidden">
+                <h3 class="panel-title">One-Way ANOVA Calculator</h3>
+                
+                <div class="data-input-section">
+                    <div class="input-group">
+                        <label for="group1Data">Group 1 Data (comma-separated):</label>
+                        <textarea id="group1Data" placeholder="e.g., 23, 25, 27, 24, 26"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="group2Data">Group 2 Data (comma-separated):</label>
+                        <textarea id="group2Data" placeholder="e.g., 30, 32, 28, 31, 29"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="group3Data">Group 3 Data (comma-separated):</label>
+                        <textarea id="group3Data" placeholder="e.g., 35, 37, 33, 36, 34"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="anovaAlpha">Significance Level (α):</label>
+                        <select id="anovaAlpha">
+                            <option value="0.05">0.05</option>
+                            <option value="0.01">0.01</option>
+                            <option value="0.10">0.10</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="calculate-button" onclick="calculateANOVA()">Calculate ANOVA</button>
+                
+                <div id="anovaResults"></div>
+            </div>
+        </section>
+
+        <!-- Simulations Section -->
+        <section id="simulations" class="content-section hidden">
+            <div class="text-center">
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                    <span class="header-icon">🎮</span>Interactive Simulations
+                </h2>
+                <p class="section-intro">
+                    Explore how sample size, effect size, and other parameters affect statistical power and results.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Chi-Squared Simulation -->
+                <div class="interactive-panel">
+                    <h3 class="panel-title">Chi-Squared Simulation</h3>
+                    
+                    <div class="simulation-controls">
+                        <div class="input-group">
+                            <label for="chiSimSampleSize">Sample Size:</label>
+                            <input type="number" id="chiSimSampleSize" value="100" min="50" max="1000" step="50">
+                        </div>
+                        <div class="input-group">
+                            <label for="chiSimEffectSize">Effect Size (deviation from null):</label>
+                            <input type="number" id="chiSimEffectSize" value="0.3" min="0" max="1" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="chiSimIterations">Number of Simulations:</label>
+                            <input type="number" id="chiSimIterations" value="1000" min="100" max="5000" step="100">
+                        </div>
+                    </div>
+                    
+                    <button class="simulate-button" onclick="updateChiSimulation()">Run Simulation</button>
+                    
+                    <div class="chart-wrapper">
+                        <canvas id="chiSimChart"></canvas>
+                    </div>
+                    
+                    <div id="chiSimResults" class="results-box" style="display: none;">
+                        <h4>Simulation Results</h4>
+                        <div id="chiSimStats"></div>
+                    </div>
+                </div>
+
+                <!-- ANOVA Simulation -->
+                <div class="interactive-panel">
+                    <h3 class="panel-title">ANOVA Simulation</h3>
+                    
+                    <div class="simulation-controls">
+                        <div class="input-group">
+                            <label for="anovaSimGroups">Number of Groups:</label>
+                            <input type="number" id="anovaSimGroups" value="3" min="2" max="6">
+                        </div>
+                        <div class="input-group">
+                            <label for="anovaSimSampleSize">Sample Size per Group:</label>
+                            <input type="number" id="anovaSimSampleSize" value="30" min="10" max="100" step="5">
+                        </div>
+                        <div class="input-group">
+                            <label for="anovaSimEffectSize">Effect Size (Cohen's f):</label>
+                            <input type="number" id="anovaSimEffectSize" value="0.25" min="0" max="1" step="0.05">
+                        </div>
+                        <div class="input-group">
+                            <label for="anovaSimIterations">Number of Simulations:</label>
+                            <input type="number" id="anovaSimIterations" value="1000" min="100" max="5000" step="100">
+                        </div>
+                    </div>
+                    
+                    <button class="simulate-button" onclick="updateAnovaSimulation()">Run Simulation</button>
+                    
+                    <div class="chart-wrapper">
+                        <canvas id="anovaSimChart"></canvas>
+                    </div>
+                    
+                    <div id="anovaSimResults" class="results-box" style="display: none;">
+                        <h4>Simulation Results</h4>
+                        <div id="anovaSimStats"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Examples Section -->
+        <section id="examples" class="content-section hidden">
+            <div class="text-center">
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                    <span class="header-icon">📝</span>Real-World Examples
+                </h2>
+                <p class="section-intro">
+                    Learn through practical examples that demonstrate when and how to use these statistical tests.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Chi-Squared Examples -->
+                <div class="example-card">
+                    <h4>Chi-Squared: Marketing Campaign Effectiveness</h4>
+                    <p><strong>Scenario:</strong> A company wants to test if customer age group is associated with product preference.</p>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <h5 class="font-semibold mb-2">Data:</h5>
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="text-left p-2">Age Group</th>
+                                    <th class="text-center p-2">Product A</th>
+                                    <th class="text-center p-2">Product B</th>
+                                    <th class="text-center p-2">Product C</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="p-2">18-30</td>
+                                    <td class="text-center p-2">45</td>
+                                    <td class="text-center p-2">35</td>
+                                    <td class="text-center p-2">20</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="p-2">31-50</td>
+                                    <td class="text-center p-2">30</td>
+                                    <td class="text-center p-2">40</td>
+                                    <td class="text-center p-2">30</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2">51+</td>
+                                    <td class="text-center p-2">15</td>
+                                    <td class="text-center p-2">25</td>
+                                    <td class="text-center p-2">40</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <button class="calculate-button" onclick="runExampleChiSquared()">Run Example Analysis</button>
+                    <div id="exampleChiResults"></div>
+                </div>
+
+                <!-- ANOVA Examples -->
+                <div class="example-card">
+                    <h4>ANOVA: Teaching Method Comparison</h4>
+                    <p><strong>Scenario:</strong> An educator wants to compare the effectiveness of three different teaching methods on student test scores.</p>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <h5 class="font-semibold mb-2">Data (Test Scores):</h5>
+                        <div class="grid grid-cols-3 gap-4 text-sm">
+                            <div>
+                                <strong>Method A:</strong><br>
+                                85, 87, 83, 89, 86, 84, 88, 85, 87, 86
+                            </div>
+                            <div>
+                                <strong>Method B:</strong><br>
+                                90, 92, 88, 94, 91, 89, 93, 90, 92, 91
+                            </div>
+                            <div>
+                                <strong>Method C:</strong><br>
+                                78, 80, 76, 82, 79, 77, 81, 78, 80, 79
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="calculate-button" onclick="runExampleANOVA()">Run Example Analysis</button>
+                    <div id="exampleAnovaResults"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t mt-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center text-gray-600">
+                <p>&copy; 2024 Interactive Statistics Guide. Educational tool for learning statistical concepts.</p>
+                <p class="mt-2 text-sm">Built with Chart.js, jStat, and MathJax for comprehensive statistical education.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Message Box for notifications -->
+    <div id="messageBox" class="fixed top-20 right-4 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 transform translate-x-full transition-all duration-300 z-50">
+        <span id="messageText"></span>
+    </div>
+
+    <script>
+        // Global variables for charts
+        let chiDistributionChart = null;
+        let chiSimChart = null;
+        let anovaSimChart = null;
+
+        // Navigation functionality
+        function initializeNavigation() {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const sections = document.querySelectorAll('.content-section');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all buttons
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Hide all sections
+                    sections.forEach(section => section.classList.add('hidden'));
+                    
+                    // Show target section
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.classList.remove('hidden');
+                    }
+                });
+            });
+        }
+
+        // Show message function
+        function showMessage(text, type = 'info') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            
+            messageText.textContent = text;
+            
+            // Reset classes
+            messageBox.className = 'fixed top-20 right-4 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 z-50';
+            
+            // Add color based on type
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-500', 'text-white');
+            } else if (type === 'success') {
+                messageBox.classList.add('bg-green-500', 'text-white');
+            } else {
+                messageBox.classList.add('bg-blue-500', 'text-white');
+            }
+            
+            // Show message
+            messageBox.classList.remove('opacity-0', 'translate-x-full');
+            messageBox.classList.add('opacity-100', 'translate-x-0');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                messageBox.classList.add('opacity-0', 'translate-x-full');
+                messageBox.classList.remove('opacity-100', 'translate-x-0');
+            }, 3000);
+        }
+
+        // Chi-Squared Distribution Chart
+        function renderChiSquaredDistributionChart(df) {
+            const ctx = document.getElementById('chiDistributionChart');
+            if (!ctx) return;
+
+            if (chiDistributionChart) {
+                chiDistributionChart.destroy();
+            }
+
+            // Generate chi-squared distribution data
+            const xValues = [];
+            const yValues = [];
+            const maxX = Math.max(20, df * 3);
+            
+            for (let x = 0.1; x <= maxX; x += 0.1) {
+                xValues.push(x);
+                yValues.push(jStat.chisquare.pdf(x, df));
+            }
+
+            chiDistributionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: xValues.map(x => x.toFixed(1)),
+                    datasets: [{
+                        label: `χ² Distribution (df=${df})`,
+                        data: yValues,
+                        borderColor: '#4338CA',
+                        backgroundColor: 'rgba(67, 56, 202, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'χ² Value'
+                            },
+                            ticks: {
+                                maxTicksLimit: 10
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Probability Density'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Test type switching
+        function switchTestType(type) {
+            const chiBtn = document.getElementById('chiSquaredBtn');
+            const anovaBtn = document.getElementById('anovaBtn');
+            const chiCalc = document.getElementById('chiSquaredCalculator');
+            const anovaCalc = document.getElementById('anovaCalculator');
+
+            if (type === 'chi-squared') {
+                chiBtn.classList.add('active');
+                anovaBtn.classList.remove('active');
+                chiCalc.classList.remove('hidden');
+                anovaCalc.classList.add('hidden');
+            } else {
+                anovaBtn.classList.add('active');
+                chiBtn.classList.remove('active');
+                anovaCalc.classList.remove('hidden');
+                chiCalc.classList.add('hidden');
+            }
+        }
+
+        // Chi-squared tab switching
+        function switchChiTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-button');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Parse comma-separated values
+        function parseCSV(input) {
+            return input.split(',').map(val => parseFloat(val.trim())).filter(val => !isNaN(val));
+        }
+
+        // Parse contingency table
+        function parseContingencyTable(input) {
+            return input.trim().split('\n').map(row => 
+                row.split(',').map(val => parseFloat(val.trim())).filter(val => !isNaN(val))
+            ).filter(row => row.length > 0);
+        }
+
+        // Chi-squared goodness of fit calculation
+        function calculateChiSquaredGoodness() {
+            try {
+                const observed = parseCSV(document.getElementById('observedFreq').value);
+                const expected = parseCSV(document.getElementById('expectedFreq').value);
+                const alpha = parseFloat(document.getElementById('chiAlpha').value);
+
+                if (observed.length === 0 || expected.length === 0) {
+                    showMessage('Please enter valid frequency data', 'error');
+                    return;
+                }
+
+                if (observed.length !== expected.length) {
+                    showMessage('Observed and expected frequencies must have the same length', 'error');
+                    return;
+                }
+
+                // Calculate chi-squared statistic
+                let chiSquared = 0;
+                for (let i = 0; i < observed.length; i++) {
+                    if (expected[i] <= 0) {
+                        showMessage('Expected frequencies must be greater than 0', 'error');
+                        return;
+                    }
+                    chiSquared += Math.pow(observed[i] - expected[i], 2) / expected[i];
+                }
+
+                const df = observed.length - 1;
+                const criticalValue = jStat.chisquare.inv(1 - alpha, df);
+                const pValue = 1 - jStat.chisquare.cdf(chiSquared, df);
+
+                displayChiResults({
+                    chiSquared: chiSquared,
+                    df: df,
+                    pValue: pValue,
+                    criticalValue: criticalValue,
+                    alpha: alpha,
+                    testType: 'Goodness of Fit'
+                });
+
+            } catch (error) {
+                showMessage('Error in calculation: ' + error.message, 'error');
+            }
+        }
+
+        // Chi-squared independence calculation
+        function calculateChiSquaredIndependence() {
+            try {
+                const tableData = parseContingencyTable(document.getElementById('contingencyTable').value);
+                const alpha = parseFloat(document.getElementById('chiAlphaIndep').value);
+
+                if (tableData.length === 0 || tableData[0].length === 0) {
+                    showMessage('Please enter valid contingency table data', 'error');
+                    return;
+                }
+
+                const rows = tableData.length;
+                const cols = tableData[0].length;
+
+                // Calculate row and column totals
+                const rowTotals = tableData.map(row => row.reduce((sum, val) => sum + val, 0));
+                const colTotals = [];
+                for (let j = 0; j < cols; j++) {
+                    colTotals[j] = tableData.reduce((sum, row) => sum + row[j], 0);
+                }
+                const grandTotal = rowTotals.reduce((sum, val) => sum + val, 0);
+
+                // Calculate expected frequencies and chi-squared
+                let chiSquared = 0;
+                for (let i = 0; i < rows; i++) {
+                    for (let j = 0; j < cols; j++) {
+                        const expected = (rowTotals[i] * colTotals[j]) / grandTotal;
+                        if (expected < 5) {
+                            showMessage('Warning: Expected frequency less than 5 detected. Results may be unreliable.', 'error');
+                        }
+                        chiSquared += Math.pow(tableData[i][j] - expected, 2) / expected;
+                    }
+                }
+
+                const df = (rows - 1) * (cols - 1);
+                const criticalValue = jStat.chisquare.inv(1 - alpha, df);
+                const pValue = 1 - jStat.chisquare.cdf(chiSquared, df);
+
+                displayChiResults({
+                    chiSquared: chiSquared,
+                    df: df,
+                    pValue: pValue,
+                    criticalValue: criticalValue,
+                    alpha: alpha,
+                    testType: 'Independence'
+                });
+
+            } catch (error) {
+                showMessage('Error in calculation: ' + error.message, 'error');
+            }
+        }
+
+        // Display chi-squared results
+        function displayChiResults(results) {
+            const resultsDiv = document.getElementById('chiResults');
+            const isSignificant = results.pValue < results.alpha;
+
+            resultsDiv.innerHTML = `
+                <div class="results-box">
+                    <h4>Chi-Squared Test Results (${results.testType})</h4>
+                    <div class="result-item">
+                        <span class="result-label">Chi-Squared Statistic (χ²):</span>
+                        <span class="result-value">${results.chiSquared.toFixed(4)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Degrees of Freedom:</span>
+                        <span class="result-value">${results.df}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">P-value:</span>
+                        <span class="result-value">${results.pValue.toFixed(6)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Critical Value (α = ${results.alpha}):</span>
+                        <span class="result-value">${results.criticalValue.toFixed(4)}</span>
+                    </div>
+                    <div class="interpretation-box ${isSignificant ? 'significant' : 'not-significant'}">
+                        <strong>Interpretation:</strong>
+                        ${isSignificant ? 
+                            `The result is statistically significant (p < ${results.alpha}). We reject the null hypothesis.` :
+                            `The result is not statistically significant (p ≥ ${results.alpha}). We fail to reject the null hypothesis.`
+                        }
+                    </div>
+                </div>
+            `;
+
+            showMessage('Chi-squared calculation completed!', 'success');
+        }
+
+        // ANOVA calculation
+        function calculateANOVA() {
+            try {
+                const group1 = parseCSV(document.getElementById('group1Data').value);
+                const group2 = parseCSV(document.getElementById('group2Data').value);
+                const group3 = parseCSV(document.getElementById('group3Data').value);
+                const alpha = parseFloat(document.getElementById('anovaAlpha').value);
+
+                if (group1.length === 0 || group2.length === 0 || group3.length === 0) {
+                    showMessage('Please enter valid data for all groups', 'error');
+                    return;
+                }
+
+                const groups = [group1, group2, group3].filter(group => group.length > 0);
+                const k = groups.length; // number of groups
+                const N = groups.reduce((sum, group) => sum + group.length, 0); // total sample size
+
+                // Calculate group means and overall mean
+                const groupMeans = groups.map(group => group.reduce((sum, val) => sum + val, 0) / group.length);
+                const allValues = groups.flat();
+                const overallMean = allValues.reduce((sum, val) => sum + val, 0) / allValues.length;
+
+                // Calculate Sum of Squares
+                let SSBetween = 0;
+                let SSWithin = 0;
+
+                // Between-group sum of squares
+                for (let i = 0; i < groups.length; i++) {
+                    SSBetween += groups[i].length * Math.pow(groupMeans[i] - overallMean, 2);
+                }
+
+                // Within-group sum of squares
+                for (let i = 0; i < groups.length; i++) {
+                    for (let j = 0; j < groups[i].length; j++) {
+                        SSWithin += Math.pow(groups[i][j] - groupMeans[i], 2);
+                    }
+                }
+
+                const SSTotal = SSBetween + SSWithin;
+
+                // Calculate degrees of freedom
+                const dfBetween = k - 1;
+                const dfWithin = N - k;
+                const dfTotal = N - 1;
+
+                // Calculate Mean Squares
+                const MSBetween = SSBetween / dfBetween;
+                const MSWithin = SSWithin / dfWithin;
+
+                // Calculate F-statistic
+                const F = MSBetween / MSWithin;
+
+                // Calculate p-value
+                const pValue = 1 - jStat.centralF.cdf(F, dfBetween, dfWithin);
+                const criticalValue = jStat.centralF.inv(1 - alpha, dfBetween, dfWithin);
+
+                displayAnovaResults({
+                    F: F,
+                    dfBetween: dfBetween,
+                    dfWithin: dfWithin,
+                    pValue: pValue,
+                    criticalValue: criticalValue,
+                    alpha: alpha,
+                    SSBetween: SSBetween,
+                    SSWithin: SSWithin,
+                    SSTotal: SSTotal,
+                    MSBetween: MSBetween,
+                    MSWithin: MSWithin,
+                    groupMeans: groupMeans,
+                    groups: groups
+                });
+
+            } catch (error) {
+                showMessage('Error in ANOVA calculation: ' + error.message, 'error');
+            }
+        }
+
+        // Display ANOVA results
+        function displayAnovaResults(results) {
+            const resultsDiv = document.getElementById('anovaResults');
+            const isSignificant = results.pValue < results.alpha;
+
+            resultsDiv.innerHTML = `
+                <div class="results-box">
+                    <h4>One-Way ANOVA Results</h4>
+                    
+                    <h5 class="font-semibold mt-4 mb-2">ANOVA Table:</h5>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border-collapse border border-gray-300">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="border border-gray-300 p-2 text-left">Source</th>
+                                    <th class="border border-gray-300 p-2">Sum of Squares</th>
+                                    <th class="border border-gray-300 p-2">df</th>
+                                    <th class="border border-gray-300 p-2">Mean Square</th>
+                                    <th class="border border-gray-300 p-2">F</th>
+                                    <th class="border border-gray-300 p-2">p-value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border border-gray-300 p-2">Between Groups</td>
+                                    <td class="border border-gray-300 p-2">${results.SSBetween.toFixed(4)}</td>
+                                    <td class="border border-gray-300 p-2">${results.dfBetween}</td>
+                                    <td class="border border-gray-300 p-2">${results.MSBetween.toFixed(4)}</td>
+                                    <td class="border border-gray-300 p-2">${results.F.toFixed(4)}</td>
+                                    <td class="border border-gray-300 p-2">${results.pValue.toFixed(6)}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-300 p-2">Within Groups</td>
+                                    <td class="border border-gray-300 p-2">${results.SSWithin.toFixed(4)}</td>
+                                    <td class="border border-gray-300 p-2">${results.dfWithin}</td>
+                                    <td class="border border-gray-300 p-2">${results.MSWithin.toFixed(4)}</td>
+                                    <td class="border border-gray-300 p-2">-</td>
+                                    <td class="border border-gray-300 p-2">-</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-300 p-2">Total</td>
+                                    <td class="border border-gray-300 p-2">${results.SSTotal.toFixed(4)}</td>
+                                    <td class="border border-gray-300 p-2">${results.dfBetween + results.dfWithin}</td>
+                                    <td class="border border-gray-300 p-2">-</td>
+                                    <td class="border border-gray-300 p-2">-</td>
+                                    <td class="border border-gray-300 p-2">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h5 class="font-semibold mt-4 mb-2">Group Statistics:</h5>
+                    <div class="grid grid-cols-${results.groups.length} gap-4 text-sm">
+                        ${results.groups.map((group, i) => `
+                            <div>
+                                <strong>Group ${i + 1}:</strong><br>
+                                Mean: ${results.groupMeans[i].toFixed(2)}<br>
+                                N: ${group.length}
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="result-item mt-4">
+                        <span class="result-label">Critical Value (α = ${results.alpha}):</span>
+                        <span class="result-value">${results.criticalValue.toFixed(4)}</span>
+                    </div>
+
+                    <div class="interpretation-box ${isSignificant ? 'significant' : 'not-significant'}">
+                        <strong>Interpretation:</strong>
+                        ${isSignificant ? 
+                            `The result is statistically significant (p < ${results.alpha}). There are significant differences between group means.` :
+                            `The result is not statistically significant (p ≥ ${results.alpha}). No significant differences between group means were found.`
+                        }
+                    </div>
+                </div>
+            `;
+
+            showMessage('ANOVA calculation completed!', 'success');
+        }
+
+        // Chi-squared simulation
+        function updateChiSimulation() {
+            const sampleSize = parseInt(document.getElementById('chiSimSampleSize').value);
+            const effectSize = parseFloat(document.getElementById('chiSimEffectSize').value);
+            const iterations = parseInt(document.getElementById('chiSimIterations').value);
+
+            try {
+                const chiSquaredValues = [];
+                const pValues = [];
+                let significantCount = 0;
+
+                for (let i = 0; i < iterations; i++) {
+                    // Simulate contingency table with effect
+                    const observed = [];
+                    const expected = [];
+                    
+                    // Create 2x2 table simulation
+                    const baseProb = 0.5;
+                    const prob1 = baseProb + effectSize;
+                    const prob2 = baseProb - effectSize;
+                    
+                    // Ensure probabilities are valid
+                    const p1 = Math.max(0.1, Math.min(0.9, prob1));
+                    const p2 = Math.max(0.1, Math.min(0.9, prob2));
+                    
+                    const n1 = Math.floor(sampleSize / 2);
+                    const n2 = sampleSize - n1;
+                    
+                    const obs11 = jStat.binomial.sample(n1, p1);
+                    const obs12 = n1 - obs11;
+                    const obs21 = jStat.binomial.sample(n2, p2);
+                    const obs22 = n2 - obs21;
+                    
+                    observed.push(obs11, obs12, obs21, obs22);
+                    
+                    // Calculate expected under null hypothesis
+                    const total1 = obs11 + obs21;
+                    const total2 = obs12 + obs22;
+                    const totalA = obs11 + obs12;
+                    const totalB = obs21 + obs22;
+                    const grandTotal = sampleSize;
+                    
+                    expected.push(
+                        (totalA * total1) / grandTotal,
+                        (totalA * total2) / grandTotal,
+                        (totalB * total1) / grandTotal,
+                        (totalB * total2) / grandTotal
+                    );
+                    
+                    // Calculate chi-squared
+                    let chiSq = 0;
+                    for (let j = 0; j < 4; j++) {
+                        if (expected[j] > 0) {
+                            chiSq += Math.pow(observed[j] - expected[j], 2) / expected[j];
+                        }
+                    }
+                    
+                    chiSquaredValues.push(chiSq);
+                    
+                    const pVal = 1 - jStat.chisquare.cdf(chiSq, 1);
+                    pValues.push(pVal);
+                    
+                    if (pVal < 0.05) {
+                        significantCount++;
+                    }
+                }
+
+                // Create histogram of chi-squared values
+                renderChiSimulationChart(chiSquaredValues);
+
+                // Display results
+                const power = (significantCount / iterations) * 100;
+                const meanChiSq = chiSquaredValues.reduce((sum, val) => sum + val, 0) / chiSquaredValues.length;
+                const meanPValue = pValues.reduce((sum, val) => sum + val, 0) / pValues.length;
+
+                document.getElementById('chiSimResults').style.display = 'block';
+                document.getElementById('chiSimStats').innerHTML = `
+                    <div class="result-item">
+                        <span class="result-label">Statistical Power:</span>
+                        <span class="result-value">${power.toFixed(1)}%</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Mean χ² Value:</span>
+                        <span class="result-value">${meanChiSq.toFixed(4)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Mean p-value:</span>
+                        <span class="result-value">${meanPValue.toFixed(4)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Significant Results:</span>
+                        <span class="result-value">${significantCount} / ${iterations}</span>
+                    </div>
+                `;
+
+                showMessage('Chi-squared simulation completed!', 'success');
+
+            } catch (error) {
+                showMessage('Error in simulation: ' + error.message, 'error');
+            }
+        }
+
+        // Render chi-squared simulation chart
+        function renderChiSimulationChart(chiSquaredValues) {
+            const ctx = document.getElementById('chiSimChart');
+            if (!ctx) return;
+
+            if (chiSimChart) {
+                chiSimChart.destroy();
+            }
+
+            // Create histogram data
+            const bins = 20;
+            const minVal = Math.min(...chiSquaredValues);
+            const maxVal = Math.max(...chiSquaredValues);
+            const binWidth = (maxVal - minVal) / bins;
+            
+            const histogram = new Array(bins).fill(0);
+            const binLabels = [];
+            
+            for (let i = 0; i < bins; i++) {
+                const binStart = minVal + i * binWidth;
+                binLabels.push(binStart.toFixed(2));
+            }
+            
+            chiSquaredValues.forEach(val => {
+                const binIndex = Math.min(Math.floor((val - minVal) / binWidth), bins - 1);
+                histogram[binIndex]++;
+            });
+
+            chiSimChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: binLabels,
+                    datasets: [{
+                        label: 'Frequency',
+                        data: histogram,
+                        backgroundColor: 'rgba(67, 56, 202, 0.6)',
+                        borderColor: '#4338CA',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'χ² Value'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Frequency'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Distribution of Chi-Squared Statistics'
+                        }
+                    }
+                }
+            });
+        }
+
+        // ANOVA simulation
+        function updateAnovaSimulation() {
+            const numGroups = parseInt(document.getElementById('anovaSimGroups').value);
+            const sampleSize = parseInt(document.getElementById('anovaSimSampleSize').value);
+            const effectSize = parseFloat(document.getElementById('anovaSimEffectSize').value);
+            const iterations = parseInt(document.getElementById('anovaSimIterations').value);
+
+            try {
+                const fValues = [];
+                const pValues = [];
+                let significantCount = 0;
+
+                for (let i = 0; i < iterations; i++) {
+                    // Generate group data with effect
+                    const groups = [];
+                    const groupMeans = [];
+                    
+                    // Create group means with specified effect size
+                    for (let g = 0; g < numGroups; g++) {
+                        const groupMean = effectSize * (g - (numGroups - 1) / 2);
+                        groupMeans.push(groupMean);
+                        
+                        const groupData = [];
+                        for (let s = 0; s < sampleSize; s++) {
+                            groupData.push(jStat.normal.sample(groupMean, 1));
+                        }
+                        groups.push(groupData);
+                    }
+
+                    // Calculate ANOVA
+                    const allValues = groups.flat();
+                    const overallMean = allValues.reduce((sum, val) => sum + val, 0) / allValues.length;
+                    const N = allValues.length;
+                    const k = numGroups;
+
+                    let SSBetween = 0;
+                    let SSWithin = 0;
+
+                    // Between-group sum of squares
+                    for (let g = 0; g < numGroups; g++) {
+                        const groupMean = groups[g].reduce((sum, val) => sum + val, 0) / groups[g].length;
+                        SSBetween += groups[g].length * Math.pow(groupMean - overallMean, 2);
+                        
+                        // Within-group sum of squares
+                        for (let s = 0; s < groups[g].length; s++) {
+                            SSWithin += Math.pow(groups[g][s] - groupMean, 2);
+                        }
+                    }
+
+                    const dfBetween = k - 1;
+                    const dfWithin = N - k;
+                    const MSBetween = SSBetween / dfBetween;
+                    const MSWithin = SSWithin / dfWithin;
+                    const F = MSBetween / MSWithin;
+
+                    fValues.push(F);
+                    
+                    const pVal = 1 - jStat.centralF.cdf(F, dfBetween, dfWithin);
+                    pValues.push(pVal);
+                    
+                    if (pVal < 0.05) {
+                        significantCount++;
+                    }
+                }
+
+                // Create histogram of F values
+                renderAnovaSimulationChart(fValues);
+
+                // Display results
+                const power = (significantCount / iterations) * 100;
+                const meanF = fValues.reduce((sum, val) => sum + val, 0) / fValues.length;
+                const meanPValue = pValues.reduce((sum, val) => sum + val, 0) / pValues.length;
+
+                document.getElementById('anovaSimResults').style.display = 'block';
+                document.getElementById('anovaSimStats').innerHTML = `
+                    <div class="result-item">
+                        <span class="result-label">Statistical Power:</span>
+                        <span class="result-value">${power.toFixed(1)}%</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Mean F Value:</span>
+                        <span class="result-value">${meanF.toFixed(4)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Mean p-value:</span>
+                        <span class="result-value">${meanPValue.toFixed(4)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Significant Results:</span>
+                        <span class="result-value">${significantCount} / ${iterations}</span>
+                    </div>
+                `;
+
+                showMessage('ANOVA simulation completed!', 'success');
+
+            } catch (error) {
+                showMessage('Error in simulation: ' + error.message, 'error');
+            }
+        }
+
+        // Render ANOVA simulation chart
+        function renderAnovaSimulationChart(fValues) {
+            const ctx = document.getElementById('anovaSimChart');
+            if (!ctx) return;
+
+            if (anovaSimChart) {
+                anovaSimChart.destroy();
+            }
+
+            // Create histogram data
+            const bins = 20;
+            const minVal = Math.min(...fValues);
+            const maxVal = Math.max(...fValues);
+            const binWidth = (maxVal - minVal) / bins;
+            
+            const histogram = new Array(bins).fill(0);
+            const binLabels = [];
+            
+            for (let i = 0; i < bins; i++) {
+                const binStart = minVal + i * binWidth;
+                binLabels.push(binStart.toFixed(2));
+            }
+            
+            fValues.forEach(val => {
+                const binIndex = Math.min(Math.floor((val - minVal) / binWidth), bins - 1);
+                histogram[binIndex]++;
+            });
+
+            anovaSimChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: binLabels,
+                    datasets: [{
+                        label: 'Frequency',
+                        data: histogram,
+                        backgroundColor: 'rgba(67, 56, 202, 0.6)',
+                        borderColor: '#4338CA',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'F Value'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Frequency'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Distribution of F Statistics'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Example calculations
+        function runExampleChiSquared() {
+            // Marketing campaign example data
+            const tableData = [
+                [45, 35, 20],
+                [30, 40, 30],
+                [15, 25, 40]
+            ];
+
+            try {
+                const rows = tableData.length;
+                const cols = tableData[0].length;
+
+                // Calculate row and column totals
+                const rowTotals = tableData.map(row => row.reduce((sum, val) => sum + val, 0));
+                const colTotals = [];
+                for (let j = 0; j < cols; j++) {
+                    colTotals[j] = tableData.reduce((sum, row) => sum + row[j], 0);
+                }
+                const grandTotal = rowTotals.reduce((sum, val) => sum + val, 0);
+
+                // Calculate chi-squared
+                let chiSquared = 0;
+                for (let i = 0; i < rows; i++) {
+                    for (let j = 0; j < cols; j++) {
+                        const expected = (rowTotals[i] * colTotals[j]) / grandTotal;
+                        chiSquared += Math.pow(tableData[i][j] - expected, 2) / expected;
+                    }
+                }
+
+                const df = (rows - 1) * (cols - 1);
+                const pValue = 1 - jStat.chisquare.cdf(chiSquared, df);
+                const criticalValue = jStat.chisquare.inv(0.95, df);
+
+                document.getElementById('exampleChiResults').innerHTML = `
+                    <div class="results-box mt-4">
+                        <h4>Example Analysis Results</h4>
+                        <div class="result-item">
+                            <span class="result-label">Chi-Squared Statistic:</span>
+                            <span class="result-value">${chiSquared.toFixed(4)}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">p-value:</span>
+                            <span class="result-value">${pValue.toFixed(6)}</span>
+                        </div>
+                        <div class="interpretation-box ${pValue < 0.05 ? 'significant' : 'not-significant'}">
+                            <strong>Conclusion:</strong> ${pValue < 0.05 ? 
+                                'There is a significant association between age group and product preference.' :
+                                'No significant association between age group and product preference was found.'
+                            }
+                        </div>
+                    </div>
+                `;
+
+                showMessage('Example analysis completed!', 'success');
+
+            } catch (error) {
+                showMessage('Error in example calculation: ' + error.message, 'error');
+            }
+        }
+
+        function runExampleANOVA() {
+            // Teaching method example data
+            const methodA = [85, 87, 83, 89, 86, 84, 88, 85, 87, 86];
+            const methodB = [90, 92, 88, 94, 91, 89, 93, 90, 92, 91];
+            const methodC = [78, 80, 76, 82, 79, 77, 81, 78, 80, 79];
+
+            try {
+                const groups = [methodA, methodB, methodC];
+                const k = groups.length;
+                const N = groups.reduce((sum, group) => sum + group.length, 0);
+
+                // Calculate group means and overall mean
+                const groupMeans = groups.map(group => group.reduce((sum, val) => sum + val, 0) / group.length);
+                const allValues = groups.flat();
+                const overallMean = allValues.reduce((sum, val) => sum + val, 0) / allValues.length;
+
+                // Calculate Sum of Squares
+                let SSBetween = 0;
+                let SSWithin = 0;
+
+                for (let i = 0; i < groups.length; i++) {
+                    SSBetween += groups[i].length * Math.pow(groupMeans[i] - overallMean, 2);
+                    
+                    for (let j = 0; j < groups[i].length; j++) {
+                        SSWithin += Math.pow(groups[i][j] - groupMeans[i], 2);
+                    }
+                }
+
+                const dfBetween = k - 1;
+                const dfWithin = N - k;
+                const MSBetween = SSBetween / dfBetween;
+                const MSWithin = SSWithin / dfWithin;
+                const F = MSBetween / MSWithin;
+                const pValue = 1 - jStat.centralF.cdf(F, dfBetween, dfWithin);
+
+                document.getElementById('exampleAnovaResults').innerHTML = `
+                    <div class="results-box mt-4">
+                        <h4>Example Analysis Results</h4>
+                        <div class="result-item">
+                            <span class="result-label">F-statistic:</span>
+                            <span class="result-value">${F.toFixed(4)}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">p-value:</span>
+                            <span class="result-value">${pValue.toFixed(6)}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Method A Mean:</span>
+                            <span class="result-value">${groupMeans[0].toFixed(2)}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Method B Mean:</span>
+                            <span class="result-value">${groupMeans[1].toFixed(2)}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Method C Mean:</span>
+                            <span class="result-value">${groupMeans[2].toFixed(2)}</span>
+                        </div>
+                        <div class="interpretation-box ${pValue < 0.05 ? 'significant' : 'not-significant'}">
+                            <strong>Conclusion:</strong> ${pValue < 0.05 ? 
+                                'There are significant differences between teaching methods.' :
+                                'No significant differences between teaching methods were found.'
+                            }
+                        </div>
+                    </div>
+                `;
+
+                showMessage('Example analysis completed!', 'success');
+
+            } catch (error) {
+                showMessage('Error in example calculation: ' + error.message, 'error');
+            }
+        }
+
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeNavigation();
+            
+            // Wait for MathJax and other libraries to load before rendering charts
+            setTimeout(() => {
+                if (typeof renderChiSquaredDistributionChart === 'function') {
+                    renderChiSquaredDistributionChart(3);
+                }
+            }, 500);
+            
+            showMessage('Interactive Statistics Guide loaded successfully!', 'success');
+        });
+    </script>
+</body>
+</html>

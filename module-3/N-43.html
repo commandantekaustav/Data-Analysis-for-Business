@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S43: Introduction to Exploratory Data Analysis (EDA)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .chart-container { position: relative; height: 350px; width: 100%; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+        .chart-description { margin-top: 1rem; font-size: 0.9rem; color: #555; text-align: center; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S43: Introduction to Exploratory Data Analysis (EDA)</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Introduction to Exploratory Data Analysis (EDA)</h2>
+            <p class="section-intro">Exploratory Data Analysis (EDA) is a critical phase in the data analytics lifecycle. It's an iterative process of investigating data sets to summarize their main characteristics, often using visual methods. EDA helps us understand what the data can tell us before formal modeling or hypothesis testing, acting as a detective phase to uncover hidden patterns and potential issues.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">What is Exploratory Data Analysis (EDA)?</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">EDA is an approach to analyzing data sets to summarize their main characteristics, often with visual methods. It was championed by statistician John W. Tukey. It's not about proving anything, but rather about exploring, discovering, and understanding the data.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Key Idea:</strong> Use visual and statistical methods to get a feel for the data, identify anomalies, test hypotheses, and uncover patterns.</li>
+                    <li><strong>Contrast with Traditional Statistics:</strong> Traditional statistics often starts with a hypothesis and then tests it. EDA, conversely, is more about generating hypotheses by looking at the data first.</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Importance of EDA in the DA Lifecycle</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">EDA plays a pivotal role in the overall data analytics lifecycle, typically occurring after data collection and initial cleaning, but before formal modeling and deployment.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Guides Data Preparation:</strong> Helps identify missing values, outliers, and data inconsistencies that require further cleaning or transformation.</li>
+                    <li><strong>Informs Feature Engineering:</strong> Reveals relationships between variables that can inspire the creation of new, more informative features for models.</li>
+                    <li><strong>Aids Model Selection:</strong> Understanding data distributions and relationships can guide the choice of appropriate statistical or machine learning models.</li>
+                    <li><strong>Validates Assumptions:</strong> Many statistical models have underlying assumptions about data distribution (e.g., normality, linearity); EDA helps check these assumptions.</li>
+                    <li><strong>Prevents Misinterpretation:</strong> By understanding the nuances of the data, analysts are less likely to draw incorrect conclusions from models.</li>
+                    <li><strong>Generates Hypotheses:</strong> Uncovers potential relationships or patterns that can lead to new business questions or hypotheses to be tested.</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Goals of EDA</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">The primary goals of performing EDA are to gain a comprehensive understanding of the dataset and to prepare it for subsequent analytical steps.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Discover Patterns:</strong> Identify trends, seasonality, cyclical patterns, or other recurring behaviors in the data. For example, do sales increase during certain months?</li>
+                    <li><strong>Spot Anomalies (Outliers):</strong> Detect unusual data points that deviate significantly from the rest of the dataset. These could be errors, or they could represent important, rare events.</li>
+                    <li><strong>Test Hypotheses:</strong> While EDA is exploratory, it can be used to visually or statistically test initial assumptions or hunches about the data. For instance, "Do customers in Region A spend more than in Region B?"</li>
+                    <li><strong>Check Assumptions:</strong> Verify if the data meets the requirements for certain statistical methods. For example, is a variable normally distributed if a statistical test requires it?</li>
+                    <li><strong>Summarize Main Characteristics:</strong> Get a feel for the central tendency (mean, median, mode) and dispersion (range, standard deviation) of variables.</li>
+                    <li><strong>Identify Relationships:</strong> Understand how different variables relate to each other (e.g., correlation between advertising spend and sales).</li>
+                    <li><strong>Prepare for Modeling:</strong> Based on EDA, decide on necessary data transformations, feature selections, or potential model types.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">In essence, EDA is about asking questions of the data and letting the data reveal its story through visualizations and summary statistics.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Tool Demo (Python - Pandas, Matplotlib, Seaborn)</h2>
+            <p class="section-intro">This practical session introduces you to basic EDA techniques using Python's powerful libraries: Pandas for data manipulation, and Matplotlib/Seaborn for visualization. We'll demonstrate how to get a quick statistical summary of your data and visualize distributions using histograms and box plots.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Conceptual Dataset: Customer Demographics and Spending</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Let's imagine we have a dataset containing information about customers, including their age, monthly spending, and product category preferences. We'll use a simulated version of this data for our demo.</p>
+                <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code>
+CustomerID,Age,MonthlySpend,ProductCategory
+1,28,150.75,Electronics
+2,45,220.50,Apparel
+3,34,90.20,Home Goods
+4,52,310.00,Electronics
+5,22,65.80,Apparel
+... (more data)
+                    </code></pre>
+                </div>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">1. Initial Data Overview and Descriptive Statistics (`.describe()`)</h4>
+                <p class="mb-4 text-gray-700">The `.describe()` method in Pandas is a quick way to get a statistical summary of numerical columns in your DataFrame. It provides count, mean, standard deviation, min, max, and quartile values.</p>
+                <p class="mb-4 text-gray-700"><strong>Conceptual Python Code:</strong></p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code class="language-python">
+import pandas as pd
+import numpy as np
+
+# Simulate a DataFrame
+np.random.seed(42)
+data = {
+    'CustomerID': range(1, 101),
+    'Age': np.random.randint(18, 65, 100),
+    'MonthlySpend': np.random.normal(150, 50, 100).round(2),
+    'ProductCategory': np.random.choice(['Electronics', 'Apparel', 'Home Goods', 'Books'], 100)
+}
+df_customers = pd.DataFrame(data)
+
+print("--- DataFrame Head ---")
+print(df_customers.head())
+print("\n")
+
+print("--- Descriptive Statistics for Numerical Columns ---")
+print(df_customers.describe())
+print("\n")
+
+print("--- Information about Data Types and Non-null Counts ---")
+df_customers.info()
+                    </code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-600"><em>Conceptual Output:</em> You'd see tables summarizing `Age` and `MonthlySpend`, showing their average, spread, and range. `df.info()` would show you non-null counts and data types for all columns.</p>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">2. Visualizing Univariate Distributions: Histograms</h4>
+                <p class="mb-4 text-gray-700">Histograms are excellent for understanding the distribution shape of a single numerical variable. They show how frequently values fall into different ranges (bins).</p>
+                <p class="mb-4 text-gray-700"><strong>Conceptual Python Code (using Seaborn):</strong></p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code class="language-python">
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# # Histogram of Age
+# plt.figure(figsize=(8, 5))
+# sns.histplot(df_customers['Age'], bins=10, kde=True) # kde=True adds a kernel density estimate line
+# plt.title('Distribution of Customer Age')
+# plt.xlabel('Age')
+# plt.ylabel('Frequency')
+# plt.show()
+                    </code></pre>
+                </div>
+                <div class="chart-container">
+                    <canvas id="ageDistributionHistogram"></canvas>
+                </div>
+                <p class="chart-description"><em>Simulated Histogram: Distribution of Customer Age.</em></p>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">3. Visualizing Univariate Distributions: Box Plots</h4>
+                <p class="mb-4 text-gray-700">Box plots (or box-and-whisker plots) provide a concise summary of the distribution of a numerical variable, highlighting its median, quartiles, and potential outliers. They are particularly useful for comparing distributions across different groups.</p>
+                <p class="mb-4 text-gray-700"><strong>Conceptual Python Code (using Seaborn):</strong></p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code class="language-python">
+# # Box plot of Monthly Spend
+# plt.figure(figsize=(6, 8))
+# sns.boxplot(y=df_customers['MonthlySpend'])
+# plt.title('Distribution of Monthly Spend')
+# plt.ylabel('Monthly Spend ($)')
+# plt.show()
+                    </code></pre>
+                </div>
+                <div class="chart-container">
+                    <canvas id="monthlySpendBoxPlot"></canvas>
+                </div>
+                <p class="chart-description"><em>Simulated Box Plot: Distribution of Monthly Spend.</em></p>
+                <p class="mt-4 text-sm text-gray-600">By combining these initial statistical summaries and visualizations, you can quickly gain a foundational understanding of your dataset's characteristics, which is essential for all subsequent analytical steps.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('nav a').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Data for Chart.js simulations
+        const simulatedAges = Array.from({length: 100}, () => Math.floor(Math.random() * (65 - 18 + 1)) + 18);
+        const simulatedMonthlySpend = Array.from({length: 100}, () => parseFloat((Math.random() * 100 + 100).toFixed(2))); // Random spend between 100 and 200
+
+        // Function to create bins for histogram
+        function createHistogramBins(data, binWidth) {
+            const min = Math.min(...data);
+            const max = Math.max(...data);
+            const bins = [];
+            for (let i = min; i <= max + binWidth; i += binWidth) { // Ensure max is included
+                bins.push(i);
+            }
+            const labels = bins.slice(0, -1).map((val, i) => `${val}-${bins[i+1]}`);
+            const counts = new Array(bins.length - 1).fill(0);
+
+            data.forEach(value => {
+                for (let i = 0; i < bins.length - 1; i++) {
+                    // Check if value falls within the current bin (inclusive of lower, exclusive of upper)
+                    // Special case for the last bin to include the max value
+                    if (value >= bins[i] && (value < bins[i+1] || (i === bins.length - 2 && value === max))) {
+                        counts[i]++;
+                        break;
+                    }
+                }
+            });
+            return { labels, counts };
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Histogram of Customer Age
+            const ageBins = createHistogramBins(simulatedAges, 5); // 5-year bins
+            const ageHistCtx = document.getElementById('ageDistributionHistogram').getContext('2d');
+            new Chart(ageHistCtx, {
+                type: 'bar',
+                data: {
+                    labels: ageBins.labels,
+                    datasets: [{
+                        label: 'Frequency',
+                        data: ageBins.counts,
+                        backgroundColor: 'rgba(67, 56, 202, 0.8)',
+                        borderColor: 'rgba(67, 56, 202, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Distribution of Customer Age',
+                            font: { size: 14 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Age Range' },
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Frequency' }
+                        }
+                    }
+                }
+            });
+
+            // Box Plot of Monthly Spend (simulated)
+            // Chart.js does not have a native box plot. We'll simulate with a bar chart and descriptive text.
+            // For a true box plot, a dedicated library or custom drawing would be needed.
+            // This is a conceptual representation.
+            const spendBoxPlotCtx = document.getElementById('monthlySpendBoxPlot').getContext('2d');
+            // Calculate quartiles for conceptual display
+            const sortedSpend = [...simulatedMonthlySpend].sort((a, b) => a - b);
+            const q1Index = Math.floor(sortedSpend.length * 0.25);
+            const medianIndex = Math.floor(sortedSpend.length * 0.5);
+            const q3Index = Math.floor(sortedSpend.length * 0.75);
+
+            const q1 = sortedSpend[q1Index];
+            const median = sortedSpend.length % 2 === 0 ? (sortedSpend[medianIndex - 1] + sortedSpend[medianIndex]) / 2 : sortedSpend[medianIndex];
+            const q3 = sortedSpend[q3Index];
+            const minSpend = sortedSpend[0];
+            const maxSpend = sortedSpend[sortedSpend.length - 1];
+
+            new Chart(spendBoxPlotCtx, {
+                type: 'bar', // Using bar to simulate a single box plot visually
+                data: {
+                    labels: ['Monthly Spend'],
+                    datasets: [{
+                        label: 'Min',
+                        data: [minSpend],
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        stack: 'spend'
+                    }, {
+                        label: 'Q1-Median',
+                        data: [median - q1],
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        stack: 'spend'
+                    }, {
+                        label: 'Median-Q3',
+                        data: [q3 - median],
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                        stack: 'spend'
+                    }, {
+                        label: 'Max',
+                        data: [maxSpend - q3],
+                        backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                        stack: 'spend'
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Make it horizontal for a box plot feel
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Distribution of Monthly Spend (Conceptual Box Plot)',
+                            font: { size: 14 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const datasetLabel = context.dataset.label || '';
+                                    const value = context.parsed.x;
+                                    if (datasetLabel === 'Min') return `Min: ${minSpend.toFixed(2)}`;
+                                    if (datasetLabel === 'Q1-Median') return `Q1: ${q1.toFixed(2)}, Median: ${median.toFixed(2)}`;
+                                    if (datasetLabel === 'Median-Q3') return `Median: ${median.toFixed(2)}, Q3: ${q3.toFixed(2)}`;
+                                    if (datasetLabel === 'Max') return `Max: ${maxSpend.toFixed(2)}`;
+                                    return '';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            title: { display: true, text: 'Monthly Spend ($)' },
+                            beginAtZero: true
+                        },
+                        y: {
+                            stacked: true,
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

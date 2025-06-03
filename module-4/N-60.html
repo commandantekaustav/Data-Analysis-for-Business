@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S60: Simple Linear Regression - Interpretation & Evaluation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script>
+    
+    <script>
+        // Ensure Chart.js and its annotation plugin are available and registered immediately.
+        if (typeof Chart !== 'undefined' && typeof ChartAnnotation !== 'undefined') {
+            Chart.register(ChartAnnotation);
+            console.log("Chart.js Annotation Plugin registered successfully.");
+        } else {
+            console.error("Chart.js or Chart.js Annotation Plugin not loaded correctly. Chart annotations will not work.");
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="text"], textarea {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .action-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+        }
+        .action-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .code-block {
+            background-color: #2D3748; /* Dark background for code */
+            color: #E2E8F0; /* Light text */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', monospace; /* Monospace font */
+            overflow-x: auto; /* Allow horizontal scrolling for long lines */
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .code-block pre {
+            margin: 0;
+        }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #4A5568;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .copy-button:hover {
+            background-color: #6366F1;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        /* Message Box Styling */
+        #messageBox {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S60: Simple Linear Regression - Interpretation & Evaluation</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory-intro" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical-hands-on" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💻 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory-intro" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Interpreting & Evaluating Simple Linear Regression</h2>
+            <p class="section-intro">Once we've built a Simple Linear Regression (SLR) model using Ordinary Least Squares (OLS), the next crucial step is to interpret its components and evaluate how well it performs. This involves understanding the estimated coefficients, assessing the model's overall fit, and determining the statistical significance of its predictors.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. Interpretation of Coefficients ($b_0$ and $b_1$)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">The heart of a regression model lies in its coefficients, which tell us about the estimated relationship between the independent variable ($X$) and the dependent variable ($Y$). Remember our estimated regression equation: $$\hat{Y} = b_0 + b_1 X$$</p>
+                
+                <h4 class="text-lg font-semibold text-gray-800 mb-2">1.1. Intercept ($b_0$):</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>The intercept represents the **predicted mean value of $Y$ when $X$ is equal to zero**.</li>
+                    <li>**Context is Key:**
+                        <ul>
+                            <li>If $X=0$ is a meaningful value within the range of your data, then $b_0$ has a direct, practical interpretation.</li>
+                            <li>If $X=0$ is outside the range of your data or is not logically possible (e.g., advertising spend cannot be negative), then the intercept might not have a meaningful interpretation on its own. It merely serves as a mathematical component of the best-fit line.</li>
+                        </ul>
+                    </li>
+                    <li>**Example:** If predicting sales ($Y$) based on advertising spend ($X$), and $b_0 = 100$, it means predicted sales are 100 units when advertising spend is 0. This might be baseline sales from other sources.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">1.2. Slope ($b_1$):</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>The slope represents the **predicted change in the mean value of $Y$ for every one-unit increase in $X$**.</li>
+                    <li>It indicates the direction (positive or negative) and magnitude of the linear relationship.</li>
+                    <li>**Example:** If predicting sales ($Y$) based on advertising spend ($X$), and $b_1 = 0.5$, it means for every additional dollar spent on advertising, predicted sales are expected to increase by 0.5 units (e.g., $0.5 \text{ units/dollar}$).</li>
+                    <li>**Units Matter:** Always interpret the slope in the context of the units of $X$ and $Y$.</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. Model Fit Metrics: How Well Does the Model Explain Variance?</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">After interpreting the coefficients, we need to know how well our model fits the observed data. This is assessed using measures of "goodness of fit."</p>
+
+                <h4 class="text-lg font-semibold text-gray-800 mb-2">2.1. R-squared ($R^2$): Coefficient of Determination</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>$R^2$ is a value between 0 and 1 (or 0% and 100%).</li>
+                    <li>It represents the **proportion of the variance in the dependent variable ($Y$) that is predictable from the independent variable ($X$)**. In simpler terms, it tells us how much of the variation in $Y$ can be explained by our model.</li>
+                    <li>**Formula:**
+                        $$ R^2 = \frac{\text{Explained Variation}}{\text{Total Variation}} = \frac{\text{SSR}}{\text{SST}} = 1 - \frac{\text{SSE}}{\text{SST}} $$
+                        Where:
+                        <ul>
+                            <li>SSR (Sum of Squares Regression/Explained): Variation explained by the model.</li>
+                            <li>SSE (Sum of Squares Error/Residual): Variation not explained by the model (random error).</li>
+                            <li>SST (Sum of Squares Total): Total variation in the dependent variable.</li>
+                        </ul>
+                    </li>
+                    <li>**Interpretation:** An $R^2$ of 0.75 means that 75% of the variation in $Y$ can be explained by the linear relationship with $X$. The remaining 25% is due to other factors or random error.</li>
+                    <li>**Caution:** A high $R^2$ does not necessarily mean the model is good or that the assumptions are met. It only indicates how much variance is explained.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">2.2. Adjusted R-squared:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>Adjusted $R^2$ is a modified version of $R^2$ that **adjusts for the number of predictors in the model and the number of observations**.</li>
+                    <li>It is particularly useful in Multiple Linear Regression (where there are multiple $X$ variables), as $R^2$ always increases when you add more independent variables, even if they don't improve the model. Adjusted $R^2$ penalizes the addition of unnecessary predictors.</li>
+                    <li>In Simple Linear Regression, Adjusted $R^2$ will be very close to $R^2$.</li>
+                    <li>**Use Case:** Prefer Adjusted $R^2$ when comparing models with different numbers of predictors.</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. Significance of Coefficients: Is the Relationship Real?</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Beyond knowing the estimated values, we need to determine if the relationship between $X$ and $Y$ (represented by $b_1$) is statistically significant, meaning it's unlikely to have occurred by random chance.</p>
+                
+                <h4 class="text-lg font-semibold text-gray-800 mb-2">3.1. Hypothesis Test for the Slope ($\beta_1$):</h4>
+                <p class="mb-2 text-gray-700">We typically test the null hypothesis that the true population slope ($\beta_1$) is zero, meaning there is no linear relationship between $X$ and $Y$ in the population.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>**Null Hypothesis ($H_0$):** $\beta_1 = 0$ (There is no linear relationship between $X$ and $Y$).</li>
+                    <li>**Alternative Hypothesis ($H_a$):** $\beta_1 \ne 0$ (There is a linear relationship between $X$ and $Y$). This is typically a two-tailed test.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">3.2. t-statistic for Coefficients:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>For each coefficient ($b_0$ and $b_1$), a **t-statistic** is calculated. This measures how many standard errors the estimated coefficient is away from zero.</li>
+                    <li>**Formula:**
+                        $$ t = \frac{b_1 - \beta_{1,0}}{\text{SE}(b_1)} $$
+                        Where $\beta_{1,0}$ is the hypothesized value (usually 0 for the null hypothesis).
+                    </li>
+                    <li>A larger absolute t-statistic suggests that the coefficient is more likely to be significantly different from zero.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">3.3. p-value for Coefficients:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>The **p-value** associated with each t-statistic tells us the probability of observing a t-statistic as extreme as (or more extreme than) the one calculated, *assuming the null hypothesis is true*.</li>
+                    <li>**Decision Rule:**
+                        <ul>
+                            <li>If p-value $\le \alpha$ (significance level, e.g., 0.05): **Reject $H_0$**. Conclude that the coefficient is statistically significant, meaning $X$ has a significant linear relationship with $Y$.</li>
+                            <li>If p-value $> \alpha$: **Fail to Reject $H_0$**. Conclude that the coefficient is not statistically significant, meaning there's not enough evidence of a linear relationship between $X$ and $Y$.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-gray-700 leading-relaxed font-bold">The significance of the slope ($b_1$) is usually the primary focus, as it tells us if the independent variable is a useful predictor of the dependent variable.</p>
+            </div>
+        </section>
+
+        <section id="practical-hands-on" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💻</span>Practical: SLR Tool Demo & Hands-on Interpretation</h2>
+            <p class="section-intro">In this section, we'll simulate a Simple Linear Regression analysis using Python's `statsmodels` (which provides detailed statistical output) and then practice interpreting the results. We'll use a scenario where we predict **Product Sales** based on **Advertising Spend**.</p>
+            
+            <div class="interactive-panel">
+                <div class="panel-title">Simulated SLR Output & Interpretation</div>
+                <p class="mb-4 text-gray-700">Below is a simulated output from a Simple Linear Regression model (similar to what you'd get from `statsmodels` in Python). Use the information to answer the interpretation questions.</p>
+                
+                <div class="text-center mb-4">
+                    <button id="showPythonCodeBtn" class="action-button bg-green-600 hover:bg-green-700">Show Python Code</button>
+                    <button id="runAnalysisBtn" class="action-button">Run Simulated Analysis</button>
+                </div>
+
+                <div id="pythonCodeSection" class="hidden mt-4">
+                    <h4 class="text-indigo-600">Python Code for SLR (using `statsmodels`):</h4>
+                    <div class="code-block">
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="slrPythonCode">
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# --- 1. Generate Synthetic Data: Sales vs. Advertising Spend ---
+np.random.seed(42)
+num_observations = 100
+advertising_spend = np.random.uniform(low=10, high=100, size=num_observations) # in thousands of dollars
+# True relationship: Sales = 50 + 2.5 * Advertising_Spend + noise
+sales = 50 + 2.5 * advertising_spend + np.random.normal(loc=0, scale=15, size=num_observations) # in thousands of units
+
+data_df = pd.DataFrame({
+    'Advertising_Spend': advertising_spend,
+    'Sales': sales
+})
+
+print("Sample Data Head:")
+print(data_df.head())
+
+# --- 2. Define X (Independent) and Y (Dependent) Variables ---
+X = data_df['Advertising_Spend']
+Y = data_df['Sales']
+
+# --- 3. Add a constant to the independent variable (for intercept) ---
+X = sm.add_constant(X)
+
+# --- 4. Fit the OLS Regression Model ---
+model = sm.OLS(Y, X)
+results = model.fit()
+
+# --- 5. Print the Regression Summary (Output for Interpretation) ---
+print("\n--- Regression Analysis Summary (statsmodels) ---")
+print(results.summary())
+
+# --- 6. Visualize the Regression Line ---
+plt.figure(figsize=(10, 7))
+sns.scatterplot(x=data_df['Advertising_Spend'], y=data_df['Sales'], color='#4338CA', s=80, alpha=0.8, label='Observed Sales')
+plt.plot(data_df['Advertising_Spend'], results.predict(X), color='#EF4444', linewidth=2, label='Regression Line')
+plt.title('Sales vs. Advertising Spend with Regression Line')
+plt.xlabel('Advertising Spend (in thousands of $)')
+plt.ylabel('Sales (in thousands of units)')
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+
+# --- 7. Visualize Residuals for Assumption Checking ---
+residuals = results.resid
+predicted_values = results.predict(X)
+
+plt.figure(figsize=(10, 5))
+sns.scatterplot(x=predicted_values, y=residuals, color='#10B981', s=80, alpha=0.8)
+plt.axhline(y=0, color='red', linestyle='--', linewidth=1)
+plt.title('Residuals vs. Predicted Values (Checking Homoscedasticity)')
+plt.xlabel('Predicted Sales (Y_hat)')
+plt.ylabel('Residuals')
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+
+# --- Optional: Q-Q Plot for Normality of Residuals ---
+# This plot visually checks if residuals follow a normal distribution
+import scipy.stats as stats
+plt.figure(figsize=(6, 6))
+stats.probplot(residuals, dist="norm", plot=plt)
+plt.title('Normal Q-Q Plot of Residuals (Checking Normality)')
+plt.xlabel('Theoretical Quantiles')
+plt.ylabel('Standardized Residuals')
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+</code></pre>
+                    </div>
+                </div>
+
+                <div id="simulatedOutputSection" class="hidden mt-4">
+                    <h4 class="text-indigo-600">Simulated Regression Output (from `statsmodels`):</h4>
+                    <div class="code-block bg-gray-900 text-gray-100 p-4 rounded-md text-sm">
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="simulatedStatsOutput">
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                  Sales   R-squared:                       0.852
+Model:                            OLS   Adj. R-squared:                  0.851
+Method:                 Least Squares   F-statistic:                     565.3
+Date:                Thu, 30 May 2025   Prob (F-statistic):           1.07e-42
+Time:                        10:00:00   Log-Likelihood:                -399.78
+No. Observations:                 100   AIC:                             803.6
+Df Residuals:                      98   BIC:                             808.8
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+=====================================================================================
+                        coef    std err          t      P>|t|      [0.025      0.975]
+-------------------------------------------------------------------------------------
+const              51.2345      2.101    24.389      0.000      47.065      55.404
+Advertising_Spend   2.4876      0.104    23.776      0.000       2.281       2.694
+==============================================================================
+Omnibus:                        0.123   Durbin-Watson:                   1.987
+Prob(Omnibus):                  0.940   Jarque-Bera (JB):                0.201
+Skew:                           0.076   Prob(JB):                        0.904
+Kurtosis:                       2.890   Cond. No.                         127.
+==============================================================================
+</code></pre>
+                    </div>
+                    <p class="mt-4 text-gray-700 leading-relaxed">This output provides all the key statistics for interpreting your SLR model. Let's break it down.</p>
+
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Visualizing the Regression</h5>
+                    <div class="chart-container">
+                        <canvas id="slrScatterResidualsChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 1: Scatter plot of Sales vs. Advertising Spend with the OLS regression line and residuals (vertical dashed lines).</p>
+
+                    <div class="chart-container">
+                        <canvas id="residualsPlotChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 2: Residuals vs. Predicted Values plot. This helps in visually checking the assumptions of homoscedasticity and linearity. Ideally, residuals should be randomly scattered around zero.</p>
+                </div>
+
+                <div id="interpretationQuestions" class="hidden mt-8">
+                    <h4 class="text-xl font-semibold text-indigo-500 mb-3">Your Interpretation Questions:</h4>
+                    <p class="mb-4 text-gray-700">Based on the simulated output above, answer the following questions:</p>
+
+                    <div class="mb-6">
+                        <p class="font-semibold text-gray-800 mb-2">1. What is the estimated regression equation? (Use $\hat{Y}$ notation)</p>
+                        <textarea id="q1_equation" rows="2" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., Y_hat = b0 + b1 * X"></textarea>
+                    </div>
+
+                    <div class="mb-6">
+                        <p class="font-semibold text-gray-800 mb-2">2. Interpret the estimated intercept (const) in the context of this business problem. Is its interpretation meaningful?</p>
+                        <textarea id="q2_intercept" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Your interpretation..."></textarea>
+                    </div>
+
+                    <div class="mb-6">
+                        <p class="font-semibold text-gray-800 mb-2">3. Interpret the estimated slope (Advertising_Spend) in the context of this business problem.</p>
+                        <textarea id="q3_slope" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Your interpretation..."></textarea>
+                    </div>
+
+                    <div class="mb-6">
+                        <p class="font-semibold text-gray-800 mb-2">4. What is the R-squared value? What does it tell you about the model's fit?</p>
+                        <textarea id="q4_r_squared" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Your interpretation..."></textarea>
+                    </div>
+
+                    <div class="mb-6">
+                        <p class="font-semibold text-gray-800 mb-2">5. Is the Advertising_Spend coefficient statistically significant? Justify your answer using the t-statistic and p-value, assuming a significance level ($\alpha$) of 0.05.</p>
+                        <textarea id="q5_significance" rows="4" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Your justification..."></textarea>
+                    </div>
+
+                    <div class="text-center">
+                        <button id="checkInterpretationBtn" class="action-button">Check My Interpretations</button>
+                    </div>
+
+                    <div id="interpretationFeedback" class="feedback-box hidden mt-4">
+                        <h4 class="text-indigo-600">Suggested Interpretations:</h4>
+                        <p class="mb-2 text-gray-700"><strong>1. Estimated Regression Equation:</strong></p>
+                        <p class="text-gray-700 ml-4">$$\hat{\text{Sales}} = 51.23 + 2.49 \times \text{Advertising\_Spend}$$</p>
+                        <p class="mb-2 text-gray-700"><strong>2. Interpretation of Intercept ($b_0 = 51.23$):</strong></p>
+                        <p class="text-gray-700 ml-4">When advertising spend is $0$ (zero thousand dollars), the predicted average sales are $51.23$ thousand units. This interpretation is plausible as it could represent baseline sales without any advertising.</p>
+                        <p class="mb-2 text-gray-700"><strong>3. Interpretation of Slope ($b_1 = 2.49$):</strong></p>
+                        <p class="text-gray-700 ml-4">For every one-thousand-dollar increase in advertising spend, the predicted average sales are expected to increase by $2.49$ thousand units, holding all other factors constant.</p>
+                        <p class="mb-2 text-gray-700"><strong>4. R-squared ($R^2 = 0.852$):</strong></p>
+                        <p class="text-gray-700 ml-4">Approximately $85.2\%$ of the variation in Sales can be explained by the variation in Advertising Spend. This indicates a strong fit, meaning Advertising Spend is a good predictor of Sales.</p>
+                        <p class="mb-2 text-gray-700"><strong>5. Significance of Advertising_Spend Coefficient:</strong></p>
+                        <p class="text-gray-700 ml-4">Yes, the Advertising\_Spend coefficient is statistically significant. Its p-value is $0.000$ (which is less than our significance level $\alpha = 0.05$). The t-statistic of $23.776$ is also very large, indicating that the estimated slope is many standard errors away from zero. This provides strong evidence to reject the null hypothesis that $\beta_1 = 0$, concluding that advertising spend has a statistically significant linear relationship with sales.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <div id="messageBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg z-50" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span id="messageText" class="block sm:inline"></span>
+        <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" onclick="document.getElementById('messageBox').classList.add('hidden');">
+            <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+        </span>
+    </div>
+
+    <script>
+        // Global variables for synthetic data and chart instances
+        let advertisingSpendData = [];
+        let salesData = [];
+        let predictedSalesData = [];
+        let residualsData = [];
+        let slrScatterResidualsChartInstance = null;
+        let residualsPlotChartInstance = null;
+
+        // --- Message Box Function ---
+        function showMessage(message, type = 'error') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            messageText.innerText = message;
+            messageBox.classList.remove('hidden');
+            if (type === 'error') {
+                messageBox.classList.remove('bg-green-100', 'border-green-400', 'text-green-700');
+                messageBox.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+            } else {
+                messageBox.classList.remove('bg-red-100', 'border-red-400', 'text-red-700'); // Remove red if previously error
+                messageBox.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+            }
+        }
+
+        // --- Code Copy Function ---
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const textToCopy = codeBlock.textContent;
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                button.textContent = 'Copied!';
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                button.textContent = 'Error!';
+            }
+            document.body.removeChild(textarea);
+
+            setTimeout(() => {
+                button.textContent = 'Copy';
+            }, 2000);
+        }
+
+        // --- MathJax Rendering Function ---
+        function renderMathInElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element && typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                MathJax.typesetPromise([element]).catch(err => console.error("MathJax rendering error:", err));
+            } else if (!element) {
+                console.warn(`Element with ID '${elementId}' not found for MathJax rendering.`);
+            } else {
+                console.warn("MathJax not fully loaded or configured. Skipping MathJax rendering for:", elementId);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation button active state logic
+            document.querySelectorAll('nav a').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // --- Practical Section Logic ---
+            const showPythonCodeBtn = document.getElementById('showPythonCodeBtn');
+            const pythonCodeSection = document.getElementById('pythonCodeSection');
+            const runAnalysisBtn = document.getElementById('runAnalysisBtn');
+            const simulatedOutputSection = document.getElementById('simulatedOutputSection');
+            const interpretationQuestionsDiv = document.getElementById('interpretationQuestions');
+            const checkInterpretationBtn = document.getElementById('checkInterpretationBtn');
+            const interpretationFeedbackDiv = document.getElementById('interpretationFeedback');
+
+            showPythonCodeBtn.addEventListener('click', function() {
+                pythonCodeSection.classList.toggle('hidden');
+            });
+
+            runAnalysisBtn.addEventListener('click', function() {
+                simulatedOutputSection.classList.remove('hidden');
+                interpretationQuestionsDiv.classList.remove('hidden');
+                generateSLRDataAndCalculate();
+                drawSLRCharts();
+                // Ensure MathJax renders any equations in the simulated output and questions
+                renderMathInElement('simulatedOutputSection');
+                renderMathInElement('interpretationQuestions');
+            });
+
+            checkInterpretationBtn.addEventListener('click', function() {
+                interpretationFeedbackDiv.classList.toggle('hidden');
+                renderMathInElement('interpretationFeedback'); // Render MathJax in feedback
+            });
+
+            // --- Data Generation and OLS Calculation (Client-side for Charts) ---
+            function generateSLRDataAndCalculate() {
+                const numObservations = 100;
+                const trueSlope = 2.5;
+                const trueIntercept = 50;
+                const noiseScale = 15; // Standard deviation of noise
+
+                advertisingSpendData = [];
+                salesData = [];
+                predictedSalesData = [];
+                residualsData = [];
+
+                // Seed for reproducibility
+                Math.seedrandom('42'); // Using a simple seedrandom library if available, otherwise just Math.random()
+
+                for (let i = 0; i < numObservations; i++) {
+                    const spend = Math.random() * 90 + 10; // Spend between 10 and 100
+                    const noise = (Math.random() - 0.5) * 2 * noiseScale; // Simple approximation of normal noise
+                    const sales = trueIntercept + trueSlope * spend + noise;
+
+                    advertisingSpendData.push(spend);
+                    salesData.push(sales);
+                }
+
+                // Calculate OLS coefficients (simplified manual calculation)
+                const n = advertisingSpendData.length;
+                let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+
+                for (let i = 0; i < n; i++) {
+                    sumX += advertisingSpendData[i];
+                    sumY += salesData[i];
+                    sumXY += advertisingSpendData[i] * salesData[i];
+                    sumX2 += advertisingSpendData[i] * advertisingSpendData[i];
+                }
+
+                const meanX = sumX / n;
+                const meanY = sumY / n;
+
+                const numerator = sumXY - n * meanX * meanY;
+                const denominator = sumX2 - n * meanX * meanX;
+
+                let b1_estimated = 0;
+                if (denominator !== 0) {
+                    b1_estimated = numerator / denominator;
+                }
+                const b0_estimated = meanY - b1_estimated * meanX;
+
+                // Populate predicted and residuals data
+                for (let i = 0; i < n; i++) {
+                    const predictedY = b0_estimated + b1_estimated * advertisingSpendData[i];
+                    predictedSalesData.push(predictedY);
+                    residualsData.push(salesData[i] - predictedY);
+                }
+            }
+
+            // --- Chart Drawing Functions ---
+            function drawSLRCharts() {
+                // Chart 1: Scatter Plot with Regression Line and Residuals
+                const slrCtx = document.getElementById('slrScatterResidualsChart').getContext('2d');
+                if (slrScatterResidualsChartInstance) {
+                    slrScatterResidualsChartInstance.destroy();
+                }
+
+                const dataPoints = advertisingSpendData.map((x, i) => ({ x: x, y: salesData[i] }));
+                
+                // For the regression line, get min/max X values
+                const minX = Math.min(...advertisingSpendData);
+                const maxX = Math.max(...advertisingSpendData);
+                
+                // Use the coefficients from the simulated output for chart consistency
+                const b0_chart = 51.2345;
+                const b1_chart = 2.4876;
+
+                const regressionLinePoints = [
+                    { x: minX, y: b0_chart + b1_chart * minX },
+                    { x: maxX, y: b0_chart + b1_chart * maxX }
+                ];
+
+                // Prepare data for residuals (vertical lines)
+                const residualLines = [];
+                for (let i = 0; i < advertisingSpendData.length; i++) {
+                    residualLines.push({
+                        x1: advertisingSpendData[i],
+                        y1: salesData[i],
+                        x2: advertisingSpendData[i],
+                        y2: b0_chart + b1_chart * advertisingSpendData[i] // Predicted Y for this point
+                    });
+                }
+
+                slrScatterResidualsChartInstance = new Chart(slrCtx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Observed Sales',
+                                data: dataPoints,
+                                backgroundColor: '#4338CA',
+                                pointRadius: 5,
+                                pointHoverRadius: 7
+                            },
+                            {
+                                label: 'OLS Regression Line',
+                                data: regressionLinePoints,
+                                type: 'line',
+                                borderColor: '#EF4444',
+                                borderWidth: 2,
+                                fill: false,
+                                pointRadius: 0,
+                                showLine: true
+                            },
+                            {
+                                label: 'Residuals',
+                                data: residualLines.flatMap(d => [{x: d.x1, y: d.y1}, {x: d.x2, y: d.y2}, {x: d.x2, y: d.y2}]),
+                                type: 'line',
+                                borderColor: '#10B981',
+                                borderWidth: 0.8,
+                                borderDash: [5, 5],
+                                fill: false,
+                                pointRadius: 0,
+                                showLine: true,
+                                segment: {
+                                    borderColor: ctx => {
+                                        const { p0, p1 } = ctx;
+                                        if (p0.parsed.x === p1.parsed.x) {
+                                            return '#10B981';
+                                        }
+                                        return 'transparent';
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Sales vs. Advertising Spend with OLS Regression Line & Residuals',
+                                font: { size: 16, weight: 'bold' },
+                                color: '#374151'
+                            },
+                            legend: {
+                                display: true,
+                                labels: {
+                                    filter: function(legendItem, chartData) {
+                                        return legendItem.text === 'Observed Sales' || legendItem.text === 'OLS Regression Line';
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        if (context.dataset.label === 'Observed Sales') {
+                                            const x = context.parsed.x.toFixed(2);
+                                            const y = context.parsed.y.toFixed(2);
+                                            const predictedY = (b0_chart + b1_chart * context.parsed.x).toFixed(2);
+                                            const residual = (y - predictedY).toFixed(2);
+                                            return [`Advertising Spend: ${x}`, `Observed Sales: ${y}`, `Predicted Sales: ${predictedY}`, `Residual: ${residual}`];
+                                        }
+                                        return null;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: {
+                                    display: true,
+                                    text: 'Advertising Spend (in thousands of $)',
+                                    color: '#4B5563',
+                                    font: { size: 14, weight: 'bold' }
+                                },
+                                ticks: {
+                                    color: '#4B5563',
+                                    font: { size: 12 }
+                                },
+                                grid: {
+                                    color: '#e5e7eb'
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Sales (in thousands of units)',
+                                    color: '#4B5563',
+                                    font: { size: 14, weight: 'bold' }
+                                },
+                                ticks: {
+                                    color: '#4B5563',
+                                    font: { size: 12 }
+                                },
+                                grid: {
+                                    color: '#e5e7eb'
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+
+                // Chart 2: Residuals vs. Predicted Values Plot
+                const resCtx = document.getElementById('residualsPlotChart').getContext('2d');
+                if (residualsPlotChartInstance) {
+                    residualsPlotChartInstance.destroy();
+                }
+
+                const residualsPlotDataPoints = predictedSalesData.map((y_hat, i) => ({ x: y_hat, y: residualsData[i] }));
+
+                residualsPlotChartInstance = new Chart(resCtx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Residuals',
+                            data: residualsPlotDataPoints,
+                            backgroundColor: '#10B981', // Green
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Residuals vs. Predicted Values',
+                                font: { size: 16, weight: 'bold' },
+                                color: '#374151'
+                            },
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Predicted Y: ${context.parsed.x.toFixed(2)}, Residual: ${context.parsed.y.toFixed(2)}`;
+                                    }
+                                }
+                            },
+                            annotation: {
+                                annotations: {
+                                    zeroLine: {
+                                        type: 'line',
+                                        yMin: 0,
+                                        yMax: 0,
+                                        borderColor: '#EF4444',
+                                        borderWidth: 2,
+                                        borderDash: [5, 5]
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: {
+                                    display: true,
+                                    text: 'Predicted Sales (Y_hat)',
+                                    color: '#4B5563',
+                                    font: { size: 14, weight: 'bold' }
+                                },
+                                ticks: {
+                                    color: '#4B5563',
+                                    font: { size: 12 }
+                                },
+                                grid: {
+                                    color: '#e5e7eb'
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Residuals',
+                                    color: '#4B5563',
+                                    font: { size: 14, weight: 'bold' }
+                                },
+                                ticks: {
+                                    color: '#4B5563',
+                                    font: { size: 12 }
+                                },
+                                grid: {
+                                    color: '#e5e7eb'
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+            }
+
+            // Initial render of MathJax for the theory section on load
+            renderMathInElement('theory-intro');
+        });
+
+        // Load MathJax for rendering LaTeX
+        const mathJaxScript = document.createElement('script');
+        mathJaxScript.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
+        mathJaxScript.async = true;
+        document.body.appendChild(mathJaxScript);
+
+        // Simple Math.seedrandom for client-side data generation consistency
+        // (This is a simplified implementation, not cryptographically secure)
+        (function(global) {
+            let seed = 0;
+            global.Math.seedrandom = function(s) {
+                seed = s.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 2147483647;
+            };
+            global.Math.random = function() {
+                seed = (seed * 9301 + 49297) % 233280;
+                return seed / 233280;
+            };
+        })(this);
+    </script>
+</body>
+</html>

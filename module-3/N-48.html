@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S48: Presenting Data Stories & Avoiding Pitfalls</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .chart-container { position: relative; height: 280px; width: 100%; margin-top: 1rem; margin-bottom: 1rem; }
+        .chart-description { margin-top: 0.5rem; font-size: 0.85rem; color: #555; text-align: center; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .interactive-panel button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .interactive-panel button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .interactive-panel button:active {
+            transform: translateY(0);
+        }
+        .scenario-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .scenario-box h4 { font-size: 1.25rem; font-weight: 600; color: #374151; margin-bottom: 1rem; }
+        .scenario-box .content-area { border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem; }
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .feedback-box.good { background-color: #D1FAE5; color: #065F46; border: 1px solid #34D399; }
+        .feedback-box.bad { background-color: #FEE2E2; color: #991B1B; border: 1px solid #EF4444; }
+        .feedback-box.neutral { background-color: #FEF3C7; color: #92400E; border: 1px solid #FBBF24; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S48: Presenting Data Stories & Avoiding Pitfalls</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Presenting Data Stories & Avoiding Pitfalls</h2>
+            <p class="section-intro">The final step in the data storytelling process is the presentation. Even the most brilliant insights can fall flat if not communicated effectively. This session provides practical tips for delivering impactful data stories and highlights common pitfalls to avoid, ensuring your analysis leads to clear understanding and action.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Tips for Effective Data Story Presentation</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">A successful data presentation requires more than just good charts; it demands a compelling delivery that resonates with your audience.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>1. Know Your Audience (Revisit):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Tailor your language, level of detail, and recommendations to their specific needs and understanding. Executives want high-level, actionable insights; technical teams may want methodology.</li>
+                            <li>Anticipate their questions and prepare answers.</li>
+                        </ul>
+                    </li>
+                    <li><strong>2. Practice and Rehearse:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Familiarize yourself with the flow of your narrative and the transitions between visuals.</li>
+                            <li>Practice your verbal explanations to be concise and clear. Rehearsal builds confidence and ensures a smooth delivery.</li>
+                        </ul>
+                    </li>
+                    <li><strong>3. Keep it Concise and Focused:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Respect your audience's time. Focus on 1-3 key insights and their implications.</li>
+                            <li>Avoid "data dumping" – only present data that directly supports your narrative.</li>
+                        </ul>
+                    </li>
+                    <li><strong>4. Visuals First, Then Explain:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Allow your audience a moment to absorb a new visual before you start talking.</li>
+                            <li>Then, guide their eyes to the key elements and explain what they are seeing and why it's important.</li>
+                            <li>Use annotations or highlights on your charts to draw attention to critical points.</li>
+                        </ul>
+                    </li>
+                    <li><strong>5. Engage the Audience:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Ask rhetorical questions or direct questions to encourage participation and critical thinking.</li>
+                            <li>Encourage discussion and be prepared for questions.</li>
+                            <li>Maintain eye contact and use confident body language.</li>
+                        </ul>
+                    </li>
+                    <li><strong>6. Deliver with Confidence and Clarity:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Speak clearly and at a moderate pace.</li>
+                            <li>Show enthusiasm for your findings. Your passion can be contagious.</li>
+                        </ul>
+                    </li>
+                    <li><strong>7. End with a Strong Call to Action:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Clearly state what you want your audience to do next. What decisions need to be made? What are the concrete next steps?</li>
+                            <li>Quantify the expected impact of your recommendations if possible.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Common Pitfalls in Data Presentation and Storytelling</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Being aware of common mistakes can help you avoid them and ensure your message is received as intended.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>1. Data Dumping / Information Overload:</strong> Presenting too many charts or too much raw data without a clear narrative or explanation. The audience gets lost in the details.</li>
+                    <li><strong>2. Misleading Visuals:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Truncated Axes:</strong> Starting a bar chart's Y-axis above zero to exaggerate differences.</li>
+                            <li><strong>Improper Scaling:</strong> Using different scales for comparison charts, making differences appear larger or smaller than they are.</li>
+                            <li><strong>Inappropriate Chart Types:</strong> Using a pie chart for too many categories, or a bar chart for trends over time.</li>
+                            <li><strong>Lack of Baselines:</strong> Not showing a comparison point (e.g., target, previous period, competitor).</li>
+                        </ul>
+                    </li>
+                    <li><strong>3. Lack of Context or Narrative:</strong> Presenting isolated charts without explaining the "why" behind the analysis or the "so what" of the findings.</li>
+                    <li><strong>4. Overcomplicating:</strong> Using overly complex charts or jargon when simpler alternatives would suffice. Making the audience work too hard to understand.</li>
+                    <li><strong>5. Ignoring Audience Needs:</strong> Presenting highly technical details to a non-technical executive audience, or vice-versa.</li>
+                    <li><strong>6. No Clear Call to Action:</strong> Leaving the audience without clear next steps or decisions, leading to inaction.</li>
+                    <li><strong>7. Ethical Pitfalls:</strong> (This is a crucial area, which we will delve into more deeply in Module V, N-S84-N-S86)
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Bias:</strong> Unintentionally or intentionally presenting data in a way that favors a particular outcome.</li>
+                            <li><strong>Privacy Violations:</strong> Displaying sensitive personal data without proper anonymization or consent.</li>
+                            <li><strong>Lack of Transparency:</strong> Hiding data sources, assumptions, or limitations of the analysis.</li>
+                            <li><strong>Misrepresentation:</strong> Deliberately manipulating visuals or statistics to deceive.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">By consciously avoiding these pitfalls, you can ensure your data stories are not only compelling but also accurate, transparent, and impactful.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Interactive Presentation Scenarios & Ethical Dilemmas</h2>
+            <p class="section-intro">This practical session provides interactive scenarios to help you practice identifying effective presentation techniques and recognizing common pitfalls, including ethical considerations. Engage with the examples and reflect on your choices.</p>
+
+            <div class="interactive-panel">
+                <div class="panel-title">Simulated Presentation Scenarios</div>
+                <p class="text-gray-700 text-center mb-4">Select a scenario to see how an insight might be presented effectively or ineffectively.</p>
+                <div class="flex flex-wrap justify-center gap-4 mb-6">
+                    <button id="scenario1Btn" data-scenario="scenario1">Customer Acquisition Cost</button>
+                    <button id="scenario2Btn" data-scenario="scenario2">Product Performance</button>
+                </div>
+
+                <div id="presentationScenarioOutput" class="scenario-box hidden">
+                    <h4 id="scenarioTitle"></h4>
+                    <p id="scenarioDescription" class="text-gray-700 mb-4"></p>
+                    
+                    <div class="flex justify-center gap-4 mb-4">
+                        <button id="showGoodBtn" class="bg-green-600 hover:bg-green-700">Show Good Presentation</button>
+                        <button id="showBadBtn" class="bg-red-600 hover:bg-red-700">Show Bad Presentation</button>
+                    </div>
+
+                    <div id="presentationContent" class="content-area">
+                        </div>
+                </div>
+            </div>
+
+            <div class="interactive-panel mt-8">
+                <div class="panel-title">Ethical Dilemma Discussion</div>
+                <p class="text-gray-700 text-center mb-4">Consider the following ethical dilemmas related to data visualization and storytelling. Choose how you would respond and see the implications.</p>
+                <div class="flex flex-wrap justify-center gap-4 mb-6">
+                    <button id="dilemma1Btn" data-dilemma="dilemma1">Dilemma 1: Sales Target</button>
+                    <button id="dilemma2Btn" data-dilemma="dilemma2">Dilemma 2: Customer Data</button>
+                </div>
+
+                <div id="ethicalDilemmaOutput" class="scenario-box hidden">
+                    <h4 id="dilemmaTitle"></h4>
+                    <p id="dilemmaDescription" class="text-gray-700 mb-4"></p>
+                    <div id="dilemmaOptions" class="flex flex-col sm:flex-row justify-center gap-4 mb-4">
+                        </div>
+                    <div id="dilemmaFeedback" class="feedback-box hidden">
+                        </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mt-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Peer Feedback & Ethical Considerations Discussion</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">While these are simulated scenarios, the principles apply directly to your mini-project presentations and future work. Engage in a discussion with your peers:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>What were the most impactful differences between the "good" and "bad" presentation examples?</li>
+                    <li>How did the ethical dilemmas make you think differently about data presentation?</li>
+                    <li>Why is it crucial for data analysts to be aware of the ethical implications of their work?</li>
+                    <li>Share examples from your own experiences (or news) where data was presented misleadingly.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">This session emphasizes that data analysis is not just a technical skill; it's also about responsible and effective communication.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('nav a').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        let activeCharts = [];
+
+        function destroyCharts() {
+            activeCharts.forEach(chart => chart.destroy());
+            activeCharts = [];
+        }
+
+        function renderChart(canvasId, chartConfig) {
+            destroyCharts(); // Ensure only one chart is active at a time for these demos
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const newChart = new Chart(ctx, {
+                type: chartConfig.type,
+                data: chartConfig.data,
+                options: chartConfig.options
+            });
+            activeCharts.push(newChart);
+        }
+
+        // --- Presentation Scenarios Data ---
+        const presentationScenarios = {
+            scenario1: {
+                title: "Customer Acquisition Cost (CAC) Analysis",
+                description: "You need to present the average Customer Acquisition Cost (CAC) over the last year and highlight a recent increase.",
+                good: {
+                    text: `
+                        <p class="mb-2 text-gray-700">"Team, our Customer Acquisition Cost has seen a concerning rise in Q2, reaching $120. This is a 20% increase from Q1's $100. This trend, if unaddressed, will significantly impact our profitability. We need to investigate the underlying drivers."</p>
+                        <div class="chart-container"><canvas id="scenario1GoodChart"></canvas></div>
+                        <p class="chart-description"><em>Good: Clearly labeled, shows trend and highlights the increase with a benchmark.</em></p>
+                    `,
+                    chartConfig: {
+                        type: 'bar',
+                        data: {
+                            labels: ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024'],
+                            datasets: [{
+                                label: 'Avg. CAC ($)',
+                                data: [100, 120, 110, 115],
+                                backgroundColor: ['#4338CA', '#EF4444', '#4338CA', '#4338CA'], // Highlight Q2
+                                borderColor: ['#4338CA', '#EF4444', '#4338CA', '#4338CA'],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                title: { display: true, text: 'Average Customer Acquisition Cost (CAC) by Quarter', font: { size: 14 } },
+                                annotation: {
+                                    annotations: {
+                                        line1: {
+                                            type: 'line',
+                                            yMin: 100,
+                                            yMax: 100,
+                                            borderColor: 'rgb(75, 192, 192)',
+                                            borderWidth: 2,
+                                            borderDash: [6, 6],
+                                            label: {
+                                                content: 'Q1 Benchmark',
+                                                enabled: true,
+                                                position: 'start',
+                                                backgroundColor: 'rgba(75, 192, 192, 0.7)'
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: { title: { display: true, text: 'Quarter' } },
+                                y: { beginAtZero: true, min: 80, title: { display: true, text: 'CAC ($)' } }
+                            }
+                        }
+                    }
+                },
+                bad: {
+                    text: `
+                        <p class="mb-2 text-gray-700">"Here's the CAC data. As you can see, there are some numbers. It's gone up."</p>
+                        <div class="chart-container"><canvas id="scenario1BadChart"></canvas></div>
+                        <p class="chart-description"><em>Bad: Vague explanation, cluttered chart, misleading scale.</em></p>
+                    `,
+                    chartConfig: {
+                        type: 'line', // Inappropriate for comparing discrete quarters if not showing trend
+                        data: {
+                            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                            datasets: [{
+                                label: 'Cost',
+                                data: [100, 120, 110, 115],
+                                borderColor: 'rgb(201, 203, 207)',
+                                backgroundColor: 'transparent',
+                                fill: false,
+                                tension: 0.1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                title: { display: true, text: 'CAC Data', font: { size: 14 } }
+                            },
+                            scales: {
+                                x: { grid: { color: 'rgba(0, 0, 0, 0.3)', borderWidth: 2 } },
+                                y: { beginAtZero: false, min: 99, title: { display: false } } // Truncated Y-axis, no title
+                            }
+                        }
+                    }
+                }
+            },
+            scenario2: {
+                title: "Product Performance Review",
+                description: "You are reviewing the sales performance of different product lines and need to highlight the top performing one.",
+                good: {
+                    text: `
+                        <p class="mb-2 text-gray-700">"Our 'Premium Gadgets' line clearly leads in sales, contributing 45% of total revenue this quarter, significantly outperforming other categories. This indicates strong market demand and effective positioning for this product."</p>
+                        <div class="chart-container"><canvas id="scenario2GoodChart"></canvas></div>
+                        <p class="chart-description"><em>Good: Clear hierarchy, highlights key insight, appropriate chart for composition.</em></p>
+                    `,
+                    chartConfig: {
+                        type: 'pie',
+                        data: {
+                            labels: ['Premium Gadgets', 'Basic Accessories', 'Smart Home Devices', 'Wearables'],
+                            datasets: [{
+                                data: [45, 20, 25, 10],
+                                backgroundColor: [
+                                    '#4338CA', // Premium Gadgets (highlight)
+                                    '#6366F1',
+                                    '#818CF8',
+                                    '#A5B4FC'
+                                ],
+                                borderColor: '#ffffff',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'right' },
+                                title: { display: true, text: 'Q2 Revenue Share by Product Line', font: { size: 14 } }
+                            }
+                        }
+                    }
+                },
+                bad: {
+                    text: `
+                        <p class="mb-2 text-gray-700">"Here are all our products. Lots of numbers. Not sure what to focus on."</p>
+                        <div class="chart-container"><canvas id="scenario2BadChart"></canvas></div>
+                        <p class="chart-description"><em>Bad: Too many categories, no clear highlight, difficult to compare.</em></p>
+                    `,
+                    chartConfig: {
+                        type: 'pie',
+                        data: {
+                            labels: ['Prod A', 'Prod B', 'Prod C', 'Prod D', 'Prod E', 'Prod F', 'Prod G', 'Prod H', 'Prod I', 'Prod J'],
+                            datasets: [{
+                                data: [10, 8, 12, 7, 15, 9, 6, 11, 5, 17],
+                                backgroundColor: [
+                                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                                    '#FF9F40', '#E7E9ED', '#C9CBCE', '#7B8D9E', '#5D6D7E'
+                                ],
+                                borderColor: '#ffffff',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'right' },
+                                title: { display: true, text: 'Product Sales Data', font: { size: 14 } }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        // --- Ethical Dilemmas Data ---
+        const ethicalDilemmas = {
+            dilemma1: {
+                title: "Dilemma 1: Inflating Sales Targets",
+                description: "Your manager asks you to create a sales performance dashboard for the board meeting. They suggest 'adjusting' the sales target line downwards slightly on the chart to make the current performance look better, even though the actual target wasn't met. They say it's 'just for optics' and won't affect actual operations.",
+                options: [
+                    {
+                        label: "A. Adjust the target line as requested, prioritizing 'optics'.",
+                        feedback: {
+                            type: "bad",
+                            message: "<strong>Ethical Implication: Misrepresentation & Lack of Transparency.</strong> Adjusting data, even 'just for optics', is unethical. It misleads stakeholders and erodes trust. This can lead to poor strategic decisions based on inaccurate information."
+                        }
+                    },
+                    {
+                        label: "B. Refuse, explaining that data must be presented accurately and transparently.",
+                        feedback: {
+                            type: "good",
+                            message: "<strong>Ethical Implication: Integrity & Transparency.</strong> This is the correct ethical choice. Upholding data integrity is paramount. While it might be an uncomfortable conversation, it ensures accurate reporting and fosters long-term trust."
+                        }
+                    },
+                    {
+                        label: "C. Present the accurate data, but verbally downplay the missed target.",
+                        feedback: {
+                            type: "neutral",
+                            message: "<strong>Ethical Implication: Partial Transparency.</strong> While the data itself is accurate, verbally downplaying or spinning facts can still be misleading. It's a step better than altering the visual, but still compromises full transparency and honest communication."
+                        }
+                    }
+                ]
+            },
+            dilemma2: {
+                title: "Dilemma 2: Sharing Customer Demographics",
+                description: "You've analyzed customer demographics and found a strong correlation between a specific ethnic group and lower average spending. Your marketing team wants to use this insight to exclude that group from certain high-value marketing campaigns to 'optimize' ROI. They ask you to present this finding explicitly.",
+                options: [
+                    {
+                        label: "A. Present the finding as requested, focusing on ROI optimization.",
+                        feedback: {
+                            type: "bad",
+                            message: "<strong>Ethical Implication: Bias & Discrimination.</strong> Using demographic data to exclude groups from opportunities, even for 'optimization', can lead to discriminatory practices. While the data might show a correlation, acting on it in a way that harms or marginalizes a group is highly unethical."
+                        }
+                    },
+                    {
+                        label: "B. Refuse to present the finding in a way that enables exclusion, and discuss ethical concerns.",
+                        feedback: {
+                            type: "good",
+                            message: "<strong>Ethical Implication: Fairness & Responsible AI.</strong> This is the ethical choice. As a data analyst, you have a responsibility to ensure your insights are used fairly and do not perpetuate bias or discrimination. It's crucial to advocate for ethical use of data."
+                        }
+                    },
+                    {
+                        label: "C. Present the data, but generalize the finding without mentioning the specific ethnic group.",
+                        feedback: {
+                            type: "neutral",
+                            message: "<strong>Ethical Implication: Avoiding Direct Harm, but Not Solving the Root Issue.</strong> While this avoids explicit discrimination in your presentation, it doesn't address the underlying ethical problem if the marketing team still intends to act on the biased insight. It's a compromise that might not prevent unethical actions."
+                        }
+                    }
+                ]
+            }
+        };
+
+        // --- Event Listeners for Presentation Scenarios ---
+        document.getElementById('scenario1Btn').addEventListener('click', () => displayPresentationScenario('scenario1'));
+        document.getElementById('scenario2Btn').addEventListener('click', () => displayPresentationScenario('scenario2'));
+
+        function displayPresentationScenario(scenarioKey) {
+            const scenario = presentationScenarios[scenarioKey];
+            const outputDiv = document.getElementById('presentationScenarioOutput');
+            const contentDiv = document.getElementById('presentationContent');
+            const titleElem = document.getElementById('scenarioTitle');
+            const descElem = document.getElementById('scenarioDescription');
+
+            outputDiv.classList.remove('hidden');
+            titleElem.innerText = scenario.title;
+            descElem.innerText = scenario.description;
+            contentDiv.innerHTML = ''; // Clear previous content
+
+            document.getElementById('showGoodBtn').onclick = () => {
+                contentDiv.innerHTML = scenario.good.text;
+                if (scenario.good.chartConfig) {
+                    renderChart(scenarioKey + 'GoodChart', scenario.good.chartConfig);
+                }
+            };
+            document.getElementById('showBadBtn').onclick = () => {
+                contentDiv.innerHTML = scenario.bad.text;
+                if (scenario.bad.chartConfig) {
+                    renderChart(scenarioKey + 'BadChart', scenario.bad.chartConfig);
+                }
+            };
+
+            // Automatically show good example initially
+            document.getElementById('showGoodBtn').click();
+        }
+
+        // --- Event Listeners for Ethical Dilemmas ---
+        document.getElementById('dilemma1Btn').addEventListener('click', () => displayEthicalDilemma('dilemma1'));
+        document.getElementById('dilemma2Btn').addEventListener('click', () => displayEthicalDilemma('dilemma2'));
+
+        function displayEthicalDilemma(dilemmaKey) {
+            const dilemma = ethicalDilemmas[dilemmaKey];
+            const outputDiv = document.getElementById('ethicalDilemmaOutput');
+            const titleElem = document.getElementById('dilemmaTitle');
+            const descElem = document.getElementById('dilemmaDescription');
+            const optionsDiv = document.getElementById('dilemmaOptions');
+            const feedbackDiv = document.getElementById('dilemmaFeedback');
+
+            outputDiv.classList.remove('hidden');
+            titleElem.innerText = dilemma.title;
+            descElem.innerText = dilemma.description;
+            optionsDiv.innerHTML = ''; // Clear previous options
+            feedbackDiv.classList.add('hidden'); // Hide feedback initially
+
+            dilemma.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.innerText = option.label;
+                button.classList.add('flex-grow'); // Make buttons take available space
+                button.onclick = () => {
+                    feedbackDiv.classList.remove('hidden');
+                    feedbackDiv.className = `feedback-box ${option.feedback.type}`;
+                    feedbackDiv.innerHTML = option.feedback.message;
+                };
+                optionsDiv.appendChild(button);
+            });
+        }
+
+        // Initial setup for Chart.js annotation plugin (conceptual)
+        // Chart.js does not have a native 'annotation' plugin.
+        // If you need annotations, you would need to include the 'chartjs-plugin-annotation' library.
+        // Example: <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+        // And register it: Chart.register(ChartjsPluginAnnotation);
+        // The current code provides a conceptual representation of annotations.
+    </script>
+</body>
+</html>

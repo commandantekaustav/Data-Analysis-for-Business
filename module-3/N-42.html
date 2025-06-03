@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S42: Advanced Visualizations & Python for Interactive Dashboards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .chart-container { position: relative; height: 350px; width: 100%; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+        .chart-description { margin-top: 1rem; font-size: 0.9rem; color: #555; text-align: center; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S42: Advanced Visualizations & Python for Interactive Dashboards</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Advanced Visualizations & Python for Interactive Dashboards</h2>
+            <p class="section-intro">Beyond standard charts and basic dashboards, data visualization extends to more specialized types like map visualizations, which are crucial for location-based insights. Furthermore, for highly customized or web-integrated analytical applications, Python offers powerful libraries to build interactive dashboards. This session explores these advanced visualization concepts and introduces Python's role in creating web-based dashboards.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Map Visualizations in Tableau/Power BI</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Geographical data is prevalent in business (e.g., sales by state, customer locations, store performance). Map visualizations are incredibly effective for displaying data that has a spatial component, allowing for quick identification of regional patterns, hotspots, or areas needing attention.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Purpose:</strong> To visualize data geographically, showing distribution, density, or performance across regions, countries, states, or cities.</li>
+                    <li><strong>Types of Map Visualizations:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Filled Maps (Choropleth Maps):</strong> Regions (e.g., states, countries) are shaded with different colors based on a quantitative measure (e.g., darker shade for higher sales). Best for showing density or magnitude across predefined geographical areas.</li>
+                            <li><strong>Symbol Maps (Bubble Maps):</strong> Points (circles, squares) are placed on a map at specific locations (e.g., city coordinates). The size and/or color of the symbol can represent a measure (e.g., larger bubble for higher customer count). Good for precise location data and showing magnitude.</li>
+                            <li><strong>Density Maps:</strong> Show areas of high concentration of data points, often using color gradients to indicate "hotspots."</li>
+                        </ul>
+                    </li>
+                    <li><strong>Key Features in BI Tools:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Automatic Geocoding:</strong> BI tools can often automatically recognize geographical names (e.g., "New York", "California") and convert them into map coordinates.</li>
+                            <li><strong>Layering:</strong> Ability to overlay multiple types of data on a single map (e.g., filled map by state, with bubbles for cities).</li>
+                            <li><strong>Interactivity:</strong> Zooming, panning, tooltips on hover, and using map selections to filter other dashboard elements.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600"><em>Example Use Cases:</em> Visualizing sales performance across different states, identifying regions with high customer churn, mapping store locations, or tracking delivery routes.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Introduction to Python Libraries for Web-Based Dashboards (Plotly Dash/Streamlit)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">While Tableau and Power BI are excellent for drag-and-drop dashboard creation, Python offers frameworks for building highly customized, web-based analytical applications and dashboards. These are particularly useful when you need to integrate complex Python logic (like custom statistical models or machine learning algorithms) directly into an interactive web interface.</p>
+                
+                <h4 class="text-lg font-medium text-gray-800 mb-2">1. Plotly Dash</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>What it is:</strong> An open-source Python framework for building analytical web applications. It allows you to create interactive dashboards entirely in Python, without needing to write HTML, CSS, or JavaScript directly.</li>
+                    <li><strong>Key Features:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Python-Native:</strong> Build entire web apps using only Python.</li>
+                            <li><strong>Interactive Plotly Graphs:</strong> Leverages Plotly.js for rich, interactive charts.</li>
+                            <li><strong>Component-Based:</strong> Build layouts using Python components that represent HTML elements (e.g., `html.Div`, `dcc.Graph`).</li>
+                            <li><strong>Callbacks:</strong> Define interactivity using Python functions that respond to user inputs (e.g., slider changes, button clicks).</li>
+                        </ul>
+                    </li>
+                    <li><strong>When to Use:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>When you need highly customized, bespoke analytical applications.</li>
+                            <li>When integrating complex Python-based models (ML, statistical) directly into a user-facing dashboard.</li>
+                            <li>For internal tools where Python is the primary development language.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4 class="text-lg font-medium text-gray-800 mb-2">2. Streamlit</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>What it is:</strong> An open-source app framework for Machine Learning and Data Science teams. It's designed for rapid prototyping and deployment of data applications with minimal code.</li>
+                    <li><strong>Key Features:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Simplicity & Speed:</strong> Extremely easy and fast to turn Python scripts into interactive web apps.</li>
+                            <li><strong>Markdown Support:</strong> Write text and explanations using Markdown directly in your Python code.</li>
+                            <li><strong>Widgets:</strong> Provides simple widgets (sliders, buttons, text inputs) to add interactivity.</li>
+                            <li><strong>Automatic Reruns:</strong> Automatically reruns your script from top to bottom whenever you modify it or interact with a widget.</li>
+                        </ul>
+                    </li>
+                    <li><strong>When to Use:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>For quickly building and sharing interactive data prototypes or MVPs (Minimum Viable Products).</li>
+                            <li>When you want to showcase a data analysis or ML model in an interactive way to non-technical stakeholders.</li>
+                            <li>For personal projects or small team collaborations where rapid development is key.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Both Dash and Streamlit extend Python's capabilities beyond static plots, allowing data analysts to build full-fledged interactive web applications that can be shared and used by others, bridging the gap between data science and web development.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Demo (Tableau/Power BI Map Viz) & Python Interactive Dashboard Showcase</h2>
+            <p class="section-intro">This practical session will conceptually demonstrate map visualizations in a BI tool and then showcase the idea of an interactive dashboard built using Python. While direct live demos are not possible in this environment, we'll use illustrative examples and descriptions to convey the concepts.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Demo: Creating a Map Visualization in Tableau/Power BI</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Imagine we have sales data by US State. We want to visualize which states have the highest sales. BI tools make this very straightforward.</p>
+                
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Conceptual Data: Sales by State</h4>
+                <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code>
+State,Sales
+California,150000
+Texas,80000
+New York,120000
+Florida,70000
+Illinois,60000
+...
+                    </code></pre>
+                </div>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Conceptual Steps in Tableau/Power BI:</h4>
+                <ol class="list-decimal pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Load Data:</strong> Connect to your sales data. Ensure the 'State' column is recognized as a geographical role.</li>
+                    <li><strong>Create Map:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>In Tableau, double-click 'State' or drag it to the canvas. Tableau will automatically generate a map.</li>
+                            <li>In Power BI, select the 'Map' or 'Filled Map' visual, then drag 'State' to the 'Location' field.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Add Measure:</strong> Drag 'Sales' (summed) to the 'Color' or 'Values' field. The map regions will then be shaded based on sales volume.</li>
+                    <li><strong>Customize:</strong> Adjust colors, add labels, tooltips, and legends.</li>
+                </ol>
+                <p class="mt-4 text-sm text-gray-600"><em>Conceptual Outcome:</em> You would see a map of the US where states with higher sales are colored more intensely, allowing for immediate visual identification of high-performing regions. Clicking on a state would typically show a tooltip with detailed sales figures.</p>
+                
+                <div class="chart-container">
+                    <canvas id="mapVizSimulation"></canvas>
+                </div>
+                <p class="chart-description"><em>Simulated Map Visualization (Bar Chart representation for conceptual understanding of sales by region).</em></p>
+                <p class="mt-4 text-sm text-gray-600">This bar chart conceptually represents how different regions (like states) might be visualized on a map, with bar height indicating sales. On an actual map, these would be colored regions or sized bubbles.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Demo: Showcase of an Interactive Dashboard Built with Python (Plotly Dash)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">While we cannot run a live Python Dash application directly within this environment, we can conceptually describe its structure and interactivity. Imagine a dashboard built for analyzing customer demographics and their purchase behavior.</p>
+                
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Conceptual Python Dash Application Structure:</h4>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code class="language-python">
+# Conceptual Python code for a Plotly Dash application
+
+# import dash
+# from dash import dcc, html
+# from dash.dependencies import Input, Output
+# import plotly.express as px
+# import pandas as pd
+
+# # Load hypothetical data (e.g., from a CSV or database)
+# # df = pd.read_csv('customer_data.csv')
+# # For demonstration, create dummy data
+# data = {
+#     'Customer_ID': range(1, 101),
+#     'Age': np.random.randint(18, 65, 100),
+#     'Gender': np.random.choice(['Male', 'Female'], 100),
+#     'Monthly_Spend': np.random.normal(150, 50, 100),
+#     'Product_Category': np.random.choice(['Electronics', 'Apparel', 'Home Goods'], 100)
+# }
+# df = pd.DataFrame(data)
+
+# app = dash.Dash(__name__)
+
+# app.layout = html.Div([
+#     html.H1("Customer Behavior Dashboard", style={'textAlign': 'center'}),
+    
+#     html.Div([
+#         html.Label("Select Product Category:"),
+#         dcc.Dropdown(
+#             id='category-dropdown',
+#             options=[{'label': i, 'value': i} for i in df['Product_Category'].unique()] + [{'label': 'All', 'value': 'All'}],
+#             value='All',
+#             clearable=False
+#         ),
+#     ], style={'width': '48%', 'display': 'inline-block', 'padding': '10px'}),
+
+#     html.Div([
+#         html.Label("Select Age Range:"),
+#         dcc.RangeSlider(
+#             id='age-slider',
+#             min=df['Age'].min(),
+#             max=df['Age'].max(),
+#             value=[df['Age'].min(), df['Age'].max()],
+#             marks={str(age): str(age) for age in range(df['Age'].min(), df['Age'].max(), 10)},
+#             step=1
+#         ),
+#     ], style={'width': '48%', 'float': 'right', 'padding': '10px'}),
+
+#     dcc.Graph(id='age-spend-scatter'),
+#     dcc.Graph(id='gender-spend-bar')
+# ])
+
+# @app.callback(
+#     Output('age-spend-scatter', 'figure'),
+#     Output('gender-spend-bar', 'figure'),
+#     Input('category-dropdown', 'value'),
+#     Input('age-slider', 'value')
+# )
+# def update_graphs(selected_category, age_range):
+#     filtered_df = df[(df['Age'] >= age_range[0]) & (df['Age'] <= age_range[1])]
+    
+#     if selected_category != 'All':
+#         filtered_df = filtered_df[filtered_df['Product_Category'] == selected_category]
+
+#     scatter_fig = px.scatter(filtered_df, x='Age', y='Monthly_Spend', color='Gender',
+#                              title='Monthly Spend vs. Age by Gender')
+#     bar_fig = px.bar(filtered_df.groupby('Gender')['Monthly_Spend'].mean().reset_index(),
+#                      x='Gender', y='Monthly_Spend', title='Average Monthly Spend by Gender')
+    
+#     return scatter_fig, bar_fig
+
+# if __name__ == '__main__':
+#     # This part would typically be run from the command line: python your_app_file.py
+#     # For in-class demo, show a pre-running app or a video of it.
+#     # app.run_server(debug=True)
+#     pass # Placeholder for demonstration
+                    </code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-600"><em>Explanation:</em> This conceptual code outlines a Dash application with a dropdown for product category and a slider for age range. When a user interacts with these controls, the Python code (within the `@app.callback` function) filters the data and updates the scatter plot (showing age vs. spend) and the bar chart (showing average spend by gender). This demonstrates how Python can power highly dynamic and custom web dashboards.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Discussion: Python vs. Tableau/Power BI for Visualization</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Both dedicated BI tools and Python libraries offer powerful visualization capabilities, but they excel in different scenarios. The choice often depends on the specific project requirements, team skills, and desired level of customization.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>When to choose Tableau/Power BI:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Rapid Prototyping & Ad-hoc Analysis:</strong> Quick drag-and-drop interface is ideal for fast exploration.</li>
+                            <li><strong>Business User Accessibility:</strong> Non-coders can easily create and interact with dashboards.</li>
+                            <li><strong>Standard Reporting & Dashboards:</strong> Excellent for recurring reports and monitoring KPIs.</li>
+                            <li><strong>Data Governance & Sharing:</strong> Built-in features for publishing, sharing, and managing access to reports.</li>
+                            <li><strong>Less Complex Transformations:</strong> Power Query (Power BI) handles many common ETL tasks well.</li>
+                        </ul>
+                    </li>
+                    <li><strong>When to choose Python (Plotly Dash/Streamlit):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>High Customization & Bespoke Applications:</strong> When standard charts aren't enough, or you need unique interactive elements.</li>
+                            <li><strong>Integration with Advanced Analytics/ML:</strong> Seamlessly embed machine learning models, custom statistical analyses, or complex data processing logic directly into the dashboard.</li>
+                            <li><strong>Automation & Scalability:</strong> Part of a larger data pipeline where data cleaning, processing, and visualization are all scripted.</li>
+                            <li><strong>Cost-Effectiveness for Development:</strong> Open-source tools mean no licensing fees for development.</li>
+                            <li><strong>Version Control:</strong> Code-based approach allows for robust version control using Git.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Ultimately, the best approach often involves a hybrid strategy: using BI tools for standard reporting and quick exploration, and leveraging Python for more complex data transformations, advanced analytics, and highly customized interactive applications.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('nav a').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Data for Chart.js simulation of map viz (conceptual - using regions as categories)
+        const regionalSalesData = {
+            labels: ['California', 'Texas', 'New York', 'Florida', 'Illinois'],
+            sales: [150000, 80000, 120000, 70000, 60000]
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulated Map Visualization (Bar Chart)
+            const mapVizCtx = document.getElementById('mapVizSimulation').getContext('2d');
+            new Chart(mapVizCtx, {
+                type: 'bar',
+                data: {
+                    labels: regionalSalesData.labels,
+                    datasets: [{
+                        label: 'Total Sales ($)',
+                        data: regionalSalesData.sales,
+                        backgroundColor: 'rgba(67, 56, 202, 0.8)', // Indigo
+                        borderColor: 'rgba(67, 56, 202, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Horizontal bars to represent regions
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Conceptual Sales by State (Simulated Map Data)',
+                            font: { size: 14 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Total Sales ($)' }
+                        },
+                        y: {
+                            title: { display: true, text: 'State' }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

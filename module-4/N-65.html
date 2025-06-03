@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S65: Python for Regression</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+        .header-section { text-align: center; margin-bottom: 2rem; }
+        .header-section h1 { font-size: 2.5rem; font-weight: 700; color: #4338CA; margin-bottom: 0.5rem; }
+        .header-section p { font-size: 1.125rem; color: #4B5563; }
+        .content-block { background-color: white; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 2rem; margin-bottom: 2rem; }
+        .content-block h2 { font-size: 1.75rem; font-weight: 600; color: #1F2937; margin-bottom: 1.5rem; border-bottom: 2px solid #E5E7EB; padding-bottom: 0.75rem; }
+        .content-block h3 { font-size: 1.5rem; font-weight: 600; color: #4338CA; margin-top: 1.5rem; margin-bottom: 1rem; }
+        .content-block h4 { font-size: 1.25rem; font-weight: 600; color: #374151; margin-top: 1rem; margin-bottom: 0.75rem; }
+        .code-block {
+            background-color: #2D3748; /* Dark background for code */
+            color: #E2E8F0; /* Light text */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', monospace; /* Monospace font */
+            overflow-x: auto; /* Allow horizontal scrolling for long lines */
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+            font-size: 0.875rem; /* Smaller font for code blocks */
+        }
+        .code-block pre { margin: 0; }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #4A5568;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .copy-button:hover { background-color: #6366F1; }
+        .action-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+        }
+        .action-button:hover { background-color: #6366F1; transform: translateY(-1px); }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
+        table th, table td { border: 1px solid #e2e8f0; padding: 0.75rem; text-align: left; }
+        table th { background-color: #f8fafc; font-weight: 600; color: #4A5568; }
+        table tr:nth-child(even) { background-color: #fbfdff; }
+        .chart-container { position: relative; height: 400px; width: 100%; margin-top: 1.5rem; margin-bottom: 1rem; }
+        .hidden { display: none; }
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #D1FAE5;
+            border: 1px solid #34D399;
+            color: #065F46;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .message-box.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header-section">
+            <h1>N-S65: Python for Regression - Statsmodels & Scikit-learn</h1>
+            <p>Mastering regression analysis for both statistical inference and predictive modeling.</p>
+        </header>
+
+        <section class="content-block">
+            <h2>Theory: Statsmodels vs. Scikit-learn</h2>
+            <p class="mb-4 text-gray-700 leading-relaxed">
+                In the realm of Python for data analysis, two libraries stand out for regression tasks: Statsmodels and Scikit-learn. While both can fit linear models, their design philosophies, primary objectives, and typical outputs cater to different analytical needs. Understanding these differences is crucial for choosing the right tool for your specific problem.
+            </p>
+
+            <h3>Statsmodels: The Statistician's Choice for Inference</h3>
+            <p class="mb-2 text-gray-700 leading-relaxed">
+                Statsmodels is built with a strong emphasis on statistical inference. It provides a comprehensive set of tools for estimating and testing various statistical models, offering detailed statistical output that is familiar to users of R or SAS.
+            </p>
+            <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                <li><strong>Primary Goal:</strong> To understand the relationships between variables, test hypotheses, and draw conclusions about populations based on sample data. It focuses on the "why" and "how much" of relationships.</li>
+                <li><strong>Output:</strong> Generates rich statistical summaries, including:
+                    <ul class="list-circle pl-5 mt-1">
+                        <li>Coefficients and their standard errors</li>
+                        <li>P-values for hypothesis testing (e.g., is a coefficient significantly different from zero?)</li>
+                        <li>Confidence intervals for coefficients</li>
+                        <li>R-squared, Adjusted R-squared, F-statistic, and their p-values for overall model fit</li>
+                        <li>Diagnostic statistics (e.g., Durbin-Watson, Omnibus, Jarque-Bera) to check model assumptions.</li>
+                    </ul>
+                </li>
+                <li><strong>API Style:</strong> Often uses an R-like formula API (e.g., <code>'y ~ x1 + x2'</code>), which can be very intuitive for specifying complex models with interactions and categorical variables. It also supports array-based input.</li>
+                <li><strong>Strengths:</strong> Excellent for academic research, econometrics, and business intelligence where statistical rigor, interpretability, and hypothesis testing are paramount. It allows for deep dives into model assumptions and statistical significance.</li>
+                <li><strong>Typical Use Cases:</strong> Determining if a marketing campaign had a statistically significant impact on sales, understanding the drivers of customer churn, analyzing the effect of policy changes.</li>
+            </ul>
+
+            <h3>Scikit-learn: The Machine Learner's Toolkit for Prediction</h3>
+            <p class="mb-2 text-gray-700 leading-relaxed">
+                Scikit-learn is a machine learning library designed for building predictive models. Its focus is on generalization and performance on unseen data, making it ideal for forecasting and integration into larger ML pipelines.
+            </p>
+            <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                <li><strong>Primary Goal:</strong> To build models that can accurately predict outcomes for new, unseen data. It focuses on the "what" of prediction.</li>
+                <li><strong>Output:</strong> Primarily provides:
+                    <ul class="list-circle pl-5 mt-1">
+                        <li>Model coefficients and intercept.</li>
+                        <li>Methods to calculate performance metrics (e.g., R-squared, Mean Squared Error, Mean Absolute Error) on training and test sets.</li>
+                    </ul>
+                    It generally does *not* provide p-values, standard errors, or detailed statistical diagnostics out-of-the-box.
+                </li>
+                <li><strong>API Style:</strong> Follows a consistent object-oriented API across all its algorithms: <code>model = Algorithm(); model.fit(X, y); predictions = model.predict(X_new)</code>. This consistency makes it easy to swap out different algorithms.</li>
+                <li><strong>Strengths:</strong> Highly optimized for performance, scalability, and integration into machine learning workflows. Provides extensive tools for data preprocessing, cross-validation, hyperparameter tuning, and model selection.</li>
+                <li><strong>Typical Use Cases:</strong> Forecasting future sales, predicting house prices, building recommendation systems, anomaly detection.</li>
+            </ul>
+
+            <h4>Summary Comparison Table:</h4>
+            <div class="overflow-x-auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Statsmodels</th>
+                            <th>Scikit-learn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Core Purpose</strong></td>
+                            <td>Statistical Inference, Hypothesis Testing</td>
+                            <td>Predictive Modeling, Machine Learning</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Key Output</strong></td>
+                            <td>Full statistical summary (p-values, CIs, diagnostics)</td>
+                            <td>Coefficients, Intercept, Prediction Metrics (R2, MSE)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Typical User</strong></td>
+                            <td>Statisticians, Econometricians, Researchers</td>
+                            <td>Machine Learning Engineers, Data Scientists</td>
+                        </tr>
+                        <tr>
+                            <td><strong>API Paradigm</strong></td>
+                            <td>R-like formulas, array-based</td>
+                            <td>Object-oriented (<code>.fit()</code>, <code>.predict()</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Model Scope</strong></td>
+                            <td>Focus on classical statistical models (OLS, GLM, Time Series)</td>
+                            <td>Broad range of ML algorithms (Linear, SVM, Trees, Ensembles)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data Handling</strong></td>
+                            <td>Often integrates well with Pandas DataFrames</td>
+                            <td>Expects NumPy arrays (2D for features)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="content-block">
+            <h2>Practical: Hands-on Regression with Python</h2>
+            <p class="mb-4 text-gray-700 leading-relaxed">
+                Let's put the theory into practice by building a simple linear regression model using both Statsmodels and Scikit-learn. We'll use a simulated dataset representing the relationship between "Advertising Spend" and "Product Sales".
+            </p>
+
+            <div class="text-center mb-6">
+                <button id="runRegressionAnalysisBtn" class="action-button bg-indigo-600 hover:bg-indigo-700">Run Regression Analysis</button>
+                <button id="showPythonCodeBtn" class="action-button bg-green-600 hover:bg-green-700">Show Python Code</button>
+            </div>
+
+            <div id="pythonCodeSection" class="hidden">
+                <h4>Python Code for Regression Demo:</h4>
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="pythonRegressionCode">
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score, mean_squared_error
+
+np.random.seed(42) # for reproducibility
+
+# --- 1. Data Generation ---
+n_samples = 100
+advertising_spend = np.random.uniform(10, 100, n_samples) # in thousands
+# Sales = 20 + 1.5 * Advertising_Spend + Noise
+sales = 20 + 1.5 * advertising_spend + np.random.normal(0, 10, n_samples)
+
+# Create a Pandas DataFrame
+data = pd.DataFrame({'Advertising_Spend': advertising_spend, 'Sales': sales})
+
+print("--- Generated Data (first 5 rows) ---")
+print(data.head().to_string())
+
+# --- 2. Regression with Statsmodels (for Statistical Inference) ---
+print("\n--- Statsmodels Regression Output ---")
+# Using formula API: 'Dependent ~ Independent'
+# Statsmodels automatically adds an intercept if not explicitly excluded
+model_sm = smf.ols('Sales ~ Advertising_Spend', data=data).fit()
+print(model_sm.summary().as_text()) # .as_text() for plain text output
+
+# Extract key components for easy comparison
+print(f"\nStatsmodels Coefficients:")
+print(f"  Intercept: {model_sm.params['Intercept']:.2f}")
+print(f"  Advertising_Spend: {model_sm.params['Advertising_Spend']:.2f}")
+print(f"Statsmodels R-squared: {model_sm.rsquared:.4f}")
+print(f"Statsmodels P-value for Advertising_Spend: {model_sm.pvalues['Advertising_Spend']:.4f}")
+
+
+# --- 3. Regression with Scikit-learn (for Predictive Modeling) ---
+print("\n--- Scikit-learn Regression Output ---")
+# Scikit-learn expects X (features) as 2D array and y (target) as 1D array
+X = data[['Advertising_Spend']] # X must be 2D
+y = data['Sales']
+
+# Split data into training and testing sets (80% train, 20% test)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create and fit the Linear Regression model
+model_sk = LinearRegression()
+model_sk.fit(X_train, y_train)
+
+# Get coefficients and intercept
+print(f"Scikit-learn Coefficients (Advertising_Spend): {model_sk.coef_[0]:.2f}")
+print(f"Scikit-learn Intercept: {model_sk.intercept_:.2f}")
+
+# Make predictions on the test set
+y_pred = model_sk.predict(X_test)
+
+# Evaluate the model using R-squared and Mean Squared Error
+r2 = r2_score(y_test, y_pred)
+mse = mean_squared_error(y_test, y_pred)
+
+print(f"Scikit-learn R-squared (on test set): {r2:.4f}")
+print(f"Scikit-learn Mean Squared Error (on test set): {mse:.2f}")
+
+# --- 4. Data for Visualization (Conceptual for Chart.js) ---
+# For actual Python plotting, you'd use Matplotlib/Seaborn.
+# The following prepares data for the HTML/JS Chart.js visualization.
+# It's a conceptual representation of how data would be extracted for plotting.
+print("\n--- Visualization data prepared for Chart.js ---")
+
+# Data points (Advertising_Spend, Sales)
+scatter_points_for_chart = []
+for i in range(len(advertising_spend)):
+    scatter_points_for_chart.push({x: advertising_spend[i], y: sales[i]});
+
+# Regression line points (using Scikit-learn's model for simplicity)
+min_spend_chart = np.min(advertising_spend)
+max_spend_chart = np.max(advertising_spend)
+line_x_chart = np.array([min_spend_chart, max_spend_chart]).reshape(-1, 1) # Needs to be 2D
+line_y_chart = model_sk.predict(line_x_chart)
+
+regression_line_for_chart = [
+    {x: line_x_chart[0][0], y: line_y_chart[0]},
+    {x: line_x_chart[1][0], y: line_y_chart[1]}
+];
+</code></pre>
+                </div>
+            </div>
+
+            <div id="regressionOutputSection" class="hidden">
+                <h4>Simulated Python Analysis Output:</h4>
+                <div class="code-block bg-gray-900 text-gray-100 p-4 rounded-md text-sm">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="simulatedRegressionOutput">
+--- Generated Data (first 5 rows) ---
+   Advertising_Spend      Sales
+0            86.07  151.724578
+1            90.75  159.208947
+2            92.65  166.429995
+3            16.89   47.674395
+4            33.95   70.925203
+
+--- Statsmodels Regression Output ---
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                  Sales   R-squared:                       0.950
+Model:                            OLS   Adj. R-squared:                  0.949
+Method:                 Least Squares   F-statistic:                     1907.
+Date:                Thu, 29 May 2025   Prob (F-statistic):           1.32e-66
+Time:                        18:30:00   Log-Likelihood:                -350.29
+No. Observations:                 100   AIC:                             704.6
+Df Residuals:                      98   BIC:                             709.8
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+=====================================================================================
+                        coef    std err          t      P>|t|      [0.025      0.975]
+-------------------------------------------------------------------------------------
+Intercept            20.4567      1.802     11.350      0.000      16.879      24.034
+Advertising_Spend     1.4988      0.034     43.669      0.000       1.431       1.567
+==============================================================================
+Omnibus:                        0.321   Durbin-Watson:                   2.091
+Prob(Omnibus):                  0.852   Jarque-Bera (JB):                0.485
+Skew:                           0.063   Prob(JB):                        0.785
+Kurtosis:                       2.766   Cond. No.                         116.
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+
+Statsmodels Coefficients:
+  Intercept: 20.46
+  Advertising_Spend: 1.50
+Statsmodels R-squared: 0.9500
+Statsmodels P-value for Advertising_Spend: 0.0000
+
+--- Scikit-learn Regression Output ---
+Scikit-learn Coefficients (Advertising_Spend): 1.50
+Scikit-learn Intercept: 20.49
+Scikit-learn R-squared (on test set): 0.9485
+Scikit-learn Mean Squared Error (on test set): 95.23
+
+--- Visualization data prepared for Chart.js ---
+</code></pre>
+                </div>
+                <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Sales vs. Advertising Spend with Regression Line</h5>
+                <div class="chart-container">
+                    <canvas id="regressionScatterChart"></canvas>
+                </div>
+                <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 1: Scatter plot showing the relationship between Sales and Advertising Spend, with the linear regression line indicating the modeled trend.</p>
+            </div>
+        </section>
+    </div>
+
+    <div id="messageBox" class="message-box hidden">
+        <span id="messageText"></span>
+    </div>
+
+    <script>
+        let marketingSpendData = [];
+        let salesData = [];
+        let modelSk = null;
+        let regressionScatterChartInstance = null;
+
+        function showMessage(message, duration = 2000) {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            messageText.innerText = message;
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, duration);
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const textToCopy = codeBlock.textContent;
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                button.textContent = 'Copied!';
+                showMessage('Code copied to clipboard!', 1500);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                button.textContent = 'Error!';
+                showMessage('Failed to copy code.', 1500);
+            }
+            document.body.removeChild(textarea);
+
+            setTimeout(() => {
+                button.textContent = 'Copy';
+            }, 2000);
+        }
+
+        // Simple Math.seedrandom for client-side data generation consistency
+        (function(global) {
+            let seed = 0;
+            global.Math.seedrandom = function(s) {
+                let hash = 0;
+                for (let i = 0; i < s.length; i++) {
+                    const char = s.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash |= 0;
+                }
+                seed = Math.abs(hash) % 2147483647;
+            };
+            global.Math.random = function() {
+                seed = (seed * 9301 + 49297) % 233280;
+                return seed / 233280;
+            };
+        })(this);
+
+        function generateRegressionData() {
+            Math.seedrandom('42'); // Fixed seed for demo consistency
+
+            const n_samples = 100;
+            marketingSpendData = [];
+            salesData = [];
+
+            for (let i = 0; i < n_samples; i++) {
+                const spend = Math.random() * 90 + 10; // Uniform from 10 to 100
+                const noise = (Math.random() - 0.5) * 20; // Noise for sales
+                const sales = 20 + 1.5 * spend + noise;
+                marketingSpendData.push(spend);
+                salesData.push(sales);
+            }
+
+            // Mock a simple linear model for Chart.js regression line
+            const mock_coef = 1.5;
+            const mock_intercept = 20;
+            modelSk = {
+                coef_: [mock_coef],
+                intercept_: mock_intercept,
+                predict: function(X) {
+                    return X.map(val => this.intercept_ + this.coef_[0] * val);
+                }
+            };
+            console.log("Regression demo data generated.");
+        }
+
+        function drawRegressionChart() {
+            if (regressionScatterChartInstance) regressionScatterChartInstance.destroy();
+
+            const ctx = document.getElementById('regressionScatterChart').getContext('2d');
+            if (!ctx) { console.error("regressionScatterChart context not found."); return; }
+            
+            const scatterPoints = [];
+            for (let i = 0; i < marketingSpendData.length; i++) {
+                scatterPoints.push({x: marketingSpendData[i], y: salesData[i]});
+            }
+
+            const minSpend = Math.min(...marketingSpendData);
+            const maxSpend = Math.max(...marketingSpendData);
+            const lineX = [minSpend, maxSpend];
+            const lineY = modelSk.predict(lineX);
+
+            const regressionLine = [
+                {x: lineX[0], y: lineY[0]},
+                {x: lineX[1], y: lineY[1]}
+            ];
+
+            regressionScatterChartInstance = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Actual Sales Data',
+                            data: scatterPoints,
+                            backgroundColor: 'rgba(66, 135, 245, 0.7)',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        },
+                        {
+                            type: 'line',
+                            label: 'Regression Line',
+                            data: regressionLine,
+                            borderColor: 'red',
+                            borderWidth: 2,
+                            fill: false,
+                            pointRadius: 0,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Sales vs. Advertising Spend with Regression Line',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'Advertising Spend (in thousands)'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Sales'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const runRegressionAnalysisBtn = document.getElementById('runRegressionAnalysisBtn');
+            const showPythonCodeBtn = document.getElementById('showPythonCodeBtn');
+            const pythonCodeSection = document.getElementById('pythonCodeSection');
+            const regressionOutputSection = document.getElementById('regressionOutputSection');
+
+            if (runRegressionAnalysisBtn) {
+                runRegressionAnalysisBtn.addEventListener('click', function() {
+                    regressionOutputSection.classList.remove('hidden');
+                    generateRegressionData();
+                    drawRegressionChart();
+                    showMessage('Regression analysis simulated and chart updated!', 'success');
+                });
+            }
+
+            if (showPythonCodeBtn) {
+                showPythonCodeBtn.addEventListener('click', function() {
+                    pythonCodeSection.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

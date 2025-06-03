@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S31: Identifying and Handling Outliers - Techniques</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices:
+        - Statistical Identification (Z-score, IQR): Report Info: Definitions, conceptual. Goal: Inform. Viz/Method: Detailed text explanation for each method, including formulas and interpretation. Justification: Provides a robust understanding of quantitative outlier detection.
+        - Handling Strategies (Capping, Transformation, Removal): Report Info: Techniques, implications. Goal: Inform. Viz/Method: Detailed text explanation for each strategy, with pros/cons. Justification: Explains how to address outliers and their consequences.
+        - Tool Demo (Plots for ID): Report Info: Matplotlib/Seaborn. Goal: Illustrate. Viz/Method: Detailed Python code snippets with extensive comments for generating box plots and histograms, explaining how to interpret them for outliers. Justification: Provides conceptual hands-on guidance for visual detection.
+        - Tool Demo (IQR Filtering): Report Info: Pandas. Goal: Illustrate, apply. Viz/Method: Detailed Python code snippet for applying IQR-based filtering. Justification: Shows a practical, programmatic way to handle outliers.
+        - Activity: Outliers as Errors or Genuine: Report Info: Discussion prompt. Goal: Engage, apply. Viz/Method: Text instructions with guiding questions. Justification: Encourages critical thinking and domain expertise application.
+        CONFIRMATION: No charts used (Chart.js/Plotly.js not needed as report is conceptual/textual).
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); /* Adjust based on header/footer height */ }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+
+        .accordion-header { cursor: pointer; user-select: none; }
+        .accordion-content { display: none; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; }
+        .accordion-item.open .accordion-content { display: block; max-height: 1000px; /* Arbitrary large value */ padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .accordion-arrow { transition: transform 0.3s ease; }
+        .accordion-item.open .accordion-arrow { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S31: Identifying and Handling Outliers - Techniques</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Statistical Identification of Outliers & Handling Strategies</h2>
+            <p class="section-intro">While visual inspection provides an intuitive first look at outliers, statistical methods offer a more objective and quantitative approach to their identification. Once identified, deciding how to handle these extreme values is crucial, as each strategy carries its own implications for the dataset and subsequent analysis.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Statistical Identification of Outliers: Quantitative Approaches</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Statistical methods provide a systematic way to flag data points that fall outside a defined statistical range. Two common conceptual methods are the Z-score and the Interquartile Range (IQR) method.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">1. Z-score (Standard Score) Method</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">The Z-score measures how many standard deviations an element is from the mean. It's a way to standardize data points, allowing for comparison across different scales. A high absolute Z-score indicates an outlier.</p>
+                <p class="mb-2 text-gray-700 leading-relaxed"><strong>Formula:</strong> $Z = (X - \mu) / \sigma$</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li>$X$: Individual data point</li>
+                    <li>$\mu$: Mean of the dataset</li>
+                    <li>$\sigma$: Standard deviation of the dataset</li>
+                    <li><em>Interpretation:</em> A common threshold for identifying outliers is a Z-score greater than +3 or less than -3 (i.e., $|Z| > 3$). This means the data point is more than 3 standard deviations away from the mean.</li>
+                    <li><strong>Pros:</strong>
+                        <ul class="list-circle pl-5">
+                            <li>Easy to calculate and understand.</li>
+                            <li>Can be applied to any numerical dataset.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Cons:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Sensitive to Outliers Itself:</strong> The mean and standard deviation, which are used in the Z-score calculation, are themselves sensitive to outliers. A very extreme outlier can inflate the standard deviation, making other potential outliers appear less extreme.</li>
+                            <li><strong>Assumes Normal Distribution:</strong> It works best for data that is approximately normally distributed. For highly skewed data, the Z-score method might incorrectly identify outliers or miss genuine ones.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">2. Interquartile Range (IQR) Method</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">The IQR method is a robust statistical technique for outlier detection, particularly useful for skewed distributions as it relies on quartiles rather than the mean and standard deviation.</p>
+                <p class="mb-2 text-gray-700 leading-relaxed"><strong>Steps:</strong></p>
+                <ol class="list-decimal pl-5 space-y-1 text-gray-700 mb-2">
+                    <li>Calculate the First Quartile (Q1): The value below which 25% of the data falls.</li>
+                    <li>Calculate the Third Quartile (Q3): The value below which 75% of the data falls.</li>
+                    <li>Calculate the Interquartile Range (IQR): $IQR = Q3 - Q1$. This represents the middle 50% of the data.</li>
+                    <li>Define Outlier Bounds:
+                        <ul class="list-circle pl-5">
+                            <li>Lower Bound: $Q1 - (1.5 * IQR)$</li>
+                            <li>Upper Bound: $Q3 + (1.5 * IQR)$</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p class="mb-2 text-gray-700 leading-relaxed">Any data point that falls below the Lower Bound or above the Upper Bound is considered an outlier.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Pros:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Robust to Outliers:</strong> Q1, Q3, and IQR are less affected by extreme values compared to the mean and standard deviation.</li>
+                            <li><strong>Does Not Assume Normal Distribution:</strong> Works well for both normally distributed and skewed data.</li>
+                            <li><strong>Directly Relates to Box Plots:</strong> The 1.5 * IQR rule is what typically defines the whiskers in a box plot.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Cons:</strong>
+                        <ul class="list-circle pl-5">
+                            <li>May be less sensitive to outliers in very large datasets where the 1.5 factor might be too lenient.</li>
+                            <li>Primarily for univariate outlier detection (though extensions exist for multivariate).</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Both Z-score and IQR provide quantitative criteria for outlier detection. The choice between them often depends on the distribution of your data and your sensitivity to outliers. It's often beneficial to use both visual and statistical methods in conjunction.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Handling Strategies for Outliers: Managing Extreme Values</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Once outliers are identified, the next crucial step is deciding how to handle them. The decision depends heavily on the nature of the outlier (error vs. genuine extreme value), the amount of data, and the goals of your analysis. There's no single "best" approach; it's often a trade-off.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">1. Removal (Deletion)</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">This involves simply deleting the rows or observations that contain outliers. This is typically done when outliers are clearly identified as data entry errors, measurement errors, or are highly influential and distorting the analysis.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Pros:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Simplicity:</strong> Easy to implement.</li>
+                            <li><strong>Clean Data:</strong> Removes the direct influence of problematic data points.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Cons:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Data Loss:</strong> Can lead to significant loss of valuable data, especially if there are many outliers or if the dataset is small.</li>
+                            <li><strong>Bias:</strong> If genuine extreme values are removed, it can introduce bias and reduce the generalizability of your findings. You might be removing important information about rare events.</li>
+                            <li><strong>Reduced Statistical Power:</strong> Similar to missing data deletion, reducing sample size can impact statistical power.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">2. Capping (Winsorization)</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Capping involves replacing outlier values with a specified maximum or minimum value within a reasonable range. For example, replacing all values above the 99th percentile with the 99th percentile value, and all values below the 1st percentile with the 1st percentile value.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Pros:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Retains Data:</strong> No data points are removed, preserving the sample size.</li>
+                            <li><strong>Reduces Influence:</strong> Limits the extreme influence of outliers on statistical measures and models.</li>
+                            <li><strong>Useful for Skewed Data:</strong> Can be effective for highly skewed distributions where extreme values are genuine but disproportionately influential.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Cons:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Distorts True Distribution:</strong> Artificially compresses the tails of the distribution, making the data appear less variable than it truly is.</li>
+                            <li><strong>Loss of Information:</strong> While data points are retained, their true extreme nature is lost.</li>
+                            <li><strong>Arbitrary Threshold:</strong> Choosing the capping threshold (e.g., 99th percentile) can be somewhat arbitrary and requires domain knowledge.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">3. Transformation</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Data transformation involves applying a mathematical function to the data to reduce the impact of outliers and make the distribution more symmetrical (e.g., logarithmic transformation, square root transformation). This is often used when the data is highly skewed and outliers are genuine but make the data difficult to model.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Pros:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Retains Data:</strong> No data points are removed.</li>
+                            <li><strong>Normalizes Distribution:</strong> Can make skewed data more symmetrical, which is beneficial for many statistical models that assume normality.</li>
+                            <li><strong>Reduces Outlier Impact:</strong> Compresses the range of extreme values, making them less influential.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Cons:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Interpretability:</strong> Transformed data can be harder to interpret in its original scale, making it challenging to explain findings to non-technical stakeholders.</li>
+                            <li><strong>Choosing Transformation:</strong> Selecting the appropriate transformation requires understanding the data's distribution and the problem context.</li>
+                            <li><strong>Not a "Fix" for Errors:</strong> If the outlier is a data entry error, transformation won't correct the underlying mistake.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">4. Imputation (Model-Based)</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">While simple imputation (mean/median/mode) is not ideal for outliers, more advanced imputation techniques (e.g., using regression models or K-Nearest Neighbors to predict and replace the outlier) can sometimes be used if the outlier is believed to be a data error and can be reasonably estimated from other variables.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Pros:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Retains Data:</strong> No data points are removed.</li>
+                            <li><strong>Preserves Relationships:</strong> Attempts to estimate the outlier based on its relationship with other variables, thus preserving correlations.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Cons:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Complexity:</strong> More complex to implement than simple imputation.</li>
+                            <li><strong>Assumptions:</strong> Relies on assumptions about the relationships between variables.</li>
+                            <li><strong>Not for True Extremes:</strong> Should not be used if the outlier is a genuine extreme value, as it would distort its true nature.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">The decision on how to handle outliers is not purely technical; it requires domain expertise and a deep understanding of the data's context. Always investigate outliers first to determine if they are errors or genuine values before deciding on a treatment strategy.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Tool Demo & Activity</h2>
+            <p class="section-intro">This practical section will conceptually demonstrate how to use Python libraries like Matplotlib and Seaborn to visually identify outliers and then show how to programmatically filter data based on the IQR method. It concludes with an activity to encourage critical thinking about the nature of outliers.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Tool Demo: Creating Plots to Identify Outliers with Python (Matplotlib/Seaborn)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Visualizing data is a powerful way to spot outliers. Python's Matplotlib and Seaborn libraries are excellent for creating informative plots. Let's use a hypothetical dataset of customer spending to illustrate how box plots and histograms can reveal outliers.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800">
+                    <h4 class="font-semibold text-indigo-700 mb-2">Python Code Snippet (Conceptual - Visualizing Outliers)</h4>
+                    <pre><code class="language-python">
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. Create a sample DataFrame with some potential outliers
+print("--- Step 1: Creating a Sample DataFrame with Potential Outliers ---")
+data = {
+    'CustomerID': range(1, 21),
+    'MonthlySpend': [50, 60, 55, 70, 80, 65, 75, 90, 100, 500, # Outlier: 500
+                     45, 62, 58, 72, 85, 68, 78, 92, 105, 1500] # Outlier: 1500
+}
+df_spend = pd.DataFrame(data)
+print(df_spend)
+print("\n")
+
+# 2. Create a Box Plot to visually identify outliers
+# Box plots clearly show the median, quartiles, and points beyond the whiskers (outliers).
+print("--- Step 2: Conceptual Box Plot for 'MonthlySpend' ---")
+# plt.figure(figsize=(8, 6)) # Conceptual: setting plot size
+# sns.boxplot(y=df_spend['MonthlySpend']) # Conceptual: creating box plot
+# plt.title('Box Plot of Monthly Customer Spend') # Conceptual: adding title
+# plt.ylabel('Monthly Spend ($)') # Conceptual: adding y-axis label
+# plt.show() # Conceptual: displaying plot
+
+print("Imagine a box plot here. You would see a central box with whiskers, and individual points (like 500 and 1500) plotted far above the upper whisker, clearly indicating them as outliers.\n")
+
+# 3. Create a Histogram to visualize distribution and outliers
+# Histograms show the frequency distribution. Outliers appear as isolated bars far from the main distribution.
+print("--- Step 3: Conceptual Histogram for 'MonthlySpend' ---")
+# plt.figure(figsize=(10, 6)) # Conceptual: setting plot size
+# sns.histplot(df_spend['MonthlySpend'], bins=10, kde=True) # Conceptual: creating histogram
+# plt.title('Histogram of Monthly Customer Spend') # Conceptual: adding title
+# plt.xlabel('Monthly Spend ($)') # Conceptual: adding x-axis label
+# plt.ylabel('Frequency') # Conceptual: adding y-axis label
+# plt.show() # Conceptual: displaying plot
+
+print("Imagine a histogram here. Most bars would be clustered at the lower end (e.g., 40-100), but you would see very small, isolated bars far to the right, representing the outliers (500, 1500).\n")
+
+# 4. Create a Scatter Plot (if analyzing relationship between two variables)
+# Let's add a 'Visits' column to demonstrate scatter plot for outliers.
+df_spend['Visits'] = [2, 3, 2, 4, 3, 3, 4, 5, 4, 1, # Spend 500, Visits 1 (potential outlier)
+                      2, 3, 2, 4, 3, 3, 4, 5, 4, 0.5] # Spend 1500, Visits 0.5 (potential outlier)
+print("--- Step 4: Conceptual Scatter Plot for 'MonthlySpend' vs. 'Visits' ---")
+# plt.figure(figsize=(10, 6)) # Conceptual: setting plot size
+# sns.scatterplot(x='Visits', y='MonthlySpend', data=df_spend) # Conceptual: creating scatter plot
+# plt.title('Monthly Spend vs. Number of Visits') # Conceptual: adding title
+# plt.xlabel('Number of Visits') # Conceptual: adding x-axis label
+# plt.ylabel('Monthly Spend ($)') # Conceptual: adding y-axis label
+# plt.show() # Conceptual: displaying plot
+
+print("Imagine a scatter plot here. Most points would form a cluster, but the points (1, 500) and (0.5, 1500) would appear far away from the main cluster, indicating them as outliers in the context of both variables.\n")
+                    </code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">These conceptual plots illustrate how visual methods are highly effective for quickly identifying outliers and understanding their position relative to the main data distribution. Box plots are particularly good for numerical variables, while scatter plots excel at revealing outliers in multivariate relationships.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Tool Demo: Programmatically Handling Outliers with IQR Filtering (Pandas)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Once outliers are identified, you can use statistical methods to filter them out programmatically. The IQR method is robust and commonly used for this purpose. Here's how you would implement it in Pandas to remove outliers from a numerical column.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800">
+                    <h4 class="font-semibold text-indigo-700 mb-2">Python Code Snippet (Conceptual - IQR Filtering)</h4>
+                    <pre><code class="language-python">
+import pandas as pd
+import numpy as np
+
+# 1. Create a sample DataFrame with outliers (same as previous demo)
+print("--- Step 1: Original Sample DataFrame with Outliers ---")
+data = {
+    'CustomerID': range(1, 21),
+    'MonthlySpend': [50, 60, 55, 70, 80, 65, 75, 90, 100, 500, # Outlier: 500
+                     45, 62, 58, 72, 85, 68, 78, 92, 105, 1500] # Outlier: 1500
+}
+df_spend = pd.DataFrame(data)
+print(df_spend)
+print(f"\nOriginal DataFrame shape: {df_spend.shape}\n")
+
+# 2. Calculate Q1, Q3, and IQR for 'MonthlySpend'
+print("--- Step 2: Calculating Quartiles and IQR ---")
+Q1 = df_spend['MonthlySpend'].quantile(0.25)
+Q3 = df_spend['MonthlySpend'].quantile(0.75)
+IQR = Q3 - Q1
+print(f"Q1 (25th percentile): {Q1}")
+print(f"Q3 (75th percentile): {Q3}")
+print(f"IQR (Q3 - Q1): {IQR}\n")
+
+# 3. Define the outlier bounds using the 1.5 * IQR rule
+print("--- Step 3: Defining Outlier Bounds ---")
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+print(f"Lower Bound (Q1 - 1.5*IQR): {lower_bound:.2f}")
+print(f"Upper Bound (Q3 + 1.5*IQR): {upper_bound:.2f}\n")
+
+# 4. Filter out the outliers
+# Keep only the rows where 'MonthlySpend' is within the defined bounds.
+print("--- Step 4: Filtering Outliers using IQR ---")
+df_filtered = df_spend[(df_spend['MonthlySpend'] >= lower_bound) & (df_spend['MonthlySpend'] <= upper_bound)]
+print(df_filtered)
+print(f"\nDataFrame shape after filtering outliers: {df_filtered.shape}")
+print(f"Number of outliers removed: {len(df_spend) - len(df_filtered)}\n")
+
+# 5. Verify the outliers are gone (optional)
+# You can re-run df_filtered['MonthlySpend'].quantile([0.25, 0.75]) etc.
+# to see the new distribution.
+print("--- Step 5: Verify (Conceptual) ---")
+print("If you were to plot a box plot of df_filtered['MonthlySpend'], the outliers (500, 1500) would no longer be present.")
+                    </code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">This demo illustrates how to programmatically identify and remove outliers using the IQR method in Pandas. By calculating the quartiles and IQR, you can establish clear boundaries and filter out data points that fall outside these statistically defined limits. This is a common and effective technique for cleaning numerical data before further analysis or model building.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Activity: Are Outliers Errors or Genuine Values? A Critical Discussion</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Identifying an outlier is one thing; deciding how to treat it is another. The most crucial step before applying any handling strategy is to investigate whether the outlier is a genuine, albeit extreme, observation or a data error. This often requires domain expertise and careful reasoning.</p>
+                <p class="mb-4 text-gray-700 leading-relaxed">Consider the following scenarios. For each, discuss whether the outlier is likely a data error or a genuine extreme value, and briefly explain your reasoning. How might your decision impact a business analysis?</p>
+                
+                <div class="space-y-4">
+                    <div class="accordion-item border border-gray-200 rounded-md overflow-hidden">
+                        <div class="accordion-header bg-indigo-50 p-4 flex justify-between items-center hover:bg-indigo-100 transition-colors duration-200" onclick="toggleAccordion(this.parentElement)">
+                            <h4 class="font-medium text-indigo-700 flex items-center">
+                                Scenario 1: Customer Purchase Amount
+                            </h4>
+                            <span class="accordion-arrow text-indigo-600 text-xl">&#9662;</span>
+                        </div>
+                        <div class="accordion-content px-4 bg-white">
+                            <p class="mb-2 text-sm text-gray-700"><strong>Problem:</strong> In a dataset of daily customer purchase amounts for a grocery store, most transactions are between \$10 and \$150. One transaction is recorded as \$15,000.</p>
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-gray-700">
+                                <li><strong>Is it likely an error or genuine?</strong></li>
+                                <li><strong>Reasoning:</strong></li>
+                                <li><strong>Impact on Analysis:</strong></li>
+                            </ul>
+                            <div class="mt-4 p-3 bg-gray-100 rounded-md border border-gray-200">
+                                <h5 class="font-semibold text-indigo-700 mb-2">Suggested Approach:</h5>
+                                <p class="text-sm text-gray-700"><strong>Likely:</strong> Data Error. A single grocery transaction of \$15,000 is highly improbable and far exceeds typical purchase limits. It's most likely a misplaced decimal, an extra zero, or a data entry mistake.</p>
+                                <p class="text-sm text-gray-700 mt-1"><strong>Reasoning:</strong> The value is several orders of magnitude higher than the typical range, making a genuine purchase of that size extremely rare for a grocery store. It doesn't align with the business context.</p>
+                                <p class="text-sm text-gray-700 mt-1"><strong>Impact:</strong> If not handled, this outlier would drastically inflate the average purchase amount, skew sales forecasts, and distort insights into typical customer spending behavior. It could lead to incorrect inventory decisions or marketing strategies.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border border-gray-200 rounded-md overflow-hidden">
+                        <div class="accordion-header bg-indigo-50 p-4 flex justify-between items-center hover:bg-indigo-100 transition-colors duration-200" onclick="toggleAccordion(this.parentElement)">
+                            <h4 class="font-medium text-indigo-700 flex items-center">
+                                Scenario 2: Website Session Duration
+                            </h4>
+                            <span class="accordion-arrow text-indigo-600 text-xl">&#9662;</span>
+                        </div>
+                        <div class="accordion-content px-4 bg-white">
+                            <p class="mb-2 text-sm text-gray-700"><strong>Problem:</strong> In a dataset of website session durations (in seconds), most sessions are between 30 seconds and 5 minutes (300 seconds). A few sessions are recorded as 8 hours (28,800 seconds).</p>
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-gray-700">
+                                <li><strong>Is it likely an error or genuine?</strong></li>
+                                <li><strong>Reasoning:</strong></li>
+                                <li><strong>Impact on Analysis:</strong></li>
+                            </ul>
+                            <div class="mt-4 p-3 bg-gray-100 rounded-md border border-gray-200">
+                                <h5 class="font-semibold text-indigo-700 mb-2">Suggested Approach:</h5>
+                                <p class="text-sm text-gray-700"><strong>Likely:</strong> Genuine (but potentially uninformative) or a technical anomaly.</p>
+                                <p class="text-sm text-gray-700 mt-1"><strong>Reasoning:</strong> An 8-hour session might represent a user leaving a tab open overnight, a bot, or a technical glitch where the session wasn't properly closed. It's less likely a direct data entry error. While technically "genuine" in terms of recording, it might not represent active user engagement.</p>
+                                <p class="text-sm text-gray-700 mt-1"><strong>Impact:</strong> If included, it would heavily skew average session duration, making the website appear more engaging than it is. It could misinform UX design or marketing strategies. Such outliers might need to be capped, transformed, or removed, depending on the analytical goal (e.g., if analyzing active user engagement, these should be excluded).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border border-gray-200 rounded-md overflow-hidden">
+                        <div class="accordion-header bg-indigo-50 p-4 flex justify-between items-center hover:bg-indigo-100 transition-colors duration-200" onclick="toggleAccordion(this.parentElement)">
+                            <h4 class="font-medium text-indigo-700 flex items-center">
+                                Scenario 3: Employee Salary
+                            </h4>
+                            <span class="accordion-arrow text-indigo-600 text-xl">&#9662;</span>
+                        </div>
+                        <div class="accordion-content px-4 bg-white">
+                            <p class="mb-2 text-sm text-gray-700"><strong>Problem:</strong> In a company's salary dataset, most employees earn between \$40,000 and \$120,000 annually. The CEO's salary is \$1,000,000.</p>
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-gray-700">
+                                <li><strong>Is it likely an error or genuine?</strong></li>
+                                <li><strong>Reasoning:</strong></li>
+                                <li><strong>Impact on Analysis:</strong></li>
+                            </ul>
+                            <div class="mt-4 p-3 bg-gray-100 rounded-md border border-gray-200">
+                                <h5 class="font-semibold text-indigo-700 mb-2">Suggested Approach:</h5>
+                                <p class="text-sm text-gray-700"><strong>Likely:</strong> Genuine extreme value.</p>
+                                <p class="text-sm text-gray-700 mt-1"><strong>Reasoning:</strong> While significantly higher than other salaries, a CEO's salary of \$1,000,000 is a legitimate and expected value for that position within a large company. It's not a data entry error but a true reflection of compensation at the top tier.</p>
+                                <p class="text-sm text-gray-700 mt-1"><strong>Impact:</strong> If included, it would heavily skew the average salary, making the workforce appear much higher paid than the typical employee. For analyses like "average employee compensation," it might be appropriate to exclude or analyze separately. For "total payroll cost," it must be included. This outlier provides valuable insight into the company's compensation structure at different levels.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">This activity underscores that identifying outliers is just the beginning. The decision to remove, transform, or keep an outlier is a critical analytical judgment that requires context and understanding of the business problem.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-6 mt-auto">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        function toggleAccordion(itemElement) {
+            itemElement.classList.toggle('open');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scroll for nav links and initial active state
+            document.querySelectorAll('a.nav-button').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll('a.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Set initial active nav button based on URL hash or first section
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'practical';
+            const initialNavButton = document.querySelector(`a.nav-button[href="#${initialSection}"]`);
+            if (initialNavButton) {
+                initialNavButton.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

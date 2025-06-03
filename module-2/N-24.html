@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S24: Structured Data - Characteristics & Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices:
+        - Characteristics of Structured Data: Report Info: Expanded definition. Goal: Inform. Viz/Method: Detailed bulleted list with explanations. Justification: Provides a comprehensive understanding of its nature.
+        - SQL Databases: Report Info: Role in storage. Goal: Inform. Viz/Method: Expanded text explanation. Justification: Highlights the primary storage method for structured data.
+        - Pandas Demo: Report Info: Load CSV, basic operations. Goal: Illustrate, apply. Viz/Method: Detailed Python code snippets with extensive comments and explanations for each command. Justification: Provides hands-on conceptual understanding of initial data handling.
+        - Activity: Classify Datasets: Report Info: Activity prompt. Goal: Engage, apply. Viz/Method: Text instructions with example datasets for classification. Justification: Reinforces understanding through practical application.
+        CONFIRMATION: No charts used (Chart.js/Plotly.js not needed as report is conceptual/textual).
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); /* Adjust based on header/footer height */ }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+
+        .accordion-header { cursor: pointer; user-select: none; }
+        .accordion-content { display: none; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; }
+        .accordion-item.open .accordion-content { display: block; max-height: 1000px; /* Arbitrary large value */ padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .accordion-arrow { transition: transform 0.3s ease; }
+        .accordion-item.open .accordion-arrow { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S24: Structured Data - Characteristics & Tools</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Deep Dive into Structured Data</h2>
+            <p class="section-intro">Structured data is the most prevalent and traditionally understood form of data in business analytics. Its highly organized nature makes it exceptionally well-suited for traditional database management and efficient querying. This section will delve deeper into the defining characteristics of structured data and provide a more comprehensive overview of SQL databases, which serve as its primary storage mechanism.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Characteristics of Structured Data: The Foundation of Organization</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Structured data is defined by its adherence to a rigid, predefined schema or model. This means that its organization is highly predictable, making it easy for machines and humans to understand and process. Key characteristics include:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Predefined Schema & Fixed Format:</strong> This is the most defining characteristic. Structured data is organized into rows and columns, where each column has a specific name, a clearly defined data type (e.g., integer, text, date, boolean), and a fixed length or format. This schema must be established *before* data can be entered. For example, a "Customer ID" column will always contain a customer ID, and it will always be of a specific type (e.g., integer).</li>
+                    <li><strong>Tabular Structure:</strong> It typically resides in tables, similar to a spreadsheet. Each row in the table represents a single record or entry (e.g., one customer, one transaction), and each column represents a specific attribute or field of that record (e.g., customer name, transaction date, product price).</li>
+                    <li><strong>Easily Searchable & Queryable:</strong> Due to its organized nature, structured data can be efficiently searched, filtered, and queried using structured query languages like SQL (Structured Query Language). This allows for precise data retrieval and aggregation.</li>
+                    <li><strong>Relational Nature:</strong> Structured data is often stored in relational databases (RDBMS), where multiple tables can be linked to each other via common fields (keys). This relational aspect allows for complex queries that combine information from different tables, providing a holistic view (e.g., linking customer data to their orders).</li>
+                    <li><strong>Data Integrity & Validation:</strong> The predefined schema helps enforce data integrity rules. For instance, if a column is set to store only numerical values, the system will prevent text from being entered, thus reducing data entry errors and maintaining consistency. Constraints like "primary keys" and "foreign keys" further ensure data relationships are valid.</li>
+                    <li><strong>Scalability (with Considerations):</strong> While traditionally associated with vertical scaling (upgrading single servers), modern relational databases and data warehousing solutions can scale horizontally to handle very large volumes of structured data, often leveraging cloud infrastructure.</li>
+                    <li><strong>Quantitative and Categorical Values:</strong> Structured data can contain both numerical values (e.g., sales figures, age, quantity) which are suitable for mathematical operations, and categorical values (e.g., product names, payment methods, gender) which are used for grouping, filtering, and counting.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">The rigidity of structured data, while sometimes seen as a limitation for rapidly evolving data, is precisely what makes it so reliable and efficient for traditional business reporting, transactional systems, and many analytical tasks where data consistency is paramount.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Common Storage: SQL Databases - The Backbone of Structured Data</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">SQL (Structured Query Language) databases, also known as Relational Database Management Systems (RDBMS), are the predominant technology for storing and managing structured data. They are designed to efficiently store, retrieve, and manage data that adheres to a predefined schema, ensuring data integrity and consistency.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Role of SQL Databases:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Data Organization:</strong> Data is organized into tables, with each table consisting of rows (records) and columns (attributes).</li>
+                    <li><strong>Relationships:</strong> Tables are related to each other through primary and foreign keys, allowing for complex data models that reflect real-world relationships between entities (e.g., a customer table linked to an orders table).</li>
+                    <li><strong>Data Integrity:</strong> SQL databases enforce data integrity rules through constraints (e.g., NOT NULL, UNIQUE, PRIMARY KEY, FOREIGN KEY), ensuring that data is accurate and consistent.</li>
+                    <li><strong>Atomicity, Consistency, Isolation, Durability (ACID):</strong> These properties ensure reliable processing of database transactions. ACID compliance is critical for applications requiring high data integrity, such as financial systems.</li>
+                    <li><strong>Querying Power:</strong> SQL is a powerful declarative language used to query, insert, update, and delete data in relational databases. Its standardized nature makes it widely adopted and understood.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Examples of Popular SQL Databases:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>MySQL:</strong> An open-source RDBMS widely used for web applications, e-commerce, and data warehousing. Known for its speed, reliability, and ease of use.</li>
+                    <li><strong>PostgreSQL:</strong> Another powerful open-source RDBMS, known for its robustness, advanced features, and extensibility. Often preferred for complex data workloads and enterprise applications.</li>
+                    <li><strong>Oracle Database:</strong> A commercial, enterprise-grade RDBMS known for its high performance, scalability, and advanced security features. Widely used by large corporations for mission-critical applications.</li>
+                    <li><strong>Microsoft SQL Server:</strong> A commercial RDBMS developed by Microsoft, popular in enterprise environments, especially those using other Microsoft technologies. Offers a comprehensive suite of tools for database management and business intelligence.</li>
+                    <li><strong>SQLite:</strong> A lightweight, file-based SQL database that doesn't require a separate server process. Ideal for embedded systems, mobile applications, and small-scale desktop applications where simplicity and local storage are key.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Understanding SQL databases is essential for any data professional, as they remain a cornerstone for managing and analyzing structured data in virtually every industry.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Working with Structured Data - Initial Exploration with Pandas</h2>
+            <p class="section-intro">Working with structured data in a practical setting often begins with loading it into an analytical environment and performing initial exploratory steps. Python's Pandas library is the de facto standard for this, providing powerful tools for data manipulation and inspection. This section will walk you through essential first steps using Pandas and challenge you to classify different datasets based on their structure.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Tool Demo: Initial Data Exploration with Python (Pandas)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">When you receive a new dataset, especially in a common structured format like CSV, the first thing you need to do is load it and get a quick understanding of its contents, dimensions, and data types. Pandas DataFrames are perfect for this. Let's use a hypothetical "customer_orders.csv" file for this demonstration.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800">
+                    <h4 class="font-semibold text-indigo-700 mb-2">Python Code Snippet (using Pandas for initial exploration)</h4>
+                    <pre><code class="language-python">
+import pandas as pd
+
+# 1. Load the CSV file into a Pandas DataFrame
+# The pd.read_csv() function is highly versatile and can read various delimited files.
+# It automatically infers data types, but this can be explicitly set if needed.
+print("--- Step 1: Loading the Dataset ---")
+try:
+    df_orders = pd.read_csv('customer_orders.csv')
+    print("Dataset 'customer_orders.csv' loaded successfully into DataFrame 'df_orders'.\n")
+except FileNotFoundError:
+    print("Error: 'customer_orders.csv' not found. Please ensure the file is in the correct directory.\n")
+    # For demonstration, let's create a dummy DataFrame if file not found
+    data = {
+        'OrderID': [1, 2, 3, 4, 5],
+        'CustomerID': ['C101', 'C102', 'C101', 'C103', 'C104'],
+        'OrderDate': ['2023-01-15', '2023-01-16', '2023-01-15', '2023-01-17', '2023-01-18'],
+        'Product': ['Laptop', 'Mouse', 'Keyboard', 'Monitor', 'Webcam'],
+        'Quantity': [1, 2, 1, 1, 1],
+        'Price': [1200.00, 25.00, 75.00, 300.00, 50.00],
+        'PaymentStatus': ['Paid', 'Paid', 'Pending', 'Paid', 'Paid']
+    }
+    df_orders = pd.DataFrame(data)
+    print("Using a dummy DataFrame for demonstration.\n")
+
+
+# 2. Get the shape of the DataFrame (rows, columns)
+# df.shape returns a tuple representing the dimensions of the DataFrame.
+# This gives a quick idea of the dataset's size.
+print("--- Step 2: Checking DataFrame Shape (df.shape) ---")
+print(f"DataFrame has {df_orders.shape[0]} rows and {df_orders.shape[1]} columns.\n")
+
+# 3. View column names
+# df.columns returns an Index object containing all column labels.
+# Useful for quickly seeing what attributes are available.
+print("--- Step 3: Viewing Column Names (df.columns) ---")
+print("Columns in DataFrame:", df_orders.columns.tolist(), "\n")
+
+# 4. Display the first few rows (head)
+# df.head(n) returns the first n rows. Default is 5.
+# This provides a visual inspection of the data's structure and content.
+print("--- Step 4: Displaying First 5 Rows (df.head()) ---")
+print(df_orders.head(), "\n")
+
+# 5. Get data types of each column
+# df.dtypes returns a Series with the data type of each column.
+# Crucial for identifying if data is interpreted correctly (e.g., numbers as numbers, dates as objects/strings).
+print("--- Step 5: Checking Column Data Types (df.dtypes) ---")
+print(df_orders.dtypes, "\n")
+
+# 6. Get a concise summary of the DataFrame (info)
+# df.info() prints a summary including the index dtype and column dtypes, non-null values, and memory usage.
+# This is invaluable for quickly assessing data completeness (missing values) and types.
+print("--- Step 6: Getting DataFrame Information (df.info()) ---")
+df_orders.info()
+                    </code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">These basic Pandas commands are your first line of defense when encountering a new structured dataset. They quickly provide essential information about the data's dimensions, column names, a peek at its content, and crucially, how Pandas has interpreted the data types. This initial inspection is vital for planning subsequent data cleaning and analysis steps.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Activity: Classify Datasets as Structured or Not</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Based on your understanding of structured data, classify the following hypothetical datasets as either "Structured" or "Not Structured." For each, provide a brief justification for your classification.</p>
+                <div id="datasetClassificationContainer" class="space-y-4"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-6 mt-auto">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        const datasetClassificationData = [
+            {
+                id: 'sales_transactions',
+                name: 'Sales Transactions Log (CSV file)',
+                description: 'A file where each row represents a single sale, with columns for Transaction ID, Date, Customer ID, Product Name, Quantity, Price, and Store Location.',
+                type: 'Structured',
+                justification: 'This data is organized in a tabular format with predefined columns and consistent data types for each column (e.g., Transaction ID is always an ID, Date is always a date). It fits the row-and-column schema.'
+            },
+            {
+                id: 'customer_reviews',
+                name: 'Customer Reviews (Text from a website)',
+                description: 'A collection of free-form text comments submitted by customers about a product, with no specific fields for sentiment or keywords.',
+                type: 'Not Structured',
+                justification: 'This is free-form text without a predefined schema. While it might have associated metadata (like review ID or date), the core content (the review text itself) does not fit into a fixed row-and-column format without significant processing (e.g., Natural Language Processing).'
+            },
+            {
+                id: 'employee_database',
+                name: 'Employee Database (SQL Database)',
+                description: 'A database containing tables for employees, departments, and projects, with defined relationships between them.',
+                type: 'Structured',
+                justification: 'SQL databases are designed specifically for structured data. Information is organized into tables with fixed columns and defined relationships, adhering to a strict schema.'
+            },
+            {
+                id: 'social_media_posts',
+                name: 'Social Media Posts (e.g., Tweets)',
+                description: 'A stream of public messages, each containing text, hashtags, mentions, timestamps, and potentially images/videos, but with varying content length and optional fields.',
+                type: 'Not Structured',
+                justification: 'While individual posts have some structured metadata (timestamp, user ID), the main content (the tweet text itself) is free-form. The overall collection is not strictly tabular, and fields like hashtags or mentions can vary greatly, making it unstructured (or semi-structured if considering JSON representation).'
+            },
+            {
+                id: 'sensor_data',
+                name: 'Machine Sensor Readings (Time-series data from IoT device)',
+                description: 'Continuous streams of temperature, pressure, and vibration readings from a factory machine, recorded with timestamps.',
+                type: 'Structured',
+                justification: 'This is time-series data, which is typically structured. Each reading forms a row, with columns for timestamp, temperature, pressure, and vibration. It has a consistent, predefined format over time.'
+            },
+            {
+                id: 'customer_support_calls',
+                name: 'Customer Support Call Recordings (Audio files)',
+                description: 'A collection of audio files of customer service calls.',
+                type: 'Not Structured',
+                justification: 'Audio files are inherently unstructured data. To extract insights, they would need to be transcribed into text (making them unstructured text) and then processed further.'
+            }
+        ];
+
+        function createClassificationItem(itemData, index) {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'bg-indigo-50 p-4 rounded-lg border border-indigo-200';
+            itemDiv.innerHTML = `
+                <h4 class="font-semibold text-indigo-700 mb-2">Dataset ${index + 1}: ${itemData.name}</h4>
+                <p class="text-sm text-gray-700 mb-3">${itemData.description}</p>
+                <div class="accordion-item">
+                    <div class="accordion-header flex justify-between items-center text-indigo-600 font-medium hover:text-indigo-800 transition-colors duration-200" onclick="toggleAccordion(this.parentElement)">
+                        <span>View Classification & Justification</span>
+                        <span class="accordion-arrow text-xl">&#9662;</span>
+                    </div>
+                    <div class="accordion-content pt-2 mt-2 border-t border-indigo-100">
+                        <p class="text-sm text-gray-800"><strong>Classification:</strong> <span class="font-bold text-amber-600">${itemData.type}</span></p>
+                        <p class="text-sm text-gray-600 mt-1"><strong>Justification:</strong> ${itemData.justification}</p>
+                    </div>
+                </div>
+            `;
+            return itemDiv;
+        }
+
+        function populateDatasetClassification() {
+            const container = document.getElementById('datasetClassificationContainer');
+            datasetClassificationData.forEach((item, index) => container.appendChild(createClassificationItem(item, index)));
+        }
+
+        function toggleAccordion(itemElement) {
+            itemElement.classList.toggle('open');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            populateDatasetClassification();
+
+            // Smooth scroll for nav links and initial active state
+            document.querySelectorAll('a.nav-button').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll('a.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Set initial active nav button based on URL hash or first section
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'theory';
+            const initialNavButton = document.querySelector(`a.nav-button[href="#${initialSection}"]`);
+            if (initialNavButton) {
+                initialNavButton.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

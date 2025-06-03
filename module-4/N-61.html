@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S61: Multiple Linear Regression - Concepts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="number"], input[type="range"], textarea {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            max-width: 250px; /* Constrain width for inputs */
+            margin-bottom: 0.5rem;
+        }
+        input[type="range"] {
+            padding: 0; /* Remove padding for range input */
+            height: 2.5rem; /* Adjust height for better visual */
+            -webkit-appearance: none; /* Remove default styling */
+            appearance: none;
+            background: #d1d5db; /* Track background */
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+            max-width: 100%; /* Allow range to fill width */
+        }
+        input[type="range"]:hover {
+            opacity: 1;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4338CA;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4338CA;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        textarea {
+            max-width: 100%;
+            min-height: 80px;
+            resize: vertical;
+        }
+        .action-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+        }
+        .action-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .code-block {
+            background-color: #2D3748; /* Dark background for code */
+            color: #E2E8F0; /* Light text */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', monospace; /* Monospace font */
+            overflow-x: auto; /* Allow horizontal scrolling for long lines */
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .code-block pre {
+            margin: 0;
+        }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #4A5568;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .copy-button:hover {
+            background-color: #6366F1;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px; /* Increased height for better visibility */
+            width: 100%;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        /* Message Box Styling */
+        #messageBox {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .input-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4B5563;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S61: Multiple Linear Regression - Concepts</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory-mlr" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical-demo" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💻 Practical Demo</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory-mlr" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Extending to Multiple Linear Regression</h2>
+            <p class="section-intro">While Simple Linear Regression (SLR) is useful for modeling the relationship between two variables, real-world phenomena are often influenced by multiple factors. This is where **Multiple Linear Regression (MLR)** comes into play, allowing us to predict a dependent variable using two or more independent variables.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. The Multiple Linear Regression Model</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Multiple Linear Regression extends the concept of SLR by incorporating additional independent variables. Instead of fitting a 2D line, MLR fits a hyperplane (a plane in 3D, or a higher-dimensional equivalent) to the data.</p>
+                
+                <h4 class="text-lg font-semibold text-gray-800 mb-2">The Model Equation:</h4>
+                <div class="code-block bg-gray-100 text-gray-800 p-4 rounded-md">
+                    <pre><code>$$ Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_k X_k + \epsilon $$</code></pre>
+                    <p class="text-sm text-gray-600 mt-2">Where:</p>
+                    <ul class="list-disc pl-5 text-sm text-gray-600">
+                        <li>$Y$: The **Dependent Variable** (the variable we are trying to predict).</li>
+                        <li>$X_1, X_2, \dots, X_k$: The **Independent Variables** (or predictor variables). We now have $k$ independent variables.</li>
+                        <li>$\beta_0$: The **Y-intercept**. The expected mean value of $Y$ when all independent variables ($X_1, \dots, X_k$) are equal to zero.</li>
+                        <li>$\beta_1, \beta_2, \dots, \beta_k$: The **Partial Regression Coefficients** (or slopes). Each $\beta_j$ represents the expected change in $Y$ for a one-unit increase in $X_j$, **while holding all other independent variables constant**. This "holding constant" aspect is crucial and differentiates MLR coefficients from SLR coefficients.</li>
+                        <li>$\epsilon$: The **Error Term**, representing the unexplained variance.</li>
+                    </ul>
+                </div>
+                <p class="mt-4 text-gray-700 leading-relaxed">When we estimate this model from sample data, we use the following notation for the estimated regression equation:</p>
+                 <div class="code-block bg-gray-100 text-gray-800 p-4 rounded-md">
+                    <pre><code>$$ \hat{Y} = b_0 + b_1 X_1 + b_2 X_2 + \dots + b_k X_k $$</code></pre>
+                    <p class="text-sm text-gray-600 mt-2">Where $b_0, b_1, \dots, b_k$ are the estimated coefficients from the sample data.</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. Interpretation of Coefficients in MLR</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Interpreting coefficients in MLR is similar to SLR, but with the critical "holding all other variables constant" caveat. This is because the model accounts for the simultaneous influence of multiple predictors.</p>
+                
+                <ul class="list-disc pl-5 space-y-4 text-gray-700">
+                    <li><strong>Intercept ($b_0$):</strong>
+                        <p class="mb-2">The predicted mean value of $Y$ when *all* $X_j$ variables are zero. Again, its practical meaning depends on whether $X_j=0$ is a meaningful or plausible value for all predictors.</p>
+                    </li>
+                    <li><strong>Partial Slope ($b_j$ for $X_j$):</strong>
+                        <p class="mb-2">For a one-unit increase in $X_j$, the predicted mean value of $Y$ is expected to change by $b_j$ units, **assuming all other independent variables in the model are held constant.**</p>
+                        <p class="text-sm text-gray-600 italic">Example: Predicting house price ($Y$) based on square footage ($X_1$) and number of bedrooms ($X_2$). If $b_1 = 100$, it means for every additional square foot, the predicted house price increases by $100, assuming the number of bedrooms remains the same.</p>
+                    </li>
+                </ul>
+                <p class="mt-4 text-gray-700 leading-relaxed font-bold">This "holding constant" aspect is vital. It means the model attempts to isolate the unique contribution of each predictor after accounting for the influence of other predictors in the model.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. Multicollinearity: A Key Challenge in MLR</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Multicollinearity is a common problem in MLR that occurs when two or more independent variables in a model are highly correlated with each other. It doesn't violate the assumptions of OLS (the model can still be fit), but it can severely impact the interpretation and stability of the regression coefficients.</p>
+                
+                <h4 class="text-lg font-semibold text-gray-800 mb-2">What happens with Multicollinearity?</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Unstable Coefficients:</strong> The estimated coefficients ($b_j$) can become very sensitive to small changes in the data. They might have large standard errors, leading to high p-values even if the overall model is significant.</li>
+                    <li><strong>Difficult Interpretation:</strong> It becomes hard to interpret the individual effect of a predictor "holding all other variables constant" when those "other variables" are moving in tandem with the predictor in question. The unique contribution of each correlated predictor becomes ambiguous.</li>
+                    <li><strong>Reduced Statistical Significance:</strong> Highly correlated predictors share explanatory power. This can lead to none of them appearing statistically significant individually, even if they are collectively important.</li>
+                    <li><strong>No Impact on Prediction (usually):</strong> While multicollinearity affects coefficient interpretation, it generally does *not* affect the predictive power of the overall model (i.e., $\hat{Y}$ predictions). The model can still predict $Y$ accurately, but it struggles to assign the "credit" for that prediction uniquely to each correlated $X$.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">Detecting Multicollinearity:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>High Correlation Coefficients:</strong> Examine the correlation matrix of your independent variables. High absolute values (e.g., $|r| > 0.7$ or $0.8$) between predictors are a red flag.</li>
+                    <li><strong>Variance Inflation Factor (VIF):</strong> This is a more formal measure. VIF quantifies how much the variance of an estimated regression coefficient is inflated due to multicollinearity.
+                        <ul>
+                            <li>A VIF of 1 means no correlation between that predictor and any other predictors.</li>
+                            <li>VIF values between 1 and 5 are generally considered acceptable.</li>
+                            <li>VIF values greater than 5 (some say 10) indicate potentially problematic multicollinearity.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">Addressing Multicollinearity:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Remove one of the highly correlated variables:</strong> If two variables measure very similar things, keep the one that is theoretically more relevant or easier to interpret.</li>
+                    <li><strong>Combine correlated variables:</strong> Create an index or composite variable from the correlated predictors.</li>
+                    <li><strong>Collect more data:</strong> Sometimes, more data can help to disentangle the relationships.</li>
+                    <li><strong>Use regularization techniques:</strong> Methods like Ridge or Lasso regression (beyond the scope of basic MLR) can handle multicollinearity.</li>
+                </ul>
+                <p class="mt-4 text-gray-700 leading-relaxed font-bold">Understanding multicollinearity is critical for sound MLR modeling, especially when the goal is to understand the individual impact of each predictor.</p>
+            </div>
+        </section>
+
+        <section id="practical-demo" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💻</span>Practical Demo: Building an MLR Model & Discussing Interpretation Challenges</h2>
+            <p class="section-intro">Let's explore a Multiple Linear Regression model for **House Price Prediction** based on **Square Footage** and **Number of Bedrooms**. Use the controls below to generate synthetic data with different underlying relationships and noise levels. Observe how these changes affect the data's characteristics and consider how they would impact a real MLR analysis.</p>
+            
+            <div class="interactive-panel">
+                <div class="panel-title">MLR Model Demo & Data Generation</div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="input-group">
+                        <label for="true_b0">True Intercept ($\beta_0$):</label>
+                        <input type="number" id="true_b0" value="50000" step="1000">
+                        <p class="text-xs text-gray-500 mt-1">Baseline price when SqFt and Bedrooms are 0.</p>
+                    </div>
+                    <div class="input-group">
+                        <label for="true_b1_sqft">True SqFt Coefficient ($\beta_1$):</label>
+                        <input type="number" id="true_b1_sqft" value="150" step="10">
+                        <p class="text-xs text-gray-500 mt-1">Price change per SqFt (holding Bedrooms constant).</p>
+                    </div>
+                    <div class="input-group">
+                        <label for="true_b2_bedrooms">True Bedrooms Coefficient ($\beta_2$):</label>
+                        <input type="number" id="true_b2_bedrooms" value="20000" step="1000">
+                        <p class="text-xs text-gray-500 mt-1">Price change per Bedroom (holding SqFt constant).</p>
+                    </div>
+                    <div class="input-group">
+                        <label for="noise_scale">Noise Level (Std Dev):</label>
+                        <input type="number" id="noise_scale" value="30000" step="5000">
+                        <p class="text-xs text-gray-500 mt-1">Random variation in prices. Higher = more scatter, lower R-squared.</p>
+                    </div>
+                    <div class="input-group">
+                        <label for="correlation_factor">Correlation Strength (SqFt & Bedrooms): <span id="correlation_value">0.75</span></label>
+                        <input type="range" id="correlation_factor" min="0" max="1" step="0.05" value="0.75">
+                        <p class="text-xs text-gray-500 mt-1">How much SqFt and Bedrooms move together. Higher = more multicollinearity.</p>
+                    </div>
+                </div>
+                
+                <div class="text-center mb-4">
+                    <button id="generateDataBtn" class="action-button bg-indigo-600 hover:bg-indigo-700">Generate Data & Show Visuals</button>
+                    <button id="resetParamsBtn" class="action-button bg-gray-500 hover:bg-gray-600">Reset Parameters</button>
+                    <button id="showMlrPythonCodeBtn" class="action-button bg-green-600 hover:bg-green-700">Show Python Code</button>
+                </div>
+
+                <div id="mlrPythonCodeSection" class="hidden mt-4">
+                    <h4 class="text-indigo-600">Python Code for MLR (using `statsmodels`):</h4>
+                    <div class="code-block">
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="mlrPythonCode">
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+import seaborn as sns
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+# --- 1. Generate Synthetic Data: House Price, Square Footage, Bedrooms ---
+# These parameters can be adjusted in the interactive demo
+TRUE_B0 = 50000
+TRUE_B1_SQFT = 150
+TRUE_B2_BEDROOMS = 20000
+NOISE_SCALE = 30000
+CORRELATION_FACTOR = 0.75 # Controls correlation between SqFt and Bedrooms
+
+np.random.seed(42) # For reproducibility
+
+num_houses = 100
+
+# Independent Variable 1: Square Footage
+sq_footage = np.random.normal(loc=2000, scale=300, size=num_houses)
+sq_footage = np.clip(sq_footage, 1000, 3500) # Clip to reasonable range
+
+# Independent Variable 2: Number of Bedrooms (correlated with Sq Footage)
+# Generate bedrooms with controlled correlation
+# A common way to generate correlated variables (X1, X2) with correlation 'rho':
+# Z1 = random_normal()
+# Z2 = random_normal()
+# X1 = Z1
+# X2 = rho * Z1 + sqrt(1 - rho^2) * Z2
+# Then scale X1 and X2 to desired means and std deviations.
+
+# Simplified approach for demo:
+# Mix a component dependent on sq_footage with a random component
+bedrooms_base = sq_footage / 700 # Roughly 1 bedroom per 700 sq ft
+random_bedrooms_noise = np.random.normal(loc=0, scale=1.5, size=num_houses) # Some random variation
+bedrooms = bedrooms_base * CORRELATION_FACTOR + random_bedrooms_noise * (1 - CORRELATION_FACTOR) * 3 + 1
+bedrooms = np.round(bedrooms)
+bedrooms = np.clip(bedrooms, 2, 5) # Clip to reasonable range (2-5 bedrooms)
+
+# Dependent Variable: House Price
+house_price = TRUE_B0 + TRUE_B1_SQFT * sq_footage + TRUE_B2_BEDROOMS * bedrooms + np.random.normal(loc=0, scale=NOISE_SCALE, size=num_houses)
+house_price = np.clip(house_price, 150000, 1000000) # Ensure prices are somewhat realistic
+
+data_df = pd.DataFrame({
+    'Square_Footage': sq_footage,
+    'Bedrooms': bedrooms,
+    'House_Price': house_price
+})
+
+print("Sample Data Head:")
+print(data_df.head())
+
+# --- 2. Check for Multicollinearity (Correlation Matrix & VIF) ---
+print("\n--- Correlation Matrix of Predictors ---")
+correlation_matrix = data_df[['Square_Footage', 'Bedrooms']].corr()
+print(correlation_matrix)
+
+plt.figure(figsize=(6, 5))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=.5)
+plt.title('Correlation Matrix of Predictors (Sq Footage, Bedrooms)')
+plt.show()
+
+# --- 3. Define X (Independent) and Y (Dependent) Variables ---
+X = data_df[['Square_Footage', 'Bedrooms']] # Multiple independent variables
+Y = data_df['House_Price']
+
+# --- 4. Add a constant to the independent variables (for intercept) ---
+X = sm.add_constant(X)
+
+# --- 5. Fit the OLS Regression Model ---
+model = sm.OLS(Y, X)
+results = model.fit()
+
+# --- 6. Print the Regression Summary (Output for Interpretation) ---
+print("\n--- Multiple Linear Regression Analysis Summary (statsmodels) ---")
+print(results.summary())
+
+# --- 7. Calculate Variance Inflation Factor (VIF) ---
+vif_data = pd.DataFrame()
+vif_data["feature"] = X.columns
+vif_data["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+print("\n--- Variance Inflation Factor (VIF) ---")
+print(vif_data)
+
+# --- 8. Visualize Predicted vs. Actual (for overall model fit) ---
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x=data_df['House_Price'], y=results.predict(X), color='#4338CA', s=80, alpha=0.8)
+plt.plot([min(data_df['House_Price']), max(data_df['House_Price'])],
+         [min(data_df['House_Price']), max(data_df['House_Price'])],
+         color='red', linestyle='--', label='Perfect Fit Line')
+plt.title('Actual vs. Predicted House Prices')
+plt.xlabel('Actual House Price')
+plt.ylabel('Predicted House Price')
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+</code></pre>
+                    </div>
+                </div>
+
+                <div id="mlrOutputSection" class="hidden mt-4">
+                    <h4 class="text-indigo-600">Simulated MLR Output (from `statsmodels`):</h4>
+                    <div class="code-block bg-gray-900 text-gray-100 p-4 rounded-md text-sm">
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="simulatedMlrStatsOutput">
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:            House_Price   R-squared:                       0.785
+Model:                            OLS   Adj. R-squared:                  0.780
+Method:                 Least Squares   F-statistic:                     177.6
+Date:                Thu, 30 May 2025   Prob (F-statistic):           1.02e-33
+Time:                        10:00:00   Log-Likelihood:                -1191.0
+No. Observations:                 100   AIC:                             2388.
+Df Residuals:                      97   BIC:                             2396.
+Df Model:                           2                                         
+Covariance Type:            nonrobust                                         
+==================================================================================
+                     coef    std err          t      P>|t|      [0.025      0.975]
+----------------------------------------------------------------------------------
+const           4.500e+04   2.000e+04    2.250      0.027    5100.000    8.490e+04
+Square_Footage    145.0000     10.000    14.500      0.000     125.000     165.000
+Bedrooms        1.500e+04   1.000e+04    1.500      0.137   -4900.000    3.490e+04
+==============================================================================
+Omnibus:                        0.500   Durbin-Watson:                   1.950
+Prob(Omnibus):                  0.779   Jarque-Bera (JB):                0.600
+Skew:                           0.100   Prob(JB):                        0.740
+Kurtosis:                       2.800   Cond. No.                     1.50e+04
+==============================================================================
+</code></pre>
+                    </div>
+                    <h4 class="text-indigo-600 mt-6">Simulated Correlation Matrix of Predictors:</h4>
+                    <div class="code-block bg-gray-900 text-gray-100 p-4 rounded-md text-sm">
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="simulatedCorrelationMatrix">
+                 Square_Footage  Bedrooms
+Square_Footage         1.00          0.75
+Bedrooms               0.75          1.00
+</code></pre>
+                    </div>
+                    <h4 class="text-indigo-600 mt-6">Simulated Variance Inflation Factor (VIF):</h4>
+                    <div class="code-block bg-gray-900 text-gray-100 p-4 rounded-md text-sm">
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="simulatedVifOutput">
+       feature         VIF
+0        const    0.000000
+1  Square_Footage  2.564103
+2        Bedrooms  2.564103
+</code></pre>
+                    </div>
+
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Visualizing Generated Data: Correlation between Predictors</h5>
+                    <div class="chart-container">
+                        <canvas id="correlationMatrixChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 1: Scatter plot showing the relationship between Square Footage and Bedrooms in the generated data. Observe how the scatter changes with the "Correlation Strength" parameter.</p>
+
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Visualizing Generated Data: House Price vs. Square Footage</h5>
+                    <div class="chart-container">
+                        <canvas id="priceVsSqFtChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 2: Scatter plot of generated House Price vs. Square Footage. The "true" relationship is shown as a line. Observe how the scatter around the line changes with the "Noise Level" parameter.</p>
+
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Visualizing Generated Data: House Price vs. Bedrooms</h5>
+                    <div class="chart-container">
+                        <canvas id="priceVsBedroomsChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 3: Scatter plot of generated House Price vs. Bedrooms. The "true" relationship is shown as a line. Observe how the scatter around the line changes with the "Noise Level" parameter.</p>
+
+
+                    <div id="mlrInterpretation" class="feedback-box mt-4">
+                        <h4 class="text-indigo-600">Discussion & Interpretation of Simulated MLR Output:</h4>
+                        <p class="mb-2 text-gray-700">The simulated `statsmodels` output above represents what you might get from running an MLR on data similar to what you generated. Let's interpret it:</p>
+                        <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                            <li><strong>Overall Model Fit ($R^2$, Adj. $R^2$, F-statistic):</strong>
+                                <p class="mb-1">The $R^2$ is $0.785$, meaning $78.5\%$ of the variance in house prices is explained by Square Footage and Bedrooms. The F-statistic's p-value ($1.02e-33$) is very low, indicating the overall model is highly statistically significant. **Observe how the "Noise Level" you set impacts the perceived R-squared in a real model: higher noise typically leads to lower R-squared.**</p>
+                            </li>
+                            <li><strong>Interpretation of Coefficients:</strong>
+                                <ul>
+                                    <li><strong>Intercept (const = $45000$):</strong> When Square Footage and Bedrooms are both zero (which is not practically meaningful for a house), the predicted house price is $45,000$.</li>
+                                    <li><strong>Square_Footage (coef = $145.00$):</strong> For every one-unit (one square foot) increase in square footage, the predicted house price increases by $145$, **holding the number of bedrooms constant**. This coefficient is highly significant (p-value $0.000$). **Compare this to your "True SqFt Coefficient" input. A real model tries to estimate this 'true' value.**</li>
+                                    <li><strong>Bedrooms (coef = $15000$):</strong> For every one-unit increase in the number of bedrooms, the predicted house price increases by $15,000$, **holding the square footage constant**. However, notice its p-value ($0.137$). This coefficient is **not statistically significant** at a typical $\alpha=0.05$ level. **Compare this to your "True Bedrooms Coefficient" input. Even if the 'true' effect is strong, multicollinearity can make it appear insignificant.**</li>
+                                </ul>
+                            </li>
+                            <li><strong>Multicollinearity Challenge:</strong>
+                                <p class="mb-1">The correlation matrix shows a correlation of $0.75$ between `Square_Footage` and `Bedrooms`. This is a relatively high correlation, suggesting multicollinearity. The VIF values are $2.56$, which are generally considered acceptable (below 5 or 10), but still indicate some degree of shared variance. **Experiment with the "Correlation Strength" slider: higher correlation will lead to higher VIF values and can make individual coefficients (like Bedrooms here) appear less significant.**</p>
+                                <p class="mb-1">The fact that `Bedrooms` is not significant, despite intuitively being an important factor for house price, is a classic symptom of multicollinearity. `Square_Footage` and `Bedrooms` are highly correlated, so `Square_Footage` might be "taking credit" for most of the explained variance, leaving `Bedrooms` with an insignificant unique contribution *after* accounting for square footage.</p>
+                                <p class="mb-1">This means while the overall model is good at predicting price, it's hard to precisely disentangle the *individual* impact of bedrooms when square footage is already in the model and highly correlated.</p>
+                            </li>
+                        </ul>
+                        <p class="mt-4 text-gray-700 font-bold">Key Takeaway: When predictors are highly correlated, interpreting individual coefficients becomes challenging. The model might still predict well, but understanding the unique contribution of each variable is harder.</p>
+                    </div>
+
+                    <div class="interactive-panel mt-8">
+                        <div class="panel-title">Predict New House Price</div>
+                        <p class="mb-4 text-gray-700">Use the *simulated* MLR model to predict the price of a new house. This uses the coefficients from the `statsmodels` output above.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="input-group">
+                                <label for="predict_sqft">Square Footage:</label>
+                                <input type="number" id="predict_sqft" value="2200" step="100">
+                            </div>
+                            <div class="input-group">
+                                <label for="predict_bedrooms">Number of Bedrooms:</label>
+                                <input type="number" id="predict_bedrooms" value="4" step="1">
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button id="predictPriceBtn" class="action-button">Predict Price</button>
+                        </div>
+                        <div id="predictionResult" class="results-box hidden mt-4">
+                            <h4>Predicted House Price:</h4>
+                            <div class="result-item">
+                                <span class="result-label">Predicted Price:</span>
+                                <span class="result-value" id="predictedPriceValue"></span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">This prediction is based on the *simulated* model: $\hat{\text{Price}} = 45000 + 145 \times \text{SqFt} + 15000 \times \text{Bedrooms}$</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <div id="messageBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg z-50" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span id="messageText" class="block sm:inline"></span>
+        <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" onclick="document.getElementById('messageBox').classList.add('hidden');">
+            <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+        </span>
+    </div>
+
+    <script>
+        // Global variables for synthetic data and chart instances
+        let sqFootageData = [];
+        let bedroomsData = [];
+        let housePriceData = [];
+        let correlationMatrixChartInstance = null;
+        let priceVsSqFtChartInstance = null;
+        let priceVsBedroomsChartInstance = null;
+
+        // Default parameters for data generation
+        const defaultParams = {
+            true_b0: 50000,
+            true_b1_sqft: 150,
+            true_b2_bedrooms: 20000,
+            noise_scale: 30000,
+            correlation_factor: 0.75
+        };
+
+        // --- Message Box Function ---
+        function showMessage(message, type = 'error') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            messageText.innerText = message;
+            messageBox.classList.remove('hidden');
+            if (type === 'error') {
+                messageBox.classList.remove('bg-green-100', 'border-green-400', 'text-green-700');
+                messageBox.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+            } else {
+                messageBox.classList.remove('bg-red-100', 'border-red-400', 'text-red-700'); // Remove red if previously error
+                messageBox.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+            }
+        }
+
+        // --- Code Copy Function ---
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const textToCopy = codeBlock.textContent;
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                button.textContent = 'Copied!';
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                button.textContent = 'Error!';
+            }
+            document.body.removeChild(textarea);
+
+            setTimeout(() => {
+                button.textContent = 'Copy';
+            }, 2000);
+        }
+
+        // --- MathJax Rendering Function ---
+        function renderMathInElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element && typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                MathJax.typesetPromise([element]).catch(err => console.error("MathJax rendering error for element:", elementId, err));
+            } else if (!element) {
+                console.warn(`Element with ID '${elementId}' not found for MathJax rendering.`);
+            } else {
+                console.warn("MathJax not fully loaded or configured. Skipping MathJax rendering for:", elementId);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation button active state logic
+            document.querySelectorAll('nav a').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // --- Practical Demo Logic ---
+            const true_b0_input = document.getElementById('true_b0');
+            const true_b1_sqft_input = document.getElementById('true_b1_sqft');
+            const true_b2_bedrooms_input = document.getElementById('true_b2_bedrooms');
+            const noise_scale_input = document.getElementById('noise_scale');
+            const correlation_factor_input = document.getElementById('correlation_factor');
+            const correlation_value_span = document.getElementById('correlation_value');
+
+            const generateDataBtn = document.getElementById('generateDataBtn');
+            const resetParamsBtn = document.getElementById('resetParamsBtn');
+            const showMlrPythonCodeBtn = document.getElementById('showMlrPythonCodeBtn');
+            const mlrPythonCodeSection = document.getElementById('mlrPythonCodeSection');
+            const mlrOutputSection = document.getElementById('mlrOutputSection');
+            const mlrInterpretationDiv = document.getElementById('mlrInterpretation');
+
+            const predictSqFtInput = document.getElementById('predict_sqft');
+            const predictBedroomsInput = document.getElementById('predict_bedrooms');
+            const predictPriceBtn = document.getElementById('predictPriceBtn');
+            const predictionResultDiv = document.getElementById('predictionResult');
+            const predictedPriceValueSpan = document.getElementById('predictedPriceValue');
+
+            // Update correlation value display
+            correlation_factor_input.addEventListener('input', () => {
+                correlation_value_span.textContent = parseFloat(correlation_factor_input.value).toFixed(2);
+            });
+
+            showMlrPythonCodeBtn.addEventListener('click', function() {
+                mlrPythonCodeSection.classList.toggle('hidden');
+            });
+
+            generateDataBtn.addEventListener('click', function() {
+                mlrOutputSection.classList.remove('hidden');
+                mlrInterpretationDiv.classList.remove('hidden');
+
+                generateMlrSyntheticData();
+                drawMlrCharts();
+
+                // Ensure all MathJax elements in the revealed sections are typeset
+                renderMathInElement('mlrOutputSection');
+                renderMathInElement('mlrInterpretation');
+            });
+
+            resetParamsBtn.addEventListener('click', function() {
+                true_b0_input.value = defaultParams.true_b0;
+                true_b1_sqft_input.value = defaultParams.true_b1_sqft;
+                true_b2_bedrooms_input.value = defaultParams.true_b2_bedrooms;
+                noise_scale_input.value = defaultParams.noise_scale;
+                correlation_factor_input.value = defaultParams.correlation_factor;
+                correlation_value_span.textContent = defaultParams.correlation_factor.toFixed(2);
+                
+                // Regenerate data and charts with default parameters
+                generateDataBtn.click(); 
+            });
+
+            predictPriceBtn.addEventListener('click', function() {
+                const sqft = parseFloat(predictSqFtInput.value);
+                const bedrooms = parseFloat(predictBedroomsInput.value);
+
+                if (isNaN(sqft) || isNaN(bedrooms)) {
+                    showMessage("Please enter valid numbers for Square Footage and Bedrooms.", "error");
+                    return;
+                }
+
+                // Use the hardcoded simulated coefficients for prediction
+                const estimated_b0 = 45000;
+                const estimated_b1_sqft = 145;
+                const estimated_b2_bedrooms = 15000;
+
+                const predictedPrice = estimated_b0 + (estimated_b1_sqft * sqft) + (estimated_b2_bedrooms * bedrooms);
+                
+                predictedPriceValueSpan.textContent = `$${predictedPrice.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+                predictionResultDiv.classList.remove('hidden');
+            });
+
+            // --- Data Generation for MLR Demo (Client-side) ---
+            function generateMlrSyntheticData() {
+                const numHouses = 100;
+                // Seed for reproducibility
+                Math.seedrandom('42');
+
+                // Get parameters from inputs
+                const true_b0 = parseFloat(true_b0_input.value);
+                const true_b1_sqft = parseFloat(true_b1_sqft_input.value);
+                const true_b2_bedrooms = parseFloat(true_b2_bedrooms_input.value);
+                const noiseScale = parseFloat(noise_scale_input.value);
+                const correlationFactor = parseFloat(correlation_factor_input.value);
+
+                sqFootageData = [];
+                bedroomsData = [];
+                housePriceData = [];
+
+                for (let i = 0; i < numHouses; i++) {
+                    let sq_footage = Math.random() * (3500 - 1000) + 1000; // 1000 to 3500
+                    
+                    // Generate bedrooms with controlled correlation
+                    // Mix a component dependent on sq_footage with a random component
+                    let bedrooms_base = sq_footage / 700; // Roughly 1 bedroom per 700 sq ft
+                    let random_bedrooms_noise = (Math.random() - 0.5) * 2 * 1.5; // Some random variation
+                    
+                    let bedrooms = bedrooms_base * correlationFactor + random_bedrooms_noise * (1 - correlationFactor) * 3 + 1;
+                    bedrooms = Math.round(bedrooms);
+                    bedrooms = Math.max(2, Math.min(5, bedrooms)); // Clip to 2-5 bedrooms
+
+                    const noise = (Math.random() - 0.5) * 2 * noiseScale;
+                    let price = true_b0 + (true_b1_sqft * sq_footage) + (true_b2_bedrooms * bedrooms) + noise;
+                    price = Math.max(150000, Math.min(1000000, price)); // Clip prices
+
+                    sqFootageData.push(sq_footage);
+                    bedroomsData.push(bedrooms);
+                    housePriceData.push(price);
+                }
+            }
+
+            // --- Chart Drawing Functions ---
+            function drawMlrCharts() {
+                // Chart 1: Correlation between Predictors (SqFt vs. Bedrooms)
+                const corrCtx = document.getElementById('correlationMatrixChart').getContext('2d');
+                if (correlationMatrixChartInstance) {
+                    correlationMatrixChartInstance.destroy();
+                }
+
+                const correlationDataPoints = sqFootageData.map((sqft, i) => ({ x: sqft, y: bedroomsData[i] }));
+                
+                correlationMatrixChartInstance = new Chart(corrCtx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'SqFt vs. Bedrooms',
+                            data: correlationDataPoints,
+                            backgroundColor: '#4338CA',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Generated Data: Square Footage vs. Bedrooms',
+                                font: { size: 16, weight: 'bold' },
+                                color: '#374151'
+                            },
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `SqFt: ${context.parsed.x.toFixed(0)}, Bedrooms: ${context.parsed.y.toFixed(0)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: {
+                                    display: true,
+                                    text: 'Square Footage',
+                                    color: '#4B5563'
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Number of Bedrooms',
+                                    color: '#4B5563'
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+
+                // Chart 2: Price vs. Square Footage
+                const priceSqFtCtx = document.getElementById('priceVsSqFtChart').getContext('2d');
+                if (priceVsSqFtChartInstance) {
+                    priceVsSqFtChartInstance.destroy();
+                }
+
+                const priceSqFtDataPoints = sqFootageData.map((sqft, i) => ({ x: sqft, y: housePriceData[i] }));
+                
+                const true_b0_val = parseFloat(true_b0_input.value);
+                const true_b1_sqft_val = parseFloat(true_b1_sqft_input.value);
+
+                const minSqFt = Math.min(...sqFootageData);
+                const maxSqFt = Math.max(...sqFootageData);
+
+                const trueLineSqFt = [
+                    { x: minSqFt, y: true_b0_val + true_b1_sqft_val * minSqFt },
+                    { x: maxSqFt, y: true_b0_val + true_b1_sqft_val * maxSqFt }
+                ];
+
+                priceVsSqFtChartInstance = new Chart(priceSqFtCtx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Generated House Prices',
+                            data: priceSqFtDataPoints,
+                            backgroundColor: '#4338CA',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        },
+                        {
+                            label: 'True Relationship Line',
+                            data: trueLineSqFt,
+                            type: 'line',
+                            borderColor: 'red',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            pointRadius: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Generated Data: House Price vs. Square Footage',
+                                font: { size: 16, weight: 'bold' },
+                                color: '#374151'
+                            },
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        if (context.dataset.label === 'Generated House Prices') {
+                                            return `SqFt: ${context.parsed.x.toFixed(0)}, Price: ${context.parsed.y.toFixed(0)}`;
+                                        }
+                                        return null;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: {
+                                    display: true,
+                                    text: 'Square Footage',
+                                    color: '#4B5563'
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'House Price',
+                                    color: '#4B5563'
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+
+                // Chart 3: Price vs. Bedrooms
+                const priceBedroomsCtx = document.getElementById('priceVsBedroomsChart').getContext('2d');
+                if (priceVsBedroomsChartInstance) {
+                    priceBedroomsChartInstance.destroy();
+                }
+
+                const priceBedroomsDataPoints = bedroomsData.map((bedrooms, i) => ({ x: bedrooms, y: housePriceData[i] }));
+                
+                const true_b2_bedrooms_val = parseFloat(true_b2_bedrooms_input.value);
+                const minBedrooms = Math.min(...bedroomsData);
+                const maxBedrooms = Math.max(...bedroomsData);
+
+                // Note: For a 2D plot of Y vs X2, we can't truly "hold X1 constant".
+                // The line here represents Y = B0 + B2*X2, ignoring X1's influence.
+                // It's a simplified visualization to show the general trend with X2.
+                const trueLineBedrooms = [
+                    { x: minBedrooms, y: true_b0_val + true_b2_bedrooms_val * minBedrooms },
+                    { x: maxBedrooms, y: true_b0_val + true_b2_bedrooms_val * maxBedrooms }
+                ];
+
+                priceVsBedroomsChartInstance = new Chart(priceBedroomsCtx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Generated House Prices',
+                            data: priceBedroomsDataPoints,
+                            backgroundColor: '#4338CA',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        },
+                        {
+                            label: 'True Relationship Line (Simplified)',
+                            data: trueLineBedrooms,
+                            type: 'line',
+                            borderColor: 'red',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            pointRadius: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Generated Data: House Price vs. Bedrooms',
+                                font: { size: 16, weight: 'bold' },
+                                color: '#374151'
+                            },
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        if (context.dataset.label === 'Generated House Prices') {
+                                            return `Bedrooms: ${context.parsed.x.toFixed(0)}, Price: ${context.parsed.y.toFixed(0)}`;
+                                        }
+                                        return null;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: {
+                                    display: true,
+                                    text: 'Number of Bedrooms',
+                                    color: '#4B5563'
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'House Price',
+                                    color: '#4B5563'
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+            }
+
+            // Initial render of MathJax for the theory section on load
+            // This is crucial for initial load.
+            renderMathInElement('theory-mlr');
+
+            // Trigger initial data generation and chart drawing with default values
+            generateDataBtn.click();
+        });
+
+        // Load MathJax for rendering LaTeX
+        const mathJaxScript = document.createElement('script');
+        mathJaxScript.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
+        mathJaxScript.async = true;
+        document.body.appendChild(mathJaxScript);
+
+        // Simple Math.seedrandom for client-side data generation consistency
+        (function(global) {
+            let seed = 0;
+            global.Math.seedrandom = function(s) {
+                seed = s.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 2147483647;
+            };
+            global.Math.random = function() {
+                seed = (seed * 9301 + 49297) % 233280;
+                return seed / 233280;
+            };
+        })(this);
+    </script>
+</body>
+</html>

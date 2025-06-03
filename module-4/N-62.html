@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S62: Business Case Studies using Regression</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="number"], textarea {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            max-width: 250px; /* Constrain width for inputs */
+            margin-bottom: 0.5rem;
+        }
+        textarea {
+            max-width: 100%;
+            min-height: 80px;
+            resize: vertical;
+        }
+        .action-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+        }
+        .action-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .code-block {
+            background-color: #2D3748; /* Dark background for code */
+            color: #E2E8F0; /* Light text */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', monospace; /* Monospace font */
+            overflow-x: auto; /* Allow horizontal scrolling for long lines */
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .code-block pre {
+            margin: 0;
+        }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #4A5568;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .copy-button:hover {
+            background-color: #6366F1;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px; /* Increased height for better visibility */
+            width: 100%;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        /* Message Box Styling */
+        #messageBox {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .input-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4B5563;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S62: Business Case Studies using Regression</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#intro" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">🚀 Intro</a></li>
+                    <li><a href="#case-study" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💼 Case Study</a></li>
+                    <li><a href="#activity-steps" class="nav-button text-sm sm:text-base font-medium py-2 px-3">🛠️ Activity Steps</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="intro" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">🚀</span>Introduction: Regression in Action</h2>
+            <p class="section-intro">Welcome to a hands-on session where you'll apply your knowledge of Simple and Multiple Linear Regression to solve a real-world business problem. This mini-case study will challenge you to think like a data analyst, from understanding the problem to delivering actionable insights.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Why Regression for Business?</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Regression analysis is a cornerstone of data-driven decision-making in business because it allows us to:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>**Predict Outcomes:** Forecast sales, demand, stock prices, customer churn, etc.</li>
+                    <li>**Understand Relationships:** Quantify how changes in one or more factors influence a key business metric.</li>
+                    <li>**Identify Key Drivers:** Determine which variables have the most significant impact on the outcome.</li>
+                    <li>**Optimize Strategies:** Inform marketing campaigns, pricing strategies, resource allocation, and more.</li>
+                </ul>
+                <p class="mt-4 text-gray-700 leading-relaxed font-bold">Today, you'll put these skills to the test with a practical scenario!</p>
+            </div>
+        </section>
+
+        <section id="case-study" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💼</span>Mini-Case Study: E-commerce Sales Prediction</h2>
+            <p class="section-intro">You are a data analyst at "TrendSetters," an online fashion retailer. The marketing team is trying to understand what drives their weekly online sales and how they can optimize their strategies. They suspect that **website traffic**, **marketing spend**, and the **average customer review score** significantly influence sales.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">The Business Problem:</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">TrendSetters wants to build a model that can predict weekly online sales. Specifically, they want to know:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>Which factors (website traffic, marketing spend, customer reviews) have a significant impact on sales?</li>
+                    <li>How much do sales change for a given change in each of these factors?</li>
+                    <li>How well can we predict sales using these factors?</li>
+                    <li>Based on the findings, what strategic recommendations can be made to the marketing team?</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">The Data (Synthetic for this Exercise)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">We'll generate a synthetic dataset representing weekly sales data for TrendSetters. This dataset will include:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>`Sales` (Dependent Variable): Weekly online sales in thousands of dollars.</li>
+                    <li>`Website_Traffic` (Independent Variable 1): Weekly unique website visitors in thousands.</li>
+                    <li>`Marketing_Spend` (Independent Variable 2): Weekly marketing budget allocated in thousands of dollars.</li>
+                    <li>`Customer_Reviews` (Independent Variable 3): Average weekly customer review score (on a scale of 1 to 5).</li>
+                </ul>
+                <p class="mt-4 text-gray-700 leading-relaxed">You can copy and run the Python code below in your environment to generate this dataset. Then, proceed to the activity steps.</p>
+                
+                <div class="text-center mb-4">
+                    <button id="generateDataCodeBtn" class="action-button bg-green-600 hover:bg-green-700">Show Data Generation Code</button>
+                </div>
+
+                <div id="dataGenerationCodeSection" class="hidden mt-4">
+                    <h4 class="text-indigo-600">Python Code to Generate Data:</h4>
+                    <div class="code-block">
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="dataGenerationPythonCode">
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+import seaborn as sns
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+np.random.seed(42) # For reproducibility
+
+num_weeks = 100 # Number of weekly observations
+
+# Independent Variables
+website_traffic = np.random.normal(loc=50, scale=10, size=num_weeks) # in thousands
+website_traffic = np.clip(website_traffic, 30, 70)
+
+marketing_spend = np.random.normal(loc=10, scale=3, size=num_weeks) # in thousands of dollars
+marketing_spend = np.clip(marketing_spend, 5, 20)
+
+# Customer reviews - let's make it slightly correlated with marketing spend (e.g., better marketing -> happier customers)
+customer_reviews = 3.5 + (marketing_spend / 10) * 0.5 + np.random.normal(loc=0, scale=0.3, size=num_weeks)
+customer_reviews = np.clip(customer_reviews, 1, 5) # Scale 1 to 5
+
+# Dependent Variable: Sales (in thousands of dollars)
+# True relationship: Sales = 20 + 0.8 * Traffic + 5 * Marketing_Spend + 10 * Reviews + noise
+true_b0 = 20
+true_b_traffic = 0.8
+true_b_marketing = 5
+true_b_reviews = 10
+noise = np.random.normal(loc=0, scale=10, size=num_weeks) # Noise in sales
+
+sales = true_b0 + true_b_traffic * website_traffic + true_b_marketing * marketing_spend + true_b_reviews * customer_reviews + noise
+sales = np.clip(sales, 50, 200) # Ensure sales are somewhat realistic
+
+# Create DataFrame
+data = pd.DataFrame({
+    'Website_Traffic': website_traffic,
+    'Marketing_Spend': marketing_spend,
+    'Customer_Reviews': customer_reviews,
+    'Sales': sales
+})
+
+print("Generated Data Head:")
+print(data.head())
+
+# Save to CSV (optional, for external use)
+# data.to_csv('ecommerce_sales_data.csv', index=False)
+# print("\nData saved to ecommerce_sales_data.csv")
+</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="activity-steps" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">🛠️</span>Group Activity: Regression Analysis (60 min)</h2>
+            <p class="section-intro">Work in groups to analyze the TrendSetters case study. Follow these steps, using the generated data and Python for your analysis.</p>
+
+            <div class="interactive-panel">
+                <div class="panel-title">Your Regression Analysis Steps</div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">Step 1: Understand the Problem & Identify Variables (5 min)</h3>
+                    <p class="mb-4 text-gray-700">Revisit the business problem. Clearly identify the dependent variable (what you want to predict) and the independent variables (what you will use to predict).</p>
+                    <div class="flex flex-col sm:flex-row gap-4 mb-2">
+                        <div class="flex-1">
+                            <label for="depVar" class="block text-gray-700 text-sm font-bold mb-1">Dependent Variable (Y):</label>
+                            <input type="text" id="depVar" placeholder="e.g., Sales">
+                        </div>
+                        <div class="flex-1">
+                            <label for="indepVars" class="block text-gray-700 text-sm font-bold mb-1">Independent Variables (X's, comma-separated):</label>
+                            <input type="text" id="indepVars" placeholder="e.g., Traffic, Marketing, Reviews">
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button id="checkVarsBtn" class="action-button">Check Variables</button>
+                    </div>
+                    <div id="varsFeedback" class="feedback-box hidden mt-4">
+                        <p class="font-semibold text-gray-800">Suggested:</p>
+                        <p class="text-gray-700 ml-4">Dependent (Y): `Sales`</p>
+                        <p class="text-gray-700 ml-4">Independent (X's): `Website_Traffic`, `Marketing_Spend`, `Customer_Reviews`</p>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">Step 2: Data Exploration & Visualization (15 min)</h3>
+                    <p class="mb-4 text-gray-700">Before building the model, explore your data. Generate scatter plots to visualize relationships between Sales and each independent variable. Also, examine the correlation matrix of all variables (including Sales) to understand linear associations and potential multicollinearity among predictors.</p>
+                    
+                    <div class="text-center mb-4">
+                        <button id="showExplorationCodeBtn" class="action-button bg-green-600 hover:bg-green-700">Show Python Exploration Code</button>
+                        <button id="generateExplorationChartsBtn" class="action-button">Generate Visualizations</button>
+                    </div>
+
+                    <div id="explorationCodeSection" class="hidden mt-4">
+                        <h4 class="text-indigo-600">Python Code for Data Exploration:</h4>
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="explorationPythonCode">
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Assuming 'data' DataFrame is already generated from the previous step
+
+# --- 1. Descriptive Statistics ---
+print("Descriptive Statistics for the Dataset:")
+print(data.describe())
+
+# --- 2. Scatter Plots (Sales vs. each predictor) ---
+plt.figure(figsize=(15, 5))
+
+plt.subplot(1, 3, 1) # 1 row, 3 columns, first plot
+sns.scatterplot(x='Website_Traffic', y='Sales', data=data, color='#4338CA')
+plt.title('Sales vs. Website Traffic')
+plt.xlabel('Website Traffic (thousands)')
+plt.ylabel('Sales (thousands $)')
+plt.grid(True, linestyle='--', alpha=0.6)
+
+plt.subplot(1, 3, 2) # Second plot
+sns.scatterplot(x='Marketing_Spend', y='Sales', data=data, color='#10B981')
+plt.title('Sales vs. Marketing Spend')
+plt.xlabel('Marketing Spend (thousands $)')
+plt.ylabel('Sales (thousands $)')
+plt.grid(True, linestyle='--', alpha=0.6)
+
+plt.subplot(1, 3, 3) # Third plot
+sns.scatterplot(x='Customer_Reviews', y='Sales', data=data, color='#EF4444')
+plt.title('Sales vs. Customer Reviews')
+plt.xlabel('Customer Reviews (1-5)')
+plt.ylabel('Sales (thousands $)')
+plt.grid(True, linestyle='--', alpha=0.6)
+
+plt.tight_layout()
+plt.show()
+
+# --- 3. Correlation Matrix Heatmap ---
+print("\nCorrelation Matrix:")
+correlation_matrix = data.corr()
+print(correlation_matrix)
+
+plt.figure(figsize=(8, 7))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=.5)
+plt.title('Correlation Matrix of All Variables')
+plt.show()
+</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="explorationChartsSection" class="hidden mt-4">
+                        <h4 class="text-indigo-600 text-center mb-4">Visual Data Exploration</h4>
+                        <div class="chart-container">
+                            <canvas id="salesScatterChart"></canvas>
+                        </div>
+                        <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 1: Scatter plots of Sales vs. Website Traffic, Marketing Spend, and Customer Reviews. Observe the direction and strength of relationships.</p>
+
+                        <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Correlation Matrix of All Variables</h5>
+                        <div class="code-block bg-gray-900 text-gray-100 p-4 rounded-md text-sm">
+                            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                            <pre><code id="correlationMatrixOutput"></code></pre>
+                        </div>
+                        <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 2: The correlation matrix for all variables. Values closer to 1 or -1 indicate stronger linear relationships. Pay attention to correlations between independent variables (potential multicollinearity) and between independent variables and Sales.</p>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">Step 3: Choose & Build the Model (15 min)</h3>
+                    <p class="mb-4 text-gray-700">Based on your understanding of the problem and data exploration, decide whether a Simple Linear Regression (using only one predictor) or a Multiple Linear Regression (using multiple predictors) is more appropriate. Then, use Python to build the model.</p>
+                    
+                    <div class="text-center mb-4">
+                        <button id="showModelCodeBtn" class="action-button bg-green-600 hover:bg-green-700">Show Python Model Code</button>
+                        <button id="runModelAnalysisBtn" class="action-button">Run Model & Show Output</button>
+                    </div>
+
+                    <div id="modelCodeSection" class="hidden mt-4">
+                        <h4 class="text-indigo-600">Python Code for Multiple Linear Regression:</h4>
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="mlrModelPythonCode">
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+import seaborn as sns
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+# Assuming 'data' DataFrame is already generated from the previous step
+
+# Define Dependent (Y) and Independent (X) variables
+Y = data['Sales']
+X = data[['Website_Traffic', 'Marketing_Spend', 'Customer_Reviews']]
+
+# Add a constant (intercept) to the independent variables
+X = sm.add_constant(X)
+
+# Fit the OLS Regression Model
+model = sm.OLS(Y, X)
+results = model.fit()
+
+# Print the Regression Summary
+print("--- Multiple Linear Regression Analysis Summary ---")
+print(results.summary())
+
+# Calculate and print VIFs to check for multicollinearity
+print("\n--- Variance Inflation Factor (VIF) ---")
+vif_data = pd.DataFrame()
+vif_data["feature"] = X.columns
+vif_data["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+print(vif_data)
+
+# Visualize Actual vs. Predicted Sales
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x=Y, y=results.predict(X), color='#4338CA', s=80, alpha=0.8, label='Actual vs. Predicted')
+plt.plot([Y.min(), Y.max()], [Y.min(), Y.max()], color='red', linestyle='--', label='Perfect Fit Line')
+plt.title('Actual vs. Predicted Sales')
+plt.xlabel('Actual Sales (thousands $)')
+plt.ylabel('Predicted Sales (thousands $)')
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+
+# Visualize Residuals vs. Predicted Values
+residuals = results.resid
+predicted_values = results.predict(X)
+plt.figure(figsize=(8, 5))
+sns.scatterplot(x=predicted_values, y=residuals, color='#10B981', s=80, alpha=0.8)
+plt.axhline(y=0, color='red', linestyle='--', linewidth=1)
+plt.title('Residuals vs. Predicted Values')
+plt.xlabel('Predicted Sales (thousands $)')
+plt.ylabel('Residuals')
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="modelOutputSection" class="hidden mt-4">
+                        <h4 class="text-indigo-600">Simulated MLR Output (from `statsmodels`):</h4>
+                        <div class="code-block bg-gray-900 text-gray-100 p-4 rounded-md text-sm">
+                            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="simulatedMlrOutput">
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                  Sales   R-squared:                       0.895
+Model:                            OLS   Adj. R-squared:                  0.892
+Method:                 Least Squares   F-statistic:                     274.5
+Date:                Thu, 30 May 2025   Prob (F-statistic):           1.01e-48
+Time:                        10:00:00   Log-Likelihood:                -350.22
+No. Observations:                 100   AIC:                             708.4
+Df Residuals:                      96   BIC:                             718.8
+Df Model:                           3                                         
+Covariance Type:            nonrobust                                         
+====================================================================================
+                       coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------------
+const             21.5000      5.000      4.300      0.000      11.570      31.430
+Website_Traffic    0.7900      0.080      9.875      0.000       0.631       0.949
+Marketing_Spend    4.9000      0.250     19.600      0.000       4.404       5.396
+Customer_Reviews   9.8000      1.500      6.533      0.000       6.820      12.780
+==============================================================================
+Omnibus:                        0.050   Durbin-Watson:                   2.050
+Prob(Omnibus):                  0.975   Jarque-Bera (JB):                0.100
+Skew:                           0.010   Prob(JB):                        0.950
+Kurtosis:                       2.900   Cond. No.                         450.
+==============================================================================
+</code></pre>
+                        </div>
+                        <h4 class="text-indigo-600 mt-6">Simulated VIF Output:</h4>
+                        <div class="code-block bg-gray-900 text-gray-100 p-4 rounded-md text-sm">
+                            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="simulatedVifOutput">
+             feature       VIF
+0              const  0.000000
+1    Website_Traffic  1.050000
+2    Marketing_Spend  1.100000
+3   Customer_Reviews  1.080000
+</code></pre>
+                        </div>
+                        <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Actual vs. Predicted Sales</h5>
+                        <div class="chart-container">
+                            <canvas id="actualVsPredictedSalesChart"></canvas>
+                        </div>
+                        <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 3: Scatter plot comparing actual weekly sales with values predicted by the MLR model. Points closer to the red dashed line indicate better model accuracy.</p>
+
+                        <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Residuals vs. Predicted Sales</h5>
+                        <div class="chart-container">
+                            <canvas id="residualsVsPredictedChart"></canvas>
+                        </div>
+                        <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 4: Residuals (errors) plotted against predicted sales. Ideally, these points should be randomly scattered around zero, indicating that the model's assumptions are met.</p>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">Step 4: Interpret Results (15 min)</h3>
+                    <p class="mb-4 text-gray-700">Now, interpret the simulated regression output. Focus on the overall model fit, the meaning of each coefficient, and their statistical significance.</p>
+
+                    <div class="mb-6">
+                        <p class="font-semibold text-gray-800 mb-2">1. What is the estimated regression equation for Sales?</p>
+                        <textarea id="q1_equation" rows="2" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., Sales_hat = b0 + b1*Traffic + ..."></textarea>
+                    </div>
+                    <div class="mb-6">
+                        <p class="font-semibold text-gray-800 mb-2">2. Interpret the R-squared value. How well does the model explain sales variation?</p>
+                        <textarea id="q2_r_squared" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Your interpretation..."></textarea>
+                    </div>
+                    <div class="mb-6">
+                        <p class="font-semibold text-gray-800 mb-2">3. Interpret the coefficient for `Website_Traffic`. Is it statistically significant ($\alpha=0.05$)?</p>
+                        <textarea id="q3_traffic_coef" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Your interpretation..."></textarea>
+                    </div>
+                    <div class="mb-6">
+                        <p class="font-semibold text-gray-800 mb-2">4. Interpret the coefficient for `Marketing_Spend`. Is it statistically significant ($\alpha=0.05$)?</p>
+                        <textarea id="q4_marketing_coef" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Your interpretation..."></textarea>
+                    </div>
+                    <div class="mb-6">
+                        <p class="font-semibold text-gray-800 mb-2">5. Interpret the coefficient for `Customer_Reviews`. Is it statistically significant ($\alpha=0.05$)?</p>
+                        <textarea id="q5_reviews_coef" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Your interpretation..."></textarea>
+                    </div>
+                    <div class="mb-6">
+                        <p class="font-semibold text-gray-800 mb-2">6. Are there any signs of multicollinearity among the predictors? (Refer to correlation matrix and VIFs)</p>
+                        <textarea id="q6_multicollinearity" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Your interpretation..."></textarea>
+                    </div>
+
+                    <div class="text-center">
+                        <button id="checkInterpretationBtn" class="action-button">Check My Interpretations</button>
+                    </div>
+                    <div id="interpretationFeedback" class="feedback-box hidden mt-4">
+                        <h4 class="text-indigo-600">Suggested Interpretations:</h4>
+                        <p class="mb-2 text-gray-700"><strong>1. Estimated Regression Equation:</strong></p>
+                        <p class="text-gray-700 ml-4">$$\hat{\text{Sales}} = 21.50 + 0.79 \times \text{Website\_Traffic} + 4.90 \times \text{Marketing\_Spend} + 9.80 \times \text{Customer\_Reviews}$$</p>
+                        <p class="mb-2 text-gray-700"><strong>2. R-squared ($R^2 = 0.895$):</strong></p>
+                        <p class="text-gray-700 ml-4">Approximately $89.5\%$ of the variation in weekly online sales can be explained by the combined linear relationship with Website Traffic, Marketing Spend, and Customer Review scores. This indicates a very strong fit, suggesting the model is highly effective at explaining sales fluctuations.</p>
+                        <p class="mb-2 text-gray-700"><strong>3. Website_Traffic Coefficient ($b_1 = 0.79$):</strong></p>
+                        <p class="text-gray-700 ml-4">For every one-thousand-unit increase in weekly website traffic, the predicted average sales are expected to increase by $0.79$ thousand dollars (or $790), holding Marketing Spend and Customer Reviews constant. This coefficient is highly statistically significant (p-value $0.000 < 0.05$).</p>
+                        <p class="mb-2 text-gray-700"><strong>4. Marketing_Spend Coefficient ($b_2 = 4.90$):</strong></p>
+                        <p class="text-gray-700 ml-4">For every one-thousand-dollar increase in weekly marketing spend, the predicted average sales are expected to increase by $4.90$ thousand dollars (or $4,900), holding Website Traffic and Customer Reviews constant. This coefficient is also highly statistically significant (p-value $0.000 < 0.05$).</p>
+                        <p class="mb-2 text-gray-700"><strong>5. Customer_Reviews Coefficient ($b_3 = 9.80$):</strong></p>
+                        <p class="text-gray-700 ml-4">For every one-point increase in the average weekly customer review score (e.g., from 3 to 4), the predicted average sales are expected to increase by $9.80$ thousand dollars (or $9,800), holding Website Traffic and Marketing Spend constant. This coefficient is highly statistically significant (p-value $0.000 < 0.05$).</p>
+                        <p class="mb-2 text-gray-700"><strong>6. Multicollinearity:</strong></p>
+                        <p class="text-gray-700 ml-4">Looking at the correlation matrix and VIF values, there are no strong signs of problematic multicollinearity. All VIFs are close to 1 (e.g., 1.05, 1.10, 1.08), which is well below the common thresholds of 5 or 10. This indicates that the independent variables are not highly correlated with each other, allowing for relatively clear interpretation of their individual effects on sales.</p>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">Step 5: Formulate Business Recommendations (10 min)</h3>
+                    <p class="mb-4 text-gray-700">Based on your complete analysis (model fit, coefficients, significance, multicollinearity), what actionable recommendations would you provide to TrendSetters' marketing team?</p>
+                    <textarea id="recommendationsInput" rows="6" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Your recommendations..."></textarea>
+                    <div class="text-center">
+                        <button id="revealRecommendationsBtn" class="action-button">Reveal Suggested Recommendations</button>
+                    </div>
+                    <div id="recommendationsFeedback" class="feedback-box hidden mt-4">
+                        <h4 class="text-indigo-600">Suggested Recommendations:</h4>
+                        <p class="mb-2 text-gray-700">"To the Marketing Team at TrendSetters,</p>
+                        <p class="mb-2 text-gray-700">Our regression analysis reveals that **Website Traffic, Marketing Spend, and Customer Review scores** are all statistically significant predictors of weekly online sales, collectively explaining nearly $90\%$ of the variation in sales. This indicates a robust model for understanding and forecasting sales.</p>
+                        <p class="mb-2 text-gray-700">Here are our key recommendations:</p>
+                        <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                            <li>**Prioritize Website Traffic Growth:** With every 1,000 additional visitors, sales are predicted to increase by $0.79$ thousand dollars. Invest in SEO, content marketing, and other strategies to drive more organic and paid traffic.</li>
+                            <li>**Optimize Marketing Spend:** Each additional $1,000$ in marketing spend is associated with a predicted increase of $4.90$ thousand dollars in sales. Continue to invest in effective marketing channels and consider A/B testing to maximize ROI.</li>
+                            <li>**Focus on Customer Satisfaction & Reviews:** A one-point increase in average customer review score is predicted to boost sales by $9.80$ thousand dollars. This highlights the immense value of positive customer experience. Implement initiatives to improve product quality, customer service, and encourage positive reviews.</li>
+                            <li>**Integrated Strategy:** Since all three factors independently contribute to sales and do not suffer from significant multicollinearity, a holistic strategy that focuses on improving all three areas simultaneously is likely to yield the best results.</li>
+                        </ul>
+                        <p class="mt-2 text-gray-700">By strategically focusing on these key drivers, TrendSetters can effectively boost its online sales performance."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <div id="messageBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg z-50" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span id="messageText" class="block sm:inline"></span>
+        <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" onclick="document.getElementById('messageBox').classList.add('hidden');">
+            <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+        </span>
+    </div>
+
+    <script>
+        // Global variables for synthetic data and chart instances
+        let websiteTrafficData = [];
+        let marketingSpendData = [];
+        let customerReviewsData = [];
+        let salesData = [];
+        let predictedSalesData = []; // To store predicted values for charts
+
+        let salesScatterChartInstance = null;
+        // No Chart.js instance for heatmap anymore, using text output
+        let actualVsPredictedSalesChartInstance = null;
+        let residualsVsPredictedChartInstance = null;
+
+        // --- Message Box Function ---
+        function showMessage(message, type = 'error') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            messageText.innerText = message;
+            messageBox.classList.remove('hidden');
+            if (type === 'error') {
+                messageBox.classList.remove('bg-green-100', 'border-green-400', 'text-green-700');
+                messageBox.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+            } else {
+                messageBox.classList.remove('bg-red-100', 'border-red-400', 'text-red-700'); // Remove red if previously error
+                messageBox.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+            }
+        }
+
+        // --- Code Copy Function ---
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const textToCopy = codeBlock.textContent;
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                button.textContent = 'Copied!';
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                button.textContent = 'Error!';
+            }
+            document.body.removeChild(textarea);
+
+            setTimeout(() => {
+                button.textContent = 'Copy';
+            }, 2000);
+        }
+
+        // --- MathJax Rendering Function ---
+        function renderMathInElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element && typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                // Ensure MathJax is ready and then typeset
+                MathJax.startup.promise.then(() => {
+                    MathJax.typesetPromise([element]).catch(err => console.error("MathJax rendering error for element:", elementId, err));
+                });
+            } else if (!element) {
+                console.warn(`Element with ID '${elementId}' not found for MathJax rendering.`);
+            } else {
+                console.warn("MathJax not fully loaded or configured. Skipping MathJax rendering for:", elementId);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation button active state logic
+            document.querySelectorAll('nav a').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // --- Case Study & Data Generation ---
+            const generateDataCodeBtn = document.getElementById('generateDataCodeBtn');
+            const dataGenerationCodeSection = document.getElementById('dataGenerationCodeSection');
+
+            generateDataCodeBtn.addEventListener('click', function() {
+                dataGenerationCodeSection.classList.toggle('hidden');
+            });
+
+            // --- Step 1: Variable Identification ---
+            const checkVarsBtn = document.getElementById('checkVarsBtn');
+            const varsFeedback = document.getElementById('varsFeedback');
+
+            checkVarsBtn.addEventListener('click', function() {
+                varsFeedback.classList.toggle('hidden');
+            });
+
+            // --- Step 2: Data Exploration & Visualization ---
+            const showExplorationCodeBtn = document.getElementById('showExplorationCodeBtn');
+            const explorationCodeSection = document.getElementById('explorationCodeSection');
+            const generateExplorationChartsBtn = document.getElementById('generateExplorationChartsBtn');
+            const explorationChartsSection = document.getElementById('explorationChartsSection');
+
+            showExplorationCodeBtn.addEventListener('click', function() {
+                explorationCodeSection.classList.toggle('hidden');
+            });
+
+            generateExplorationChartsBtn.addEventListener('click', function() {
+                explorationChartsSection.classList.remove('hidden');
+                generateSyntheticData(); // Ensure data is generated before charting
+                drawSalesScatterCharts();
+                displayCorrelationMatrix(); // Call the new function to display text matrix
+            });
+
+            // --- Step 3: Choose & Build the Model ---
+            const showModelCodeBtn = document.getElementById('showModelCodeBtn');
+            const modelCodeSection = document.getElementById('modelCodeSection');
+            const runModelAnalysisBtn = document.getElementById('runModelAnalysisBtn');
+            const modelOutputSection = document.getElementById('modelOutputSection');
+
+            showModelCodeBtn.addEventListener('click', function() {
+                modelCodeSection.classList.toggle('hidden');
+            });
+
+            runModelAnalysisBtn.addEventListener('click', function() {
+                modelOutputSection.classList.remove('hidden');
+                generateSyntheticData(); // Ensure data is present
+                simulateMlrResults(); // Simulate MLR results for charts
+                drawActualVsPredictedChart();
+                drawResidualsVsPredictedChart();
+                renderMathInElement('modelOutputSection'); // Render MathJax in simulated output
+            });
+
+            // --- Step 4: Interpret Results ---
+            const checkInterpretationBtn = document.getElementById('checkInterpretationBtn');
+            const interpretationFeedback = document.getElementById('interpretationFeedback');
+
+            checkInterpretationBtn.addEventListener('click', function() {
+                interpretationFeedback.classList.toggle('hidden');
+                renderMathInElement('interpretationFeedback'); // Render MathJax in feedback
+            });
+
+            // --- Step 5: Formulate Business Recommendations ---
+            const revealRecommendationsBtn = document.getElementById('revealRecommendationsBtn');
+            const recommendationsFeedback = document.getElementById('recommendationsFeedback');
+
+            revealRecommendationsBtn.addEventListener('click', function() {
+                recommendationsFeedback.classList.toggle('hidden');
+            });
+
+            // --- Data Generation Function (Client-side for Charts) ---
+            function generateSyntheticData() {
+                const numWeeks = 100;
+                Math.seedrandom('42'); // For reproducibility
+
+                websiteTrafficData = [];
+                marketingSpendData = [];
+                customerReviewsData = [];
+                salesData = [];
+                predictedSalesData = []; // Reset predicted data
+
+                const true_b0 = 20;
+                const true_b_traffic = 0.8;
+                const true_b_marketing = 5;
+                const true_b_reviews = 10;
+                const noiseScale = 10;
+
+                for (let i = 0; i < numWeeks; i++) {
+                    const traffic = Math.random() * (70 - 30) + 30;
+                    const marketing = Math.random() * (20 - 5) + 5;
+                    const reviews = 3.5 + (marketing / 10) * 0.5 + (Math.random() - 0.5) * 2 * 0.3;
+                    const noise = (Math.random() - 0.5) * 2 * noiseScale;
+
+                    const sales = true_b0 + true_b_traffic * traffic + true_b_marketing * marketing + true_b_reviews * reviews + noise;
+
+                    websiteTrafficData.push(traffic);
+                    marketingSpendData.push(marketing);
+                    customerReviewsData.push(reviews);
+                    salesData.push(Math.max(50, Math.min(200, sales))); // Clip sales
+                }
+                console.log("Synthetic data generated:", { websiteTrafficData: websiteTrafficData.length, salesData: salesData.length });
+            }
+
+            // --- Simulate MLR Results for Charts ---
+            function simulateMlrResults() {
+                // These coefficients are hardcoded to match the simulated Python output
+                const b0_simulated = 21.5000;
+                const b_traffic_simulated = 0.7900;
+                const b_marketing_simulated = 4.9000;
+                const b_reviews_simulated = 9.8000;
+
+                predictedSalesData = salesData.map((s, i) => {
+                    return b0_simulated +
+                           b_traffic_simulated * websiteTrafficData[i] +
+                           b_marketing_simulated * marketingSpendData[i] +
+                           b_reviews_simulated * customerReviewsData[i];
+                });
+                console.log("Simulated MLR results calculated.");
+            }
+
+            // --- Chart Drawing Functions ---
+            function drawSalesScatterCharts() {
+                const ctx = document.getElementById('salesScatterChart').getContext('2d');
+                if (!ctx) { console.error("Sales Scatter Chart context not found."); return; }
+                console.log("Drawing Sales Scatter Chart...");
+
+                if (salesScatterChartInstance) {
+                    salesScatterChartInstance.destroy();
+                }
+
+                // Prepare data for Chart.js
+                const trafficSales = websiteTrafficData.map((x, i) => ({ x: x, y: salesData[i] }));
+                const marketingSales = marketingSpendData.map((x, i) => ({ x: x, y: salesData[i] }));
+                const reviewsSales = customerReviewsData.map((x, i) => ({ x: x, y: salesData[i] }));
+
+                salesScatterChartInstance = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Sales vs. Traffic',
+                                data: trafficSales,
+                                backgroundColor: '#4338CA',
+                                pointRadius: 5,
+                                pointHoverRadius: 7
+                            },
+                            {
+                                label: 'Sales vs. Marketing Spend',
+                                data: marketingSales,
+                                backgroundColor: '#10B981',
+                                pointRadius: 5,
+                                pointHoverRadius: 7
+                            },
+                            {
+                                label: 'Sales vs. Customer Reviews',
+                                data: reviewsSales,
+                                backgroundColor: '#EF4444',
+                                pointRadius: 5,
+                                pointHoverRadius: 7
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Sales vs. Predictors',
+                                font: { size: 16, weight: 'bold' },
+                                color: '#374151'
+                            },
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        label += `X: ${context.parsed.x.toFixed(2)}, Y: ${context.parsed.y.toFixed(2)}`;
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: {
+                                    display: true,
+                                    text: 'Predictor Value',
+                                    color: '#4B5563'
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Sales (thousands $)',
+                                    color: '#4B5563'
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+            }
+
+            function displayCorrelationMatrix() {
+                console.log("Displaying Correlation Matrix...");
+                const correlationMatrixOutput = document.getElementById('correlationMatrixOutput');
+                if (!correlationMatrixOutput) { console.error("Correlation Matrix output element not found."); return; }
+
+                const dataForCorr = [websiteTrafficData, marketingSpendData, customerReviewsData, salesData];
+                const variableNames = ['Website_Traffic', 'Marketing_Spend', 'Customer_Reviews', 'Sales'];
+                const correlationMatrix = Array(variableNames.length).fill(0).map(() => Array(variableNames.length).fill(0));
+
+                function calculatePearsonR(xData, yData) {
+                    const n = xData.length;
+                    if (n === 0) return 0;
+                    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
+                    for (let i = 0; i < n; i++) {
+                        sumX += xData[i];
+                        sumY += yData[i];
+                        sumXY += xData[i] * yData[i];
+                        sumX2 += xData[i] * xData[i];
+                        sumY2 += yData[i] * yData[i];
+                    }
+                    const numerator = (n * sumXY) - (sumX * sumY);
+                    const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+                    return denominator === 0 ? 0 : numerator / denominator;
+                }
+
+                for (let i = 0; i < variableNames.length; i++) {
+                    for (let j = 0; j < variableNames.length; j++) {
+                        if (i === j) {
+                            correlationMatrix[i][j] = 1.0;
+                        } else if (i < j) {
+                            const r = calculatePearsonR(dataForCorr[i], dataForCorr[j]);
+                            correlationMatrix[i][j] = r;
+                            correlationMatrix[j][i] = r;
+                        }
+                    }
+                }
+
+                // Format the matrix for display
+                let matrixString = '                  ' + variableNames.map(name => name.padEnd(18)).join('') + '\n';
+                matrixString += '------------------' + '-'.repeat(18 * variableNames.length) + '\n';
+                for (let i = 0; i < variableNames.length; i++) {
+                    matrixString += variableNames[i].padEnd(18);
+                    for (let j = 0; j < variableNames.length; j++) {
+                        matrixString += correlationMatrix[i][j].toFixed(4).padEnd(18);
+                    }
+                    matrixString += '\n';
+                }
+                correlationMatrixOutput.textContent = matrixString;
+            }
+
+            function drawActualVsPredictedChart() {
+                const ctx = document.getElementById('actualVsPredictedSalesChart').getContext('2d');
+                if (!ctx) { console.error("Actual vs Predicted Sales Chart context not found."); return; }
+                console.log("Drawing Actual Vs Predicted Sales Chart...");
+
+                if (actualVsPredictedSalesChartInstance) {
+                    actualVsPredictedSalesChartInstance.destroy();
+                }
+
+                const dataPoints = salesData.map((actual, i) => ({ x: actual, y: predictedSalesData[i] }));
+                
+                const minVal = Math.min(...salesData, ...predictedSalesData);
+                const maxVal = Math.max(...salesData, ...predictedSalesData);
+
+                actualVsPredictedSalesChartInstance = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Actual vs. Predicted Sales',
+                            data: dataPoints,
+                            backgroundColor: '#4338CA',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        },
+                        {
+                            label: 'Perfect Fit Line',
+                            data: [{ x: minVal, y: minVal }, { x: maxVal, y: maxVal }],
+                            type: 'line',
+                            borderColor: 'red',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            pointRadius: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Actual vs. Predicted Sales',
+                                font: { size: 16, weight: 'bold' },
+                                color: '#374151'
+                            },
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        if (context.dataset.label === 'Actual vs. Predicted Sales') {
+                                            return `Actual: ${context.parsed.x.toFixed(0)}, Predicted: ${context.parsed.y.toFixed(0)}`;
+                                        }
+                                        return null;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: {
+                                    display: true,
+                                    text: 'Actual Sales (thousands $)',
+                                    color: '#4B5563'
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Predicted Sales (thousands $)',
+                                    color: '#4B5563'
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+            }
+
+            function drawResidualsVsPredictedChart() {
+                const ctx = document.getElementById('residualsVsPredictedChart').getContext('2d');
+                if (!ctx) { console.error("Residuals Vs Predicted Chart context not found."); return; }
+                console.log("Drawing Residuals Vs Predicted Chart...");
+
+                if (residualsVsPredictedChartInstance) {
+                    residualsVsPredictedChartInstance.destroy();
+                }
+
+                const residuals = salesData.map((s, i) => s - predictedSalesData[i]);
+                const dataPoints = predictedSalesData.map((y_hat, i) => ({ x: y_hat, y: residuals[i] }));
+
+                residualsVsPredictedChartInstance = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Residuals',
+                            data: dataPoints,
+                            backgroundColor: '#10B981',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Residuals vs. Predicted Sales',
+                                font: { size: 16, weight: 'bold' },
+                                color: '#374151'
+                            },
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Predicted: ${context.parsed.x.toFixed(0)}, Residual: ${context.parsed.y.toFixed(0)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: {
+                                    display: true,
+                                    text: 'Predicted Sales (thousands $)',
+                                    color: '#4B5563'
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Residuals',
+                                    color: '#4B5563'
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toFixed(0); // Format Y-axis ticks to 0 decimal places
+                                    }
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+            }
+
+            // Initial render of MathJax for the theory section on load
+            renderMathInElement('intro');
+            renderMathInElement('case-study');
+            renderMathInElement('activity-steps'); // Render all sections initially
+
+            // Simple Math.seedrandom for client-side data generation consistency
+            (function(global) {
+                let seed = 0;
+                global.Math.seedrandom = function(s) {
+                    seed = s.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 2147483647;
+                };
+                global.Math.random = function() {
+                    seed = (seed * 9301 + 49297) % 233280;
+                    return seed / 233280;
+                };
+            })(this);
+        });
+
+        // Load MathJax for rendering LaTeX
+        const mathJaxScript = document.createElement('script');
+        mathJaxScript.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
+        mathJaxScript.async = true;
+        document.body.appendChild(mathJaxScript);
+    </script>
+</body>
+</html>

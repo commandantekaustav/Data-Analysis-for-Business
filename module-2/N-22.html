@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S22: Advanced Data Sources</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices:
+        - APIs as a Source: Report Info: Definition, use cases. Goal: Inform. Viz/Method: Interactive card with detailed explanation. Justification: Provides a deep dive into APIs.
+        - Web Scraping Concepts: Report Info: Definition, process, ethics. Goal: Inform, warn. Viz/Method: Interactive card with detailed explanation, strong emphasis on ethics. Justification: Covers technical and crucial ethical aspects.
+        - IoT Data: Report Info: Definition, examples. Goal: Inform. Viz/Method: Interactive card with detailed explanation. Justification: Introduces a growing data source.
+        - Conceptual API Demo: Report Info: Weather/stock API demo. Goal: Illustrate. Viz/Method: Detailed descriptive text and example code snippet. Justification: Explains practical application without live integration.
+        - Data Source Selection Challenge: Report Info: Problems, justification. Goal: Engage, apply. Viz/Method: Accordion items for each scenario, revealing suggested data sources and justifications. Interaction: Click to expand/collapse. Justification: Encourages critical thinking and application of learned concepts.
+        CONFIRMATION: No charts used (Chart.js/Plotly.js not needed as report is conceptual/textual).
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); /* Adjust based on header/footer height */ }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+
+        .interactive-card { background-color: white; border: 1px solid #E5E7EB; transition: all 0.3s ease; }
+        .interactive-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
+        .interactive-card .card-content { display: none; }
+        .interactive-card.open .card-content { display: block; }
+        .interactive-card .card-icon { font-size: 2rem; line-height: 1; }
+
+        .accordion-header { cursor: pointer; user-select: none; }
+        .accordion-content { display: none; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; }
+        .accordion-item.open .accordion-content { display: block; max-height: 1000px; /* Arbitrary large value */ padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .accordion-arrow { transition: transform 0.3s ease; }
+        .accordion-item.open .accordion-arrow { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S22: Advanced Data Sources - APIs, Web Scraping & IoT</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Advanced Data Sources</h2>
+            <p class="section-intro">Beyond traditional internal databases and readily available external datasets, the modern data landscape offers more dynamic and specialized sources. This section delves into three increasingly vital advanced data acquisition methods: APIs, Web Scraping, and IoT data, exploring their mechanisms, applications, and critical considerations.</p>
+            
+            <h3 class="text-xl font-semibold text-indigo-600 mb-4 text-center">Exploring Advanced Data Acquisition Methods</h3>
+            <p class="text-center text-gray-600 mb-6">Click on each method to gain a comprehensive understanding of how it works and its significance in data analytics.</p>
+            <div id="advancedSourcesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Data Source Selection Challenge</h2>
+            <p class="section-intro">Choosing the right data source is a critical skill for any data analyst. It requires understanding the business problem, the available data types, and the practical implications of each acquisition method. This section presents a conceptual demo of fetching data from a public API and then challenges you to select and justify data sources for various business problems.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Conceptual Demo: Fetching Data from a Simple Public API (Weather Data)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">APIs (Application Programming Interfaces) offer a standardized and efficient way for different software applications to communicate and exchange data. Many public and commercial entities provide APIs to allow programmatic access to their data, eliminating the need for manual downloads or complex parsing.</p>
+                <p class="mb-4 text-gray-700 leading-relaxed">Let's consider a hypothetical scenario where an e-commerce platform wants to analyze how local weather conditions might influence sales of seasonal clothing. Instead of manually checking weather websites, they can use a weather API.</p>
+                <h4 class="font-semibold text-indigo-700 mb-2">How it works (Conceptual Steps):</h4>
+                <ol class="list-decimal pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Identify an API:</strong> Find a reputable weather API provider (e.g., OpenWeatherMap, AccuWeather).</li>
+                    <li><strong>Obtain API Key:</strong> Most APIs require an API key for authentication and usage tracking. You'd sign up for a developer account to get this key.</li>
+                    <li><strong>Understand API Documentation:</strong> The documentation specifies how to make requests (e.g., URL endpoints, required parameters like city name or zip code, API key) and what format the response will be in (commonly JSON).</li>
+                    <li><strong>Make an API Request (e.g., using Python's <code>requests</code> library):</strong> You would write a small script to send an HTTP request to the API's endpoint.</li>
+                </ol>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800">
+                    <h4 class="font-semibold text-indigo-700 mb-2">Python Code Snippet (Conceptual - Weather API)</h4>
+                    <pre><code class="language-python">
+import requests
+import json
+
+# Replace with your actual API key and desired city/location
+API_KEY = "YOUR_API_KEY_HERE"
+CITY_NAME = "London"
+API_URL = f"https://api.weatherapi.com/v1/current.json?key={API_KEY}&q={CITY_NAME}"
+
+try:
+    response = requests.get(API_URL)
+    response.raise_for_status() # Raise an HTTPError for bad responses (4xx or 5xx)
+    weather_data = response.json()
+
+    print(f"--- Current Weather in {CITY_NAME} ---")
+    print(f"Temperature: {weather_data['current']['temp_c']}°C")
+    print(f"Condition: {weather_data['current']['condition']['text']}")
+    print(f"Humidity: {weather_data['current']['humidity']}%")
+    print(f"Wind Speed: {weather_data['current']['wind_kph']} kph")
+
+except requests.exceptions.HTTPError as err:
+    print(f"HTTP error occurred: {err}")
+except requests.exceptions.ConnectionError as err:
+    print(f"Error Connecting: {err}")
+except requests.exceptions.Timeout as err:
+    print(f"Timeout Error: {err}")
+except requests.exceptions.RequestException as err:
+    print(f"Something went wrong: {err}")
+except json.JSONDecodeError:
+    print("Error decoding JSON response.")
+except KeyError as err:
+    print(f"Missing expected data in API response: {err}")
+                    </code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">This conceptual code demonstrates how a data analyst would programmatically fetch real-time weather data. The returned JSON data can then be easily parsed and integrated with internal sales data to analyze correlations (e.g., "Do umbrella sales spike when it rains?"). APIs are invaluable for accessing dynamic, frequently updated external data in a structured format.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Activity: Data Source Selection Challenge</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">For each business problem below, identify the primary data source(s) you would recommend (internal, external, or a combination) and briefly justify your choice. Consider the type of information needed, its availability, and potential challenges.</p>
+                <div id="dataSourceChallengeContainer" class="space-y-4"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-6 mt-auto">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        const advancedSourcesData = [
+            { id: 'apis', title: 'APIs (Application Programming Interfaces)', icon: '🔌', description: 'Standardized interfaces that allow different software applications to communicate and exchange data programmatically.', details: 'APIs act as a bridge, enabling controlled and structured access to data from various web services, applications, and databases. Instead of downloading files, you send requests to an API endpoint and receive data (often in JSON or XML format) directly into your analytical environment. Common examples include social media APIs (Twitter, Facebook), financial APIs (stock prices, exchange rates), weather APIs, and public data APIs (e.g., government data portals). They are ideal for real-time or frequently updated data needs, offering a reliable and ethical way to access data provided by the source.' },
+            { id: 'webscraping', title: 'Web Scraping', icon: '🕷️', description: 'The automated extraction of data from websites using software programs (scrapers) that simulate human browsing.', details: 'Web scraping involves writing code (e.g., using Python libraries like Beautiful Soup or Scrapy) to automatically navigate web pages, identify specific data points (like product prices, reviews, contact information), and extract them. It\'s often used when an API is not available for a desired website. However, web scraping comes with significant ethical and legal considerations. Websites often have "Terms of Service" that prohibit scraping, and excessive requests can overload servers. It\'s crucial to respect `robots.txt` files and avoid scraping sensitive or copyrighted information without permission.' },
+            { id: 'iot', title: 'IoT (Internet of Things) Data', icon: '📡', description: 'Data generated by physical objects embedded with sensors, software, and other technologies that connect and exchange data over the internet.', details: 'IoT devices range from smart home appliances and wearable fitness trackers to industrial sensors on factory floors, smart city infrastructure, and connected vehicles. This data is typically real-time, high-volume, and often includes sensor readings (temperature, pressure, vibration, location), status updates, and usage patterns. IoT data is invaluable for predictive maintenance, operational monitoring, resource optimization, and creating smart environments. Examples include sensor data from machinery for anomaly detection, smart meter data for energy consumption, and GPS data from logistics fleets.' }
+        ];
+
+        const dataSourceChallenges = [
+            {
+                problem: 'A retail company wants to predict peak shopping hours for better staff scheduling.',
+                solution: {
+                    sources: ['Internal: Point-of-Sale (POS) System data', 'Internal: Web Analytics / E-commerce platform data'],
+                    justification: 'This is primarily an internal operational problem. POS data provides precise transaction times and volumes, while web analytics captures online traffic patterns. Both are directly relevant and granular for predicting peak demand.'
+                }
+            },
+            {
+                problem: 'A new startup wants to understand the market size and growth potential for organic food in their city.',
+                solution: {
+                    sources: ['External: Government Census Data / Demographic data', 'External: Market Research Reports (e.g., from specialized food industry analysts)', 'External: Public & Open Datasets (e.g., health statistics, consumer spending surveys)'],
+                    justification: 'This requires a broad market view. Internal data would be non-existent or insufficient for a new startup. External data provides population demographics, consumer trends, and industry-specific forecasts essential for market sizing and growth potential.'
+                }
+            },
+            {
+                problem: 'An airline wants to optimize flight prices in real-time based on demand and competitor pricing.',
+                solution: {
+                    sources: ['Internal: Flight booking data (historical and real-time)', 'Internal: Website traffic and search data', 'External: Competitor pricing APIs (if available) or Web Scraping (for competitor websites)', 'External: Weather data (via API) for flight delays/cancellations'],
+                    justification: 'This requires a combination. Internal booking data provides demand signals. External data (competitor prices) is crucial for competitive strategy. Weather data can influence demand and operational costs. APIs are preferred for real-time data, but web scraping might be necessary for competitor pricing if no API exists.'
+                }
+            },
+            {
+                problem: 'A manufacturing plant wants to predict when a specific machine will likely break down to schedule proactive maintenance.',
+                solution: {
+                    sources: ['Internal: IoT sensor data from the machine (temperature, vibration, pressure, runtime)', 'Internal: Maintenance logs (historical breakdown dates, repair details)', 'Internal: Production output data'],
+                    justification: 'This is a classic predictive maintenance problem, heavily reliant on real-time and historical operational data from the machine itself. IoT sensors provide continuous health monitoring, while maintenance logs offer ground truth for training predictive models.'
+                }
+            },
+            {
+                problem: 'A marketing agency wants to analyze public sentiment towards a client\'s new product launch on social media.',
+                solution: {
+                    sources: ['External: Social Media APIs (e.g., Twitter API, Facebook Graph API for public data)', 'External: Social Media Listening Tools (third-party platforms that aggregate social data)'],
+                    justification: 'This is entirely an external data problem. Social media APIs provide programmatic access to public posts and comments. Specialized listening tools can aggregate this data and often provide built-in sentiment analysis capabilities, which is more efficient than manual collection and analysis.'
+                }
+            }
+        ];
+
+        function createInteractiveCard(itemData) {
+            const card = document.createElement('div');
+            card.className = 'interactive-card p-6 rounded-lg shadow-lg cursor-pointer flex flex-col items-center text-center h-full';
+            card.innerHTML = `
+                <div class="card-icon text-amber-500 mb-3">${itemData.icon}</div>
+                <h4 class="text-lg font-semibold text-indigo-600 mb-2">${itemData.title}</h4>
+                <p class="text-sm text-gray-600 mb-3 flex-grow"><em>${itemData.description}</em></p>
+                <div class="card-content mt-3 pt-3 border-t border-gray-200 w-full">
+                    <p class="text-xs text-gray-500 leading-relaxed">${itemData.details}</p>
+                </div>
+                <button class="mt-4 text-xs text-indigo-500 hover:text-indigo-700 font-medium focus:outline-none">
+                    Learn More <span class="arrow-indicator">&#9662;</span>
+                </button>
+            `;
+            card.onclick = () => {
+                card.classList.toggle('open');
+                const arrow = card.querySelector('.arrow-indicator');
+                arrow.innerHTML = card.classList.contains('open') ? '&#9652;' : '&#9662;'; // Up/Down arrow
+            };
+            return card;
+        }
+
+        function populateAdvancedSources() {
+            const container = document.getElementById('advancedSourcesContainer');
+            advancedSourcesData.forEach(item => container.appendChild(createInteractiveCard(item)));
+        }
+
+        function createDataSourceChallengeItem(scenarioData, index) {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'accordion-item border border-gray-200 rounded-md overflow-hidden';
+            
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'accordion-header bg-indigo-50 p-4 flex justify-between items-center hover:bg-indigo-100 transition-colors duration-200';
+            headerDiv.innerHTML = `
+                <h4 class="font-medium text-indigo-700 flex items-center">
+                    Scenario ${index + 1}: ${scenarioData.problem}
+                </h4>
+                <span class="accordion-arrow text-indigo-600 text-xl">&#9662;</span>`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'accordion-content px-4 bg-white';
+            contentDiv.innerHTML = `
+                <h5 class="font-semibold text-gray-700 mb-2">Suggested Data Sources:</h5>
+                <ul class="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                    ${scenarioData.solution.sources.map(source => `<li>${source}</li>`).join('')}
+                </ul>
+                <h5 class="font-semibold text-gray-700 mt-3 mb-2">Justification:</h5>
+                <p class="text-sm text-gray-600">${scenarioData.solution.justification}</p>
+            `;
+            
+            headerDiv.onclick = () => {
+                // Optional: Close other open accordions in the same group
+                const parentContainer = itemDiv.closest('.space-y-4');
+                if (parentContainer) {
+                    parentContainer.querySelectorAll('.accordion-item.open').forEach(openItem => {
+                        if (openItem !== itemDiv) {
+                            openItem.classList.remove('open');
+                            openItem.querySelector('.accordion-arrow').style.transform = 'rotate(0deg)';
+                        }
+                    });
+                }
+                itemDiv.classList.toggle('open');
+                headerDiv.querySelector('.accordion-arrow').style.transform = itemDiv.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+            };
+            
+            itemDiv.appendChild(headerDiv);
+            itemDiv.appendChild(contentDiv);
+            return itemDiv;
+        }
+
+        function populateDataSourceChallenges() {
+            const container = document.getElementById('dataSourceChallengeContainer');
+            dataSourceChallenges.forEach((scenario, index) => container.appendChild(createDataSourceChallengeItem(scenario, index)));
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            populateAdvancedSources();
+            populateDataSourceChallenges();
+
+            // Smooth scroll for nav links and initial active state
+            document.querySelectorAll('a.nav-button').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll('a.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Set initial active nav button based on URL hash or first section
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'theory';
+            const initialNavButton = document.querySelector(`a.nav-button[href="#${initialSection}"]`);
+            if (initialNavButton) {
+                initialNavButton.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

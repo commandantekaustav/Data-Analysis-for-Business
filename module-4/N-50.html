@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S50: Measures of Dispersion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            font-family: monospace;
+            resize: vertical;
+        }
+        .calculate-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .calculate-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .interpretation-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .chart-illustrative {
+            position: relative;
+            height: 250px;
+            width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .example-buttons button {
+            background-color: #6366F1;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.4rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 0.4rem;
+        }
+        .example-buttons button:hover {
+            background-color: #4338CA;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S50: Measures of Dispersion</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Measures of Dispersion</h2>
+            <p class="section-intro">While measures of central tendency (mean, median, mode) tell us about the "average" or "typical" value in a dataset, they don't tell us how spread out the data points are. Measures of dispersion (also known as measures of variability or spread) quantify how much individual data points differ from the average, or from each other.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. Range</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">The range is the simplest measure of dispersion. It is the difference between the highest and lowest values in a dataset.</p>
+                <p class="mb-2 text-gray-700"><strong>Calculation:</strong> Maximum Value - Minimum Value</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>When to Use:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>For a quick and rough estimate of data spread.</li>
+                            <li>When dealing with small datasets and no extreme outliers.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Sensitivity to Outliers:</strong> Highly sensitive to outliers. A single extreme value (either very high or very low) can drastically inflate the range, making it unrepresentative of the typical spread.</li>
+                    <li><em>Example:</em> Test scores: 50, 60, 70, 80, 100. Range = 100 - 50 = 50. If there was an outlier of 10, the range would be 100 - 10 = 90, which is much larger.</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. Variance</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">Variance measures the average of the squared differences from the mean. It tells us how much the data points deviate from the mean on average. A higher variance indicates that the data points are more spread out from the mean, while a lower variance indicates they are clustered closer to the mean.</p>
+                <p class="mb-2 text-gray-700"><strong>Calculation:</strong> Average of the squared differences from the mean.</p>
+                <p class="mb-4 text-gray-700"><strong>Formulas:</strong></p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Population Variance ($\sigma^2$):</strong> $\sigma^2 = \frac{\sum (x_i - \mu)^2}{N}$</li>
+                    <li><strong>Sample Variance ($s^2$):</strong> $s^2 = \frac{\sum (x_i - \bar{x})^2}{n-1}$ (using $n-1$ for unbiased estimation of population variance from a sample)</li>
+                </ul>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>When to Use:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>As an intermediate step to calculate standard deviation.</li>
+                            <li>In statistical modeling (e.g., ANOVA, regression) where squared deviations are important.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Sensitivity to Outliers:</strong> Highly sensitive to outliers because it squares the deviations, giving disproportionately more weight to larger deviations.</li>
+                    <li><strong>Units:</strong> The units of variance are the square of the original data units, which can make it difficult to interpret directly.</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. Standard Deviation</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">Standard deviation is the square root of the variance. It is the most widely used measure of dispersion because it returns the spread in the original units of the data, making it easier to interpret than variance.</p>
+                <p class="mb-2 text-gray-700"><strong>Calculation:</strong> Square root of the variance.</p>
+                <p class="mb-4 text-gray-700"><strong>Formulas:</strong></p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Population Standard Deviation ($\sigma$):</strong> $\sigma = \sqrt{\frac{\sum (x_i - \mu)^2}{N}}$</li>
+                    <li><strong>Sample Standard Deviation ($s$):</strong> $s = \sqrt{\frac{\sum (x_i - \bar{x})^2}{n-1}}$</li>
+                </ul>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>When to Use:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>When the data is approximately normally distributed.</li>
+                            <li>To understand the typical distance of data points from the mean.</li>
+                            <li>For comparing the spread of different datasets (if they have similar units and means).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Sensitivity to Outliers:</strong> Sensitive to outliers, though less so than variance, as the square root dampens the effect of extreme squared deviations.</li>
+                    <li><em>Rule of Thumb (Normal Distribution):</em> Approximately 68% of data falls within $\pm 1$ standard deviation of the mean, 95% within $\pm 2$ standard deviations, and 99.7% within $\pm 3$ standard deviations.</li>
+                </ul>
+                <div class="chart-illustrative">
+                    <canvas id="stdDevChart"></canvas>
+                </div>
+                <p class="chart-description text-center text-sm text-gray-600"><em>Illustration of Standard Deviation: Showing data spread around the mean for two different datasets.</em></p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">4. Interquartile Range (IQR)</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">The Interquartile Range (IQR) is a measure of statistical dispersion, being equal to the difference between the upper (75th percentile) and lower (25th percentile) quartiles. It represents the range of the middle 50% of the data.</p>
+                <p class="mb-2 text-gray-700"><strong>Calculation:</strong> $IQR = Q3 - Q1$ (where $Q1$ is the 25th percentile and $Q3$ is the 75th percentile).</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>When to Use:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>When the data is skewed or contains outliers, as it is robust to extreme values.</li>
+                            <li>Often used in conjunction with the median.</li>
+                            <li>To identify potential outliers (values outside $Q1 - 1.5 \times IQR$ or $Q3 + 1.5 \times IQR$).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Sensitivity to Outliers:</strong> Not sensitive to outliers. Since it focuses on the middle 50% of the data, extreme values in the tails do not affect its calculation. This makes it a robust measure.</li>
+                    <li><em>Example:</em> In a dataset of incomes with a few very high earners, the IQR would give a more realistic picture of the income spread for the majority, compared to the range or standard deviation.</li>
+                </ul>
+                <div class="chart-illustrative">
+                    <canvas id="iqrChart"></canvas>
+                </div>
+                <p class="chart-description text-center text-sm text-gray-600"><em>Illustration of IQR: The range of the middle 50% of the data.</em></p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Calculate & Interpret Measures of Dispersion</h2>
+            <p class="section-intro">In this session, we'll explore <strong>measures of dispersion</strong>—statistical tools that describe how data points are spread out or clustered around the center. Understanding dispersion is crucial for interpreting variability and risk in business data.</p>
+
+            <div class="interactive-panel">
+                <div class="panel-title">Data Input & Calculation</div>
+                <label for="dataInput" class="block text-gray-700 font-semibold mb-2">Enter your data (numbers separated by commas):</label>
+                <textarea id="dataInput" placeholder="e.g., 10, 12, 15, 12, 18, 20, 12, 100"></textarea>
+                <div class="flex flex-wrap justify-center gap-2 mt-4 example-buttons">
+                    <button data-example="low-dispersion">Low Dispersion</button>
+                    <button data-example="high-dispersion">High Dispersion</button>
+                    <button data-example="with-outlier">With Outlier</button>
+                    <button data-example="skewed">Skewed Data</button>
+                </div>
+                <button id="calculateBtn" class="calculate-button">Calculate Measures</button>
+
+                <div id="resultsOutput" class="results-box hidden">
+                    <div class="chart-illustrative">
+                        <canvas id="dynamicDispersionChart"></canvas>
+                    </div>
+                    <h4>Calculated Measures:</h4>
+                    <div class="result-item">
+                        <span class="result-label">Count (n):</span>
+                        <span id="countResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Mean:</span>
+                        <span id="meanResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Median:</span>
+                        <span id="medianResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Range:</span>
+                        <span id="rangeResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Variance (Sample):</span>
+                        <span id="varianceResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Standard Deviation (Sample):</span>
+                        <span id="stdDevResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Q1 (25th Percentile):</span>
+                        <span id="q1Result" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Q3 (75th Percentile):</span>
+                        <span id="q3Result" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Interquartile Range (IQR):</span>
+                        <span id="iqrResult" class="result-value"></span>
+                    </div>
+                    <div id="interpretationBox" class="interpretation-box mt-4">
+                        <h5 class="font-semibold text-base mb-1">Interpretation:</h5>
+                        <p id="interpretationText" class="text-sm"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mt-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Discussion Points:</h3>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>Load the "Low Dispersion" and "High Dispersion" examples. How do the calculated measures (especially Standard Deviation and IQR) and the visual spread on the chart differ?</li>
+                    <li>Load the "With Outlier" example. Which measures of dispersion are most affected by the outlier? Which one is most robust? Why?</li>
+                    <li>Consider two investment portfolios. If Portfolio A has a higher mean return but also a higher standard deviation than Portfolio B, what does this imply about their risk?</li>
+                    <li>In what scenarios would using IQR be more appropriate than standard deviation to describe data spread?</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">This exercise helps you grasp the nuances of different dispersion measures and their practical implications in understanding the variability within your data.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        // Global variable to hold dynamic chart instance
+        let dynamicDispersionChartInstance = null;
+        let stdDevChartInstance = null;
+        let iqrChartInstance = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation button active state logic
+            document.querySelectorAll('nav a').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            const dataInput = document.getElementById('dataInput');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultsOutput = document.getElementById('resultsOutput');
+            const countResult = document.getElementById('countResult');
+            const meanResult = document.getElementById('meanResult');
+            const medianResult = document.getElementById('medianResult');
+            const rangeResult = document.getElementById('rangeResult');
+            const varianceResult = document.getElementById('varianceResult');
+            const stdDevResult = document.getElementById('stdDevResult');
+            const q1Result = document.getElementById('q1Result');
+            const q3Result = document.getElementById('q3Result');
+            const iqrResult = document.getElementById('iqrResult');
+            const interpretationText = document.getElementById('interpretationText');
+            const dynamicDispersionChartCanvas = document.getElementById('dynamicDispersionChart');
+
+            // Pre-defined example datasets
+            const exampleData = {
+                'low-dispersion': '48, 49, 50, 51, 52',
+                'high-dispersion': '10, 30, 50, 70, 90',
+                'with-outlier': '10, 12, 15, 12, 18, 20, 12, 100',
+                'skewed': '1, 2, 2, 3, 3, 3, 4, 4, 5, 15' // Example of right-skewed data
+            };
+
+            // Event listeners for example buttons
+            document.querySelectorAll('.example-buttons button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const type = this.dataset.example;
+                    dataInput.value = exampleData[type];
+                    calculateAndRender(); // Recalculate and update chart
+                });
+            });
+
+            // Set a default example data and calculate on load
+            dataInput.value = exampleData['with-outlier'];
+            calculateBtn.addEventListener('click', calculateAndRender);
+            calculateAndRender(); // Initial calculation on page load
+
+            // --- Chart.js for Theory Section Illustrations ---
+
+            // Standard Deviation Chart
+            const stdDevCtx = document.getElementById('stdDevChart').getContext('2d');
+            stdDevChartInstance = new Chart(stdDevCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Dataset 1 (Low Std Dev)',
+                            data: [{x: 48, y: 0}, {x: 49, y: 0}, {x: 50, y: 0}, {x: 51, y: 0}, {x: 52, y: 0}],
+                            backgroundColor: '#4338CA',
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            borderColor: '#4338CA',
+                            showLine: false
+                        },
+                        {
+                            label: 'Dataset 2 (High Std Dev)',
+                            data: [{x: 10, y: 1}, {x: 30, y: 1}, {x: 50, y: 1}, {x: 70, y: 1}, {x: 90, y: 1}],
+                            backgroundColor: '#EF4444',
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            borderColor: '#EF4444',
+                            showLine: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: { display: true, text: 'Standard Deviation: Visualizing Spread', font: { size: 14 } },
+                        tooltip: { callbacks: { label: (context) => `Value: ${context.parsed.x}` } }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: { display: true, text: 'Value' },
+                            min: 0,
+                            max: 100
+                        },
+                        y: {
+                            type: 'linear',
+                            display: false, // Hide y-axis
+                            min: -0.5,
+                            max: 1.5
+                        }
+                    },
+                    animation: {
+                        onComplete: function() {
+                            const chart = this;
+                            const ctx = chart.ctx;
+                            const xScale = chart.scales.x;
+                            const yScale = chart.scales.y;
+
+                            // Dataset 1 (Low Std Dev)
+                            const mean1 = 50;
+                            const stdDev1 = Math.sqrt(((48-50)**2 + (49-50)**2 + (50-50)**2 + (51-50)**2 + (52-50)**2) / 4); // Sample Std Dev
+                            const yPos1 = yScale.getPixelForValue(0);
+                            
+                            ctx.save();
+                            ctx.strokeStyle = '#4338CA';
+                            ctx.lineWidth = 2;
+                            ctx.setLineDash([5, 5]);
+                            ctx.beginPath();
+                            ctx.moveTo(xScale.getPixelForValue(mean1 - stdDev1), yPos1);
+                            ctx.lineTo(xScale.getPixelForValue(mean1 + stdDev1), yPos1);
+                            ctx.stroke();
+                            ctx.fillText(`Mean ± StdDev`, xScale.getPixelForValue(mean1), yPos1 - 10);
+                            ctx.restore();
+
+                            // Dataset 2 (High Std Dev)
+                            const mean2 = 50;
+                            const stdDev2 = Math.sqrt(((10-50)**2 + (30-50)**2 + (50-50)**2 + (70-50)**2 + (90-50)**2) / 4); // Sample Std Dev
+                            const yPos2 = yScale.getPixelForValue(1);
+
+                            ctx.save();
+                            ctx.strokeStyle = '#EF4444';
+                            ctx.lineWidth = 2;
+                            ctx.setLineDash([5, 5]);
+                            ctx.beginPath();
+                            ctx.moveTo(xScale.getPixelForValue(mean2 - stdDev2), yPos2);
+                            ctx.lineTo(xScale.getPixelForValue(mean2 + stdDev2), yPos2);
+                            ctx.stroke();
+                            ctx.fillText(`Mean ± StdDev`, xScale.getPixelForValue(mean2), yPos2 - 10);
+                            ctx.restore();
+                        }
+                    }
+                }
+            });
+
+            // IQR Chart (Conceptual Box Plot)
+            const iqrCtx = document.getElementById('iqrChart').getContext('2d');
+            iqrChartInstance = new Chart(iqrCtx, {
+                type: 'bar', // Using bar to simulate parts of a box plot
+                data: {
+                    labels: ['Data Distribution'],
+                    datasets: [
+                        {
+                            label: 'Q1 to Median',
+                            data: [20], // Represents the length from Q1 to Median
+                            backgroundColor: '#D1FAE5',
+                            stack: 'stack0'
+                        },
+                        {
+                            label: 'Median to Q3',
+                            data: [20], // Represents the length from Median to Q3
+                            backgroundColor: '#34D399',
+                            stack: 'stack0'
+                        },
+                        {
+                            label: 'Min to Q1',
+                            data: [10], // Represents length from Min to Q1
+                            backgroundColor: '#E0E7FF',
+                            stack: 'stack1'
+                        },
+                        {
+                            label: 'Q3 to Max',
+                            data: [10], // Represents length from Q3 to Max
+                            backgroundColor: '#C7D2FE',
+                            stack: 'stack1'
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y', // Horizontal bars
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'IQR: Middle 50% of Data (Conceptual)', font: { size: 14 } },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    if (context.dataset.label === 'Q1 to Median' || context.dataset.label === 'Median to Q3') {
+                                        return `IQR Segment: ${context.raw}`;
+                                    }
+                                    return context.dataset.label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            title: { display: true, text: 'Value' },
+                            min: 0,
+                            max: 60 // Total range of conceptual data (10+20+20+10)
+                        },
+                        y: {
+                            stacked: true,
+                            display: false
+                        }
+                    },
+                    animation: {
+                        onComplete: function() {
+                            const chart = this;
+                            const ctx = chart.ctx;
+                            const xScale = chart.scales.x;
+                            const yRange = chart.chartArea.bottom - chart.chartArea.top;
+                            const yMid = chart.chartArea.top + yRange / 2; // Middle of the chart area
+
+                            // Conceptual values for Q1, Median, Q3 based on the bar lengths
+                            const minVal = 0;
+                            const q1Val = 10;
+                            const medianVal = 10 + 20; // Q1 + (Q1 to Median)
+                            const q3Val = 10 + 20 + 20; // Q1 + (Q1 to Median) + (Median to Q3)
+                            const maxVal = 10 + 20 + 20 + 10;
+
+                            // Draw Q1, Median, Q3 lines
+                            const drawVerticalLine = (value, label, color) => {
+                                const xPos = xScale.getPixelForValue(value);
+                                ctx.save();
+                                ctx.strokeStyle = color;
+                                ctx.lineWidth = 2;
+                                ctx.setLineDash([2, 2]);
+                                ctx.beginPath();
+                                ctx.moveTo(xPos, chart.chartArea.top);
+                                ctx.lineTo(xPos, chart.chartArea.bottom);
+                                ctx.stroke();
+                                ctx.fillStyle = color;
+                                ctx.font = 'bold 12px Inter';
+                                ctx.textAlign = 'center';
+                                ctx.fillText(label, xPos, chart.chartArea.bottom + 15); // Label below x-axis
+                                ctx.restore();
+                            };
+
+                            drawVerticalLine(q1Val, 'Q1', '#065F46');
+                            drawVerticalLine(medianVal, 'Median', '#4338CA');
+                            drawVerticalLine(q3Val, 'Q3', '#065F46');
+
+                            // Draw IQR text
+                            ctx.save();
+                            ctx.fillStyle = '#1F2937';
+                            ctx.font = 'bold 14px Inter';
+                            ctx.textAlign = 'center';
+                            const iqrTextX = xScale.getPixelForValue((q1Val + q3Val) / 2);
+                            ctx.fillText(`IQR = ${q3Val - q1Val}`, iqrTextX, yMid - 10);
+                            ctx.restore();
+                        }
+                    }
+                }
+            });
+
+
+            // --- Functions for Practical Section ---
+
+            function calculateAndRender() {
+                const rawData = dataInput.value;
+                const numbers = rawData.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+
+                if (numbers.length === 0) {
+                    alert("Please enter valid numbers separated by commas.");
+                    resultsOutput.classList.add('hidden');
+                    return;
+                }
+
+                // Sort the numbers for median and quartiles
+                numbers.sort((a, b) => a - b);
+
+                const n = numbers.length;
+
+                // Calculate Mean
+                const mean = numbers.reduce((sum, val) => sum + val, 0) / n;
+                
+                // Calculate Median
+                let median;
+                const mid = Math.floor(n / 2);
+                if (n % 2 === 0) {
+                    median = (numbers[mid - 1] + numbers[mid]) / 2;
+                } else {
+                    median = numbers[mid];
+                }
+
+                // Calculate Range
+                const range = numbers[n - 1] - numbers[0];
+
+                // Calculate Variance (Sample)
+                const sumOfSquaredDifferences = numbers.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0);
+                const variance = n > 1 ? sumOfSquaredDifferences / (n - 1) : 0; // Use n-1 for sample variance
+
+                // Calculate Standard Deviation (Sample)
+                const stdDev = Math.sqrt(variance);
+
+                // Calculate Quartiles (Q1, Q3) and IQR
+                const getQuartile = (arr, percentile) => {
+                    const index = (percentile / 100) * (arr.length - 1);
+                    const floorIndex = Math.floor(index);
+                    const ceilIndex = Math.ceil(index);
+
+                    if (floorIndex === ceilIndex) {
+                        return arr[floorIndex];
+                    }
+                    // Linear interpolation for quartiles
+                    return arr[floorIndex] + (arr[ceilIndex] - arr[floorIndex]) * (index - floorIndex);
+                };
+
+                const q1 = getQuartile(numbers, 25);
+                const q3 = getQuartile(numbers, 75);
+                const iqr = q3 - q1;
+
+                // Display results
+                countResult.innerText = n;
+                meanResult.innerText = mean.toFixed(2);
+                medianResult.innerText = median.toFixed(2);
+                rangeResult.innerText = range.toFixed(2);
+                varianceResult.innerText = variance.toFixed(2);
+                stdDevResult.innerText = stdDev.toFixed(2);
+                q1Result.innerText = q1.toFixed(2);
+                q3Result.innerText = q3.toFixed(2);
+                iqrResult.innerText = iqr.toFixed(2);
+
+                // Provide interpretation
+                let interpretation = `The dataset has ${n} data points. The mean is ${mean.toFixed(2)}, and the median is ${median.toFixed(2)}. `;
+                interpretation += `The range is ${range.toFixed(2)}, indicating the full spread from the minimum to maximum value. `;
+                interpretation += `The standard deviation is ${stdDev.toFixed(2)}, meaning data points typically deviate by this amount from the mean. `;
+                interpretation += `The Interquartile Range (IQR) is ${iqr.toFixed(2)}, representing the spread of the middle 50% of the data (between Q1: ${q1.toFixed(2)} and Q3: ${q3.toFixed(2)}).`;
+
+                if (stdDev > mean / 3) { // Simple heuristic for high dispersion relative to mean
+                    interpretation += ` This dataset shows a relatively high dispersion, meaning the data points are quite spread out.`;
+                } else if (stdDev < mean / 10) { // Simple heuristic for low dispersion
+                    interpretation += ` This dataset shows relatively low dispersion, indicating data points are clustered closely around the mean.`;
+                }
+
+                // Check for outliers using IQR method (for interpretation)
+                const lowerBound = q1 - 1.5 * iqr;
+                const upperBound = q3 + 1.5 * iqr;
+                const outliers = numbers.filter(num => num < lowerBound || num > upperBound);
+                if (outliers.length > 0) {
+                    interpretation += ` There are potential outliers detected (${outliers.join(', ')}), which might significantly influence the mean, range, variance, and standard deviation. The median and IQR are more robust to these extreme values.`;
+                }
+
+                interpretationText.innerText = interpretation;
+                resultsOutput.classList.remove('hidden');
+
+                // Render dynamic dispersion chart
+                renderDynamicDispersionChart(numbers, mean, median, stdDev, q1, q3);
+            }
+
+            function renderDynamicDispersionChart(numbers, mean, median, stdDev, q1, q3) {
+                if (dynamicDispersionChartInstance) {
+                    dynamicDispersionChartInstance.destroy();
+                }
+
+                const minVal = Math.min(...numbers);
+                const maxVal = Math.max(...numbers);
+                const dataRange = maxVal - minVal;
+                const padding = dataRange * 0.1; // Add some padding to the chart's x-axis
+
+                dynamicDispersionChartInstance = new Chart(dynamicDispersionChartCanvas.getContext('2d'), {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Data Points',
+                            data: numbers.map(num => ({ x: num, y: 0.5 })), // Plot all points on a single horizontal line
+                            backgroundColor: '#4338CA',
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            showLine: false // Don't connect points with a line
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: 'Data Distribution with Measures of Dispersion',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Value: ${context.parsed.x}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: { display: true, text: 'Value' },
+                                min: minVal - padding,
+                                max: maxVal + padding,
+                                grid: { display: true }
+                            },
+                            y: {
+                                display: false, // Hide y-axis
+                                min: 0,
+                                max: 1
+                            }
+                        },
+                        animation: {
+                            onComplete: function() {
+                                const chart = this;
+                                const ctx = chart.ctx;
+                                const xScale = chart.scales.x;
+                                const yAxis = chart.scales.y;
+                                const yPos = yAxis.getPixelForValue(0.5); // Y position for the data points
+
+                                // Draw Mean
+                                const meanX = xScale.getPixelForValue(mean);
+                                ctx.save();
+                                ctx.strokeStyle = '#EF4444'; // Red for Mean
+                                ctx.lineWidth = 2;
+                                ctx.setLineDash([5, 5]);
+                                ctx.beginPath();
+                                ctx.moveTo(meanX, chart.chartArea.top);
+                                ctx.lineTo(meanX, chart.chartArea.bottom);
+                                ctx.stroke();
+                                ctx.fillStyle = '#EF4444';
+                                ctx.font = 'bold 12px Inter';
+                                ctx.textAlign = 'center';
+                                ctx.fillText(`Mean: ${mean.toFixed(2)}`, meanX, chart.chartArea.top + 15);
+                                ctx.restore();
+
+                                // Draw Standard Deviation range (Mean ± StdDev)
+                                const stdDevLowerX = xScale.getPixelForValue(mean - stdDev);
+                                const stdDevUpperX = xScale.getPixelForValue(mean + stdDev);
+                                ctx.save();
+                                ctx.strokeStyle = '#FBBF24'; // Amber for Std Dev
+                                ctx.lineWidth = 3;
+                                ctx.beginPath();
+                                ctx.moveTo(stdDevLowerX, yPos + 20);
+                                ctx.lineTo(stdDevUpperX, yPos + 20);
+                                ctx.stroke();
+                                ctx.beginPath();
+                                ctx.moveTo(stdDevLowerX, yPos + 15);
+                                ctx.lineTo(stdDevLowerX, yPos + 25);
+                                ctx.moveTo(stdDevUpperX, yPos + 15);
+                                ctx.lineTo(stdDevUpperX, yPos + 25);
+                                ctx.stroke();
+                                ctx.fillStyle = '#FBBF24';
+                                ctx.font = 'bold 12px Inter';
+                                ctx.textAlign = 'center';
+                                ctx.fillText(`±1 StdDev`, (stdDevLowerX + stdDevUpperX) / 2, yPos + 35);
+                                ctx.restore();
+
+                                // Draw IQR Box (Q1 to Q3)
+                                const q1X = xScale.getPixelForValue(q1);
+                                const q3X = xScale.getPixelForValue(q3);
+                                ctx.save();
+                                ctx.fillStyle = 'rgba(59, 130, 246, 0.2)'; // Blue for IQR box fill
+                                ctx.strokeStyle = '#3B82F6'; // Blue for IQR box border
+                                ctx.lineWidth = 2;
+                                ctx.fillRect(q1X, yPos - 30, q3X - q1X, 20); // Draw rectangle
+                                ctx.strokeRect(q1X, yPos - 30, q3X - q1X, 20);
+                                ctx.fillStyle = '#3B82F6';
+                                ctx.font = 'bold 12px Inter';
+                                ctx.textAlign = 'center';
+                                ctx.fillText(`IQR`, (q1X + q3X) / 2, yPos - 35);
+                                ctx.restore();
+
+                                // Draw Median within IQR box
+                                const medianX = xScale.getPixelForValue(median);
+                                ctx.save();
+                                ctx.strokeStyle = '#3B82F6'; // Blue for Median line
+                                ctx.lineWidth = 2;
+                                ctx.beginPath();
+                                ctx.moveTo(medianX, yPos - 30);
+                                ctx.lineTo(medianX, yPos - 10);
+                                ctx.stroke();
+                                ctx.restore();
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

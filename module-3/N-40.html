@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S40: Tableau/Power BI - Connecting Data & Calculated Fields</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .chart-container { position: relative; height: 350px; width: 100%; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+        .chart-description { margin-top: 1rem; font-size: 0.9rem; color: #555; text-align: center; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S40: Tableau/Power BI - Connecting Data & Calculated Fields</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Connecting Data & Calculated Fields in BI Tools</h2>
+            <p class="section-intro">Business Intelligence (BI) tools like Tableau and Power BI are designed to make data analysis and visualization accessible and efficient. A core part of their functionality lies in their ability to connect to diverse data sources and to allow users to create new, meaningful data points through "calculated fields" without altering the original raw data.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Connecting to Various Data Sources</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">The first step in any data analysis project within a BI tool is to bring your data into the environment. Tableau and Power BI offer robust connectivity to a wide array of data sources, ensuring you can work with data wherever it resides.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Common Data Source Categories:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Files:</strong> Excel workbooks (.xlsx, .xls), CSV files (.csv), Text files (.txt), JSON files, PDF files. These are often the easiest to start with.</li>
+                            <li><strong>Databases:</strong> SQL Server, MySQL, PostgreSQL, Oracle, Amazon Redshift, Google BigQuery, Snowflake, etc. These are typically used for large, structured datasets.</li>
+                            <li><strong>Cloud Services:</strong> Connectors to services like Google Analytics, Salesforce, SharePoint, Facebook Ads, Google Sheets, Dropbox, OneDrive.</li>
+                            <li><strong>Web Connectors / APIs:</strong> Allow connecting to data available via web APIs (e.g., public weather data, stock market data).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Conceptual Steps to Connect:</strong>
+                        <ol class="list-decimal pl-5 space-y-1 text-gray-700 mt-2">
+                            <li>Open Tableau Desktop / Power BI Desktop.</li>
+                            <li>Click on 'Connect to Data' or 'Get Data'.</li>
+                            <li>Select the desired data source type (e.g., 'Text File', 'SQL Server').</li>
+                            <li>Browse to the file location or enter connection details (server name, database, credentials).</li>
+                            <li>Select the specific tables/sheets you want to import.</li>
+                            <li>The tool will often preview the data and allow you to make initial data type adjustments or basic transformations.</li>
+                        </ol>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">The ability to connect to diverse data sources makes BI tools incredibly versatile, allowing analysts to pull together information from across an organization for a comprehensive view.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Concept of Calculated Fields</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Calculated fields are powerful features in BI tools that allow you to create new data fields (or "columns") based on existing ones using formulas or expressions. This is a form of "feature engineering" directly within the visualization environment, enabling you to derive new insights without modifying the underlying raw data source.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Purpose of Calculated Fields:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Derive New Metrics:</strong> Calculate profit margins, conversion rates, sales per customer, average order value.</li>
+                            <li><strong>Transform Data:</strong> Convert units (e.g., Celsius to Fahrenheit), extract parts of dates (e.g., Year, Month from a Date field), concatenate strings.</li>
+                            <li><strong>Categorize Data:</strong> Create age groups, sales tiers (e.g., 'High Value', 'Medium Value', 'Low Value').</li>
+                            <li><strong>Perform Conditional Logic:</strong> Implement 'IF-THEN-ELSE' statements to categorize or flag data based on certain conditions.</li>
+                            <li><strong>Clean Data (Lightly):</strong> Handle nulls, replace values, or standardize text.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Key Characteristics:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Virtual Fields:</strong> They are not stored in the original data source; they are computed on the fly by the BI tool.</li>
+                            <li><strong>Dynamic:</strong> They update automatically if the underlying data changes or if filters are applied to the visualization.</li>
+                            <li><strong>Formula-Based:</strong> Created using a specific formula language (e.g., DAX in Power BI, Tableau's calculation language).</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600"><em>Example:</em> If you have 'Sales' and 'Cost' columns, you can create a 'Profit' calculated field: `[Sales] - [Cost]`. Then, you can create a 'Profit Margin' calculated field: `[Profit] / [Sales]`.</p>
+                <p class="mt-4 text-sm text-gray-600">Calculated fields empower analysts to go beyond simply displaying raw data, enabling them to create richer, more insightful metrics directly within their analytical environment.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Hands-on (Tableau/Power BI) - Connecting Data, Calculated Fields, and Filters</h2>
+            <p class="section-intro">This practical session will conceptually guide you through the process of connecting to a dataset, creating calculated fields, and adding filters within a BI tool like Tableau or Power BI. While you'll be working in the actual software, this section illustrates the steps and expected outcomes.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Conceptual Dataset: Online Retail Sales</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Imagine you have the following sales data for an online retail store in a CSV file called `online_sales.csv`:</p>
+                <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code>
+OrderID,CustomerID,OrderDate,ProductCategory,Sales,Cost,Region,ShippingMode
+1,C001,2024-01-01,Electronics,150.00,100.00,East,Standard
+2,C002,2024-01-02,Apparel,75.50,50.00,West,Express
+3,C003,2024-01-03,Books,25.00,15.00,North,Standard
+4,C001,2024-01-04,Electronics,300.00,200.00,East,Express
+5,C004,2024-01-05,Home Goods,120.00,80.00,South,Standard
+6,C002,2024-01-06,Apparel,40.00,25.00,West,Standard
+7,C005,2024-01-07,Books,80.00,40.00,North,Express
+8,C003,2024-01-08,Home Goods,90.00,60.00,South,Standard
+                    </code></pre>
+                </div>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Step 1: Connect to the Dataset</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">In your chosen BI tool (Tableau or Power BI), you would initiate a new connection and select 'Text file' or 'CSV'. Then, you'd navigate to `online_sales.csv` and load it. The tool will display the columns and their inferred data types (e.g., `Sales` and `Cost` as numbers, `OrderDate` as date, others as text).</p>
+                <p class="mt-4 text-sm text-gray-600"><em>Conceptual UI Action:</em> You'd see a data source pane where columns like `Sales`, `Cost`, `OrderDate`, `ProductCategory` are listed, ready for use.</p>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Step 2: Create Calculated Fields</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Now, let's create two new calculated fields: 'Profit' and 'Profit Margin'.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Calculated Field 1: Profit</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Formula:</strong> `[Sales] - [Cost]`</li>
+                            <li><strong>Conceptual Tool Action:</strong> In Tableau, you'd right-click in the 'Data' pane and select 'Create Calculated Field'. In Power BI, you'd click 'New Measure' or 'New Column' under 'Modeling' tab.</li>
+                            <li><strong>Purpose:</strong> To get the absolute profit for each transaction.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Calculated Field 2: Profit Margin</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Formula:</strong> `SUM([Profit]) / SUM([Sales])` (Note: Aggregations like SUM are crucial here, especially for measures).</li>
+                            <li><strong>Conceptual Tool Action:</strong> Create another calculated field. Ensure the data type is set to 'Percentage' for proper formatting.</li>
+                            <li><strong>Purpose:</strong> To understand the profitability as a percentage of sales.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600"><em>Conceptual Outcome:</em> You would now see 'Profit' and 'Profit Margin' appear as new fields in your data pane, ready to be dragged onto visualizations.</p>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Step 3: Add Filters to a Worksheet/Report</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">Filters allow you to narrow down the data shown in your visualizations. Let's create a simple bar chart and then apply filters to it.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Create a Basic Chart: Sales by Region</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Drag `Region` to the columns/rows shelf.</li>
+                            <li>Drag `Sales` to the rows/columns shelf (tool will automatically sum it).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Apply a Filter: Region Filter</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Drag `Region` to the 'Filters' shelf/pane.</li>
+                            <li>A filter dialog will appear. Select specific regions (e.g., 'East' and 'North').</li>
+                            <li><strong>Conceptual Tool Action:</strong> In Tableau, you'd right-click on the `Region` filter and select 'Show Filter' to make it interactive. In Power BI, you'd use the 'Slicer' visual.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Apply a Date Filter: OrderDate Filter</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Drag `OrderDate` to the 'Filters' shelf/pane.</li>
+                            <li>Choose a range (e.g., 'Month/Year' or a specific date range).</li>
+                            <li><strong>Conceptual Tool Action:</strong> Make this filter interactive as well.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600"><em>Conceptual Outcome:</em> Your bar chart would now only show sales for the selected regions and date range. The interactive filters would allow users to dynamically change the view.</p>
+
+                <div class="chart-container">
+                    <canvas id="salesByRegionChart"></canvas>
+                </div>
+                <p class="chart-description"><em>Simulated Bar Chart: Sales by Region with conceptual filters applied.</em></p>
+                <p class="mt-4 text-sm text-gray-600">This hands-on exercise highlights the foundational steps of data analysis in BI tools: connecting to data, enriching it with calculated fields, and making it explorable with filters. These capabilities are essential for building insightful reports and dashboards.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('nav a').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Data for Chart.js simulation
+        const salesData = [
+            { region: 'East', sales: 150.00 },
+            { region: 'West', sales: 75.50 },
+            { region: 'North', sales: 25.00 },
+            { region: 'East', sales: 300.00 },
+            { region: 'South', sales: 120.00 },
+            { region: 'West', sales: 40.00 },
+            { region: 'North', sales: 80.00 },
+            { region: 'South', sales: 90.00 },
+        ];
+
+        // Aggregate sales by region
+        const aggregatedSales = salesData.reduce((acc, item) => {
+            acc[item.region] = (acc[item.region] || 0) + item.sales;
+            return acc;
+        }, {});
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('salesByRegionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(aggregatedSales),
+                    datasets: [{
+                        label: 'Total Sales ($)',
+                        data: Object.values(aggregatedSales),
+                        backgroundColor: [
+                            'rgba(67, 56, 202, 0.8)', // East
+                            'rgba(245, 158, 11, 0.8)', // West
+                            'rgba(75, 192, 192, 0.8)', // North
+                            'rgba(255, 99, 132, 0.8)'  // South
+                        ],
+                        borderColor: [
+                            'rgba(67, 56, 202, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Total Sales by Region (Conceptual Filtered View)',
+                            font: { size: 14 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Region'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Total Sales ($)'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

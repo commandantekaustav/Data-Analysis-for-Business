@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S59: Simple Linear Regression - Model & Assumptions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="text"], input[type="number"], textarea {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .action-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+        }
+        .action-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px; /* Increased height for better visibility */
+            width: 100%;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .code-block {
+            background-color: #2D3748; /* Dark background for code */
+            color: #E2E8F0; /* Light text */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', monospace; /* Monospace font */
+            overflow-x: auto; /* Allow horizontal scrolling for long lines */
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .code-block pre {
+            margin: 0;
+        }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #4A5568;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .copy-button:hover {
+            background-color: #6366F1;
+        }
+        /* Message Box Styling */
+        #messageBox {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S59: Simple Linear Regression - Model & Assumptions</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory-slr" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical-activity" class="nav-button text-sm sm:text-base font-medium py-2 px-3">📝 Variable ID</a></li>
+                    <li><a href="#ols-visualization" class="nav-button text-sm sm:text-base font-medium py-2 px-3">📊 OLS Visual</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory-slr" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Simple Linear Regression Model & Assumptions</h2>
+            <p class="section-intro">Regression analysis is a powerful statistical method used to model the relationship between a dependent variable and one or more independent variables. In this session, we focus on Simple Linear Regression (SLR), which involves just one independent variable.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Introduction to Regression</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">While correlation measures the strength and direction of a linear relationship, regression goes a step further: it helps us **predict** the value of a dependent variable based on the value of one or more independent variables. It allows us to build a mathematical model that describes how changes in the independent variable(s) are associated with changes in the dependent variable.</p>
+                <p class="mt-2 text-gray-700 leading-relaxed">Common business applications include:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>Predicting sales based on advertising spend.</li>
+                    <li>Estimating house prices based on square footage.</li>
+                    <li>Forecasting customer churn based on usage patterns.</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Simple Linear Regression (SLR) Model</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">The Simple Linear Regression model describes a linear relationship between two variables: one dependent variable ($Y$) and one independent variable ($X$). The goal is to find the "best-fit" straight line through the data points.</p>
+                
+                <h4 class="text-lg font-semibold text-gray-800 mb-2">The Model Equation:</h4>
+                <div class="code-block bg-gray-100 text-gray-800 p-4 rounded-md">
+                    <pre><code>$$ Y = \beta_0 + \beta_1 X + \epsilon $$</code></pre>
+                    <p class="text-sm text-gray-600 mt-2">Where:</p>
+                    <ul class="list-disc pl-5 text-sm text-gray-600">
+                        <li>$Y$: The **Dependent Variable** (also called response variable, outcome variable), the variable we are trying to predict or explain.</li>
+                        <li>$X$: The **Independent Variable** (also called predictor variable, explanatory variable), the variable used to predict $Y$.</li>
+                        <li>$\beta_0$ (Beta-naught): The **Y-intercept** of the regression line. It represents the expected mean value of $Y$ when $X=0$.</li>
+                        <li>$\beta_1$ (Beta-one): The **Slope** of the regression line. It represents the expected change in $Y$ for every one-unit increase in $X$.</li>
+                        <li>$\epsilon$ (Epsilon): The **Error Term** (also called residual). It represents the random variability in $Y$ that cannot be explained by $X$. It accounts for other factors influencing $Y$ that are not included in the model.</li>
+                    </ul>
+                </div>
+                <p class="mt-4 text-gray-700 leading-relaxed">When we estimate this model from sample data, we use the following notation for the estimated regression line:</p>
+                 <div class="code-block bg-gray-100 text-gray-800 p-4 rounded-md">
+                    <pre><code>$$ \hat{Y} = b_0 + b_1 X $$</code></pre>
+                    <p class="text-sm text-gray-600 mt-2">Where:</p>
+                    <ul class="list-disc pl-5 text-sm text-gray-600">
+                        <li>$\hat{Y}$ (Y-hat): The **Predicted Value** of the dependent variable.</li>
+                        <li>$b_0$: The **Estimated Y-intercept** from the sample data.</li>
+                        <li>$b_1$: The **Estimated Slope** from the sample data.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Ordinary Least Squares (OLS) Method</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">How do we find the "best-fit" line? This is where the Ordinary Least Squares (OLS) method comes in. OLS is the most widely used method for estimating the unknown parameters ($b_0$ and $b_1$) in a linear regression model.</p>
+                <p class="mb-4 text-gray-700 leading-relaxed">The core idea of OLS is to find the line that minimizes the sum of the squared differences between the observed values of the dependent variable ($Y_i$) and the values predicted by our model ($\hat{Y}_i$). These differences are known as **residuals**.</p>
+
+                <h4 class="text-lg font-semibold text-gray-800 mb-2">Residuals:</h4>
+                <div class="code-block bg-gray-100 text-gray-800 p-4 rounded-md">
+                    <pre><code>$$ e_i = Y_i - \hat{Y}_i $$</code></pre>
+                    <p class="text-sm text-gray-600 mt-2">Where:</p>
+                    <ul class="list-disc pl-5 text-sm text-gray-600">
+                        <li>$e_i$: The residual for the $i$-th observation.</li>
+                        <li>$Y_i$: The observed value of the dependent variable for the $i$-th observation.</li>
+                        <li>$\hat{Y}_i$: The predicted value of the dependent variable for the $i$-th observation, based on the regression line ($b_0 + b_1 X_i$).</li>
+                    </ul>
+                    <p class="mt-2 text-gray-600">The residual represents the vertical distance between an observed data point and the regression line. OLS aims to make these distances, when squared and summed, as small as possible.</p>
+                </div>
+
+                <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">OLS Minimization Principle:</h4>
+                <p class="mb-4 text-gray-700 leading-relaxed">OLS finds the $b_0$ and $b_1$ that minimize the Sum of Squared Residuals (SSR):</p>
+                <div class="code-block bg-gray-100 text-gray-800 p-4 rounded-md">
+                    <pre><code>$$ \text{Minimize } \sum_{i=1}^{n} e_i^2 = \sum_{i=1}^{n} (Y_i - \hat{Y}_i)^2 = \sum_{i=1}^{n} (Y_i - (b_0 + b_1 X_i))^2 $$</code></pre>
+                </div>
+
+                <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">OLS Estimators Formulas:</h4>
+                <p class="mb-4 text-gray-700 leading-relaxed">Through calculus (minimizing the SSR with respect to $b_0$ and $b_1$), we derive the formulas for the OLS estimators:</p>
+                <div class="code-block bg-gray-100 text-gray-800 p-4 rounded-md">
+                    <pre><code>$$ b_1 = \frac{\sum_{i=1}^{n} (X_i - \bar{X})(Y_i - \bar{Y})}{\sum_{i=1}^{n} (X_i - \bar{X})^2} $$</code></pre>
+                    <p class="text-sm text-gray-600 mt-2">This can also be expressed in terms of covariance and variance:</p>
+                    <pre><code>$$ b_1 = \frac{\text{Cov}(X, Y)}{\text{Var}(X)} $$</code></pre>
+                    <p class="text-sm text-gray-600 mt-2">And for the intercept:</p>
+                    <pre><code>$$ b_0 = \bar{Y} - b_1 \bar{X} $$</code></pre>
+                    <p class="text-sm text-gray-600 mt-2">Where $\bar{X}$ and $\bar{Y}$ are the means of the independent and dependent variables, respectively.</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Assumptions of Simple Linear Regression (LINE)</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">For the results of a Simple Linear Regression model to be valid and reliable, several assumptions about the error term ($\epsilon$) and the relationship between $X$ and $Y$ must be met. Violating these assumptions can lead to biased coefficients, incorrect p-values, and unreliable predictions.</p>
+                
+                <ul class="list-disc pl-5 space-y-4 text-gray-700">
+                    <li><strong>1. Linearity:</strong>
+                        <p class="mb-2">The relationship between the independent variable ($X$) and the dependent variable ($Y$) must be **linear**. This means that the data points, when plotted, should generally follow a straight line. If the relationship is curved, a linear model will not accurately capture it.</p>
+                        <p class="text-sm text-gray-600 italic">How to check: Scatter plot of $Y$ vs. $X$.</p>
+                    </li>
+                    <li><strong>2. Independence of Errors:</strong>
+                        <p class="mb-2">The errors (residuals) are **independent** of each other. This means that the error for one observation does not influence the error for another observation. This assumption is often violated in time-series data (autocorrelation) or clustered data.</p>
+                        <p class="text-sm text-gray-600 italic">How to check: Durbin-Watson test, plot of residuals vs. order of data collection.</p>
+                    </li>
+                    <li><strong>3. Normality of Errors:</strong>
+                        <p class="mb-2">The errors (residuals) are **normally distributed** at each value of $X$. While the Central Limit Theorem can sometimes mitigate minor deviations for large sample sizes, significant non-normality can affect the validity of hypothesis tests and confidence intervals.</p>
+                        <p class="text-sm text-gray-600 italic">How to check: Histogram of residuals, Q-Q plot of residuals, Shapiro-Wilk test.</p>
+                    </li>
+                    <li><strong>4. Equal Variance of Errors (Homoscedasticity):</strong>
+                        <p class="mb-2">The variance of the errors is **constant** across all levels of the independent variable ($X$). This means the spread of the residuals should be roughly the same across the range of predicted $Y$ values. If the variance increases or decreases as $X$ changes (heteroscedasticity), it can lead to inefficient coefficient estimates and incorrect standard errors.</p>
+                        <p class="text-sm text-gray-600 italic">How to check: Scatter plot of residuals vs. predicted $Y$ values ($\hat{Y}$). Look for a "fan" or "cone" shape for heteroscedasticity.</p>
+                    </li>
+                    <li><strong>(Optional) No Outliers/Influential Points:</strong>
+                        <p class="mb-2">While not always listed as a core assumption, extreme outliers or influential data points can disproportionately affect the regression line and its coefficients. It's important to identify and understand them.</p>
+                        <p class="text-sm text-gray-600 italic">How to check: Residual plots, Cook's distance, leverage plots.</p>
+                    </li>
+                </ul>
+                <p class="mt-4 text-gray-700 leading-relaxed font-bold">Understanding and checking these assumptions is crucial for building a reliable and interpretable regression model.</p>
+            </div>
+        </section>
+
+        <section id="practical-activity" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📝</span>Practical Activity: Identify Independent/Dependent Variables</h2>
+            <p class="section-intro">For each business scenario below, identify the most likely Independent Variable (X) and Dependent Variable (Y) if you were to build a Simple Linear Regression model to predict or explain the outcome.</p>
+            
+            <div class="interactive-panel">
+                <div class="panel-title">Variable Identification Challenge</div>
+                
+                <div class="mb-6">
+                    <p class="font-semibold text-gray-800 mb-2">Scenario 1: A marketing team wants to understand how their advertising spend impacts product sales.</p>
+                    <div class="flex flex-col sm:flex-row gap-4 mb-2">
+                        <div class="flex-1">
+                            <label for="scenario1_x" class="block text-gray-700 text-sm font-bold mb-1">Independent Variable (X):</label>
+                            <input type="text" id="scenario1_x" placeholder="e.g., Advertising Spend">
+                        </div>
+                        <div class="flex-1">
+                            <label for="scenario1_y" class="block text-gray-700 text-sm font-bold mb-1">Dependent Variable (Y):</label>
+                            <input type="text" id="scenario1_y" placeholder="e.g., Product Sales">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <p class="font-semibold text-gray-800 mb-2">Scenario 2: A real estate agent wants to predict the selling price of a house based on its square footage.</p>
+                    <div class="flex flex-col sm:flex-row gap-4 mb-2">
+                        <div class="flex-1">
+                            <label for="scenario2_x" class="block text-gray-700 text-sm font-bold mb-1">Independent Variable (X):</label>
+                            <input type="text" id="scenario2_x" placeholder="e.g., Square Footage">
+                        </div>
+                        <div class="flex-1">
+                            <label for="scenario2_y" class="block text-gray-700 text-sm font-bold mb-1">Dependent Variable (Y):</label>
+                            <input type="text" id="scenario2_y" placeholder="e.g., Selling Price">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <p class="font-semibold text-gray-800 mb-2">Scenario 3: A call center manager wants to see if the number of training hours for new employees affects their average call handling time.</p>
+                    <div class="flex flex-col sm:flex-row gap-4 mb-2">
+                        <div class="flex-1">
+                            <label for="scenario3_x" class="block text-gray-700 text-sm font-bold mb-1">Independent Variable (X):</label>
+                            <input type="text" id="scenario3_x" placeholder="e.g., Training Hours">
+                        </div>
+                        <div class="flex-1">
+                            <label for="scenario3_y" class="block text-gray-700 text-sm font-bold mb-1">Dependent Variable (Y):</label>
+                            <input type="text" id="scenario3_y" placeholder="e.g., Average Call Handling Time">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button id="checkVariablesBtn" class="action-button">Check My Answers</button>
+                </div>
+
+                <div id="variableFeedback" class="feedback-box hidden mt-4">
+                    <h4 class="text-indigo-600">Suggested Answers:</h4>
+                    <div class="mb-4">
+                        <p class="font-semibold text-gray-800">Scenario 1: Advertising Spend vs. Product Sales</p>
+                        <p class="text-gray-700 ml-4">Independent (X): Advertising Spend</p>
+                        <p class="text-gray-700 ml-4">Dependent (Y): Product Sales</p>
+                    </div>
+                    <div class="mb-4">
+                        <p class="font-semibold text-gray-800">Scenario 2: Square Footage vs. Selling Price</p>
+                        <p class="text-gray-700 ml-4">Independent (X): Square Footage</p>
+                        <p class="text-gray-700 ml-4">Dependent (Y): Selling Price</p>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-800">Scenario 3: Training Hours vs. Average Call Handling Time</p>
+                        <p class="text-gray-700 ml-4">Independent (X): Training Hours</p>
+                        <p class="text-gray-700 ml-4">Dependent (Y): Average Call Handling Time</p>
+                    </div>
+                    <p class="mt-4 text-gray-700 italic">Remember: The independent variable is what you use to predict, and the dependent variable is what you are predicting.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="ols-visualization" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📊</span>Practical: OLS Regression Line Visualization</h2>
+            <p class="section-intro">Let's visualize how OLS finds the best-fit line. We'll generate some synthetic data, calculate the OLS coefficients, and then plot the data points along with the regression line and their residuals.</p>
+            
+            <div class="interactive-panel">
+                <div class="panel-title">OLS Regression Line & Residuals</div>
+                <p class="mb-4 text-gray-700">Adjust the number of points and the amount of noise to see how it affects the regression line and the spread of residuals.</p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 mb-4 justify-center items-center">
+                    <div>
+                        <label for="olsNumPoints" class="block text-gray-700 text-sm font-bold mb-1">Number of Data Points:</label>
+                        <input type="number" id="olsNumPoints" value="50" min="10" max="500" step="10">
+                    </div>
+                    <div>
+                        <label for="olsNoise" class="block text-gray-700 text-sm font-bold mb-1">Noise Factor (0-1):</label>
+                        <input type="number" id="olsNoise" value="0.3" min="0" max="1" step="0.05">
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button id="generateOlsDataBtn" class="action-button">Generate Data & Plot OLS</button>
+                    <button id="showOlsPythonCodeBtn" class="action-button bg-green-600 hover:bg-green-700">Show Python Code</button>
+                </div>
+
+                <div id="olsResults" class="results-box hidden mt-4">
+                    <h4 class="text-indigo-600">OLS Regression Coefficients:</h4>
+                    <div class="result-item">
+                        <span class="result-label">Estimated Intercept ($b_0$):</span>
+                        <span id="olsIntercept" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Estimated Slope ($b_1$):</span>
+                        <span id="olsSlope" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Regression Equation:</span>
+                        <span id="olsEquation" class="result-value"></span>
+                    </div>
+
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Scatter Plot with OLS Regression Line & Residuals</h5>
+                    <div class="chart-container">
+                        <canvas id="olsScatterPlotChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 1: Scatter plot showing synthetic data points, the calculated OLS regression line, and vertical lines representing the residuals (the difference between observed and predicted Y values).</p>
+                </div>
+
+                <div id="olsPythonCodeSection" class="hidden mt-4">
+                    <h4 class="text-indigo-600">Python Code for OLS Regression & Visualization:</h4>
+                    <div class="code-block">
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="olsPythonCode">
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm # For OLS model
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# --- Data Generation (based on interactive inputs) ---
+num_points = 50 # Example value, replace with input from UI
+noise_factor = 0.3 # Example value, replace with input from UI
+
+np.random.seed(42) # For reproducibility
+
+# Generate X values
+X = np.random.uniform(low=10, high=100, size=num_points)
+
+# Generate Y values with a true linear relationship + noise
+# True relationship: Y = 5 + 1.5 * X
+true_slope = 1.5
+true_intercept = 5
+noise = np.random.normal(loc=0, scale=noise_factor * 20, size=num_points) # Scale noise based on factor
+Y = true_intercept + true_slope * X + noise
+
+data_df = pd.DataFrame({'X': X, 'Y': Y})
+
+# --- Perform OLS Regression ---
+# Add a constant (intercept) to the independent variable for statsmodels
+X_with_const = sm.add_constant(X)
+model = sm.OLS(Y, X_with_const)
+results = model.fit()
+
+# Get estimated coefficients
+b0_intercept = results.params[0]
+b1_slope = results.params[1]
+
+print(f"Estimated Intercept (b0): {b0_intercept:.4f}")
+print(f"Estimated Slope (b1): {b1_slope:.4f}")
+print(f"Regression Equation: Y_hat = {b0_intercept:.2f} + {b1_slope:.2f} * X")
+
+# Get predicted Y values
+predicted_Y = results.predict(X_with_const)
+data_df['Predicted_Y'] = predicted_Y
+data_df['Residuals'] = Y - predicted_Y
+
+# --- Visualize OLS Regression Line and Residuals ---
+plt.figure(figsize=(10, 7))
+sns.scatterplot(x='X', y='Y', data=data_df, label='Observed Data Points', color='#4338CA', s=80, alpha=0.8)
+
+# Plot the regression line
+plt.plot(data_df['X'], data_df['Predicted_Y'], color='#EF4444', linewidth=2, label=f'OLS Regression Line: Y_hat = {b0_intercept:.2f} + {b1_slope:.2f}X')
+
+# Plot residuals (vertical lines from observed to predicted)
+for i in range(num_points):
+    plt.plot([data_df['X'].iloc[i], data_df['X'].iloc[i]],
+             [data_df['Y'].iloc[i], data_df['Predicted_Y'].iloc[i]],
+             color='#10B981', linestyle='--', linewidth=0.8, alpha=0.6)
+
+plt.title('OLS Regression: Observed Data, Regression Line, and Residuals')
+plt.xlabel('Independent Variable (X)')
+plt.ylabel('Dependent Variable (Y)')
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+
+# --- Residuals Plot (for checking assumptions) ---
+plt.figure(figsize=(8, 5))
+sns.scatterplot(x=data_df['Predicted_Y'], y=data_df['Residuals'], color='#4338CA', s=80, alpha=0.8)
+plt.axhline(y=0, color='red', linestyle='--', linewidth=1)
+plt.title('Residuals vs. Predicted Values Plot')
+plt.xlabel('Predicted Values (Y_hat)')
+plt.ylabel('Residuals')
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <div id="messageBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg z-50" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span id="messageText" class="block sm:inline"></span>
+        <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" onclick="document.getElementById('messageBox').classList.add('hidden');">
+            <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+        </span>
+    </div>
+
+    <script>
+        // --- Message Box Function ---
+        function showMessage(message, type = 'error') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            messageText.innerText = message;
+            messageBox.classList.remove('hidden');
+            if (type === 'error') {
+                messageBox.classList.remove('bg-green-100', 'border-green-400', 'text-green-700');
+                messageBox.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+            } else {
+                messageBox.classList.remove('bg-red-100', 'border-red-400', 'text-red-700'); // Remove red if previously error
+                messageBox.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+            }
+        }
+
+        // --- Code Copy Function ---
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const textToCopy = codeBlock.textContent;
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                button.textContent = 'Copied!';
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                button.textContent = 'Error!';
+            }
+            document.body.removeChild(textarea);
+
+            setTimeout(() => {
+                button.textContent = 'Copy';
+            }, 2000);
+        }
+
+        // --- MathJax Rendering Function ---
+        function renderMathInElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element && typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                MathJax.typesetPromise([element]).catch(err => console.error("MathJax rendering error:", err));
+            } else if (!element) {
+                console.warn(`Element with ID '${elementId}' not found for MathJax rendering.`);
+            } else {
+                console.warn("MathJax not fully loaded or configured. Skipping MathJax rendering for:", elementId);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation button active state logic
+            document.querySelectorAll('nav a').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // --- Practical Activity Logic (Variable Identification) ---
+            const checkVariablesBtn = document.getElementById('checkVariablesBtn');
+            const variableFeedback = document.getElementById('variableFeedback');
+
+            checkVariablesBtn.addEventListener('click', function() {
+                variableFeedback.classList.toggle('hidden');
+            });
+
+            // --- OLS Visualization Logic ---
+            const olsNumPointsInput = document.getElementById('olsNumPoints');
+            const olsNoiseInput = document.getElementById('olsNoise');
+            const generateOlsDataBtn = document.getElementById('generateOlsDataBtn');
+            const olsResultsDiv = document.getElementById('olsResults');
+            const olsInterceptSpan = document.getElementById('olsIntercept');
+            const olsSlopeSpan = document.getElementById('olsSlope');
+            const olsEquationSpan = document.getElementById('olsEquation');
+            const showOlsPythonCodeBtn = document.getElementById('showOlsPythonCodeBtn');
+            const olsPythonCodeSection = document.getElementById('olsPythonCodeSection');
+            const olsPythonCode = document.getElementById('olsPythonCode');
+
+            let olsScatterPlotChartInstance = null;
+            let currentXData = [];
+            let currentYData = [];
+            let currentPredictedYData = [];
+            let currentResiduals = [];
+
+            generateOlsDataBtn.addEventListener('click', function() {
+                const numPoints = parseInt(olsNumPointsInput.value);
+                const noiseFactor = parseFloat(olsNoiseInput.value);
+
+                if (isNaN(numPoints) || numPoints < 10 || isNaN(noiseFactor) || noiseFactor < 0 || noiseFactor > 1) {
+                    showMessage("Please enter valid inputs for data points (min 10) and noise factor (0-1).", 'error');
+                    return;
+                }
+
+                generateOlsSyntheticData(numPoints, noiseFactor);
+                calculateOlsCoefficients();
+                drawOlsScatterPlot();
+                olsResultsDiv.classList.remove('hidden');
+                updateOlsPythonCodeBlock(numPoints, noiseFactor);
+                renderMathInElement('olsResults'); // Render MathJax for the equation
+            });
+
+            showOlsPythonCodeBtn.addEventListener('click', function() {
+                olsPythonCodeSection.classList.toggle('hidden');
+            });
+
+            function generateOlsSyntheticData(n, noiseFactor) {
+                currentXData = [];
+                currentYData = [];
+                const trueSlope = 1.5;
+                const trueIntercept = 5;
+                const maxNoise = noiseFactor * 20; // Scale noise based on factor
+
+                for (let i = 0; i < n; i++) {
+                    const x = Math.random() * 90 + 10; // X from 10 to 100
+                    const noise = (Math.random() - 0.5) * 2 * maxNoise; // Random noise centered at 0
+                    const y = trueIntercept + trueSlope * x + noise;
+                    currentXData.push(x);
+                    currentYData.push(y);
+                }
+            }
+
+            function calculateOlsCoefficients() {
+                const n = currentXData.length;
+                let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+
+                for (let i = 0; i < n; i++) {
+                    sumX += currentXData[i];
+                    sumY += currentYData[i];
+                    sumXY += currentXData[i] * currentYData[i];
+                    sumX2 += currentXData[i] * currentXData[i];
+                }
+
+                const meanX = sumX / n;
+                const meanY = sumY / n;
+
+                const numerator = sumXY - n * meanX * meanY;
+                const denominator = sumX2 - n * meanX * meanX;
+
+                let b1 = 0;
+                if (denominator !== 0) {
+                    b1 = numerator / denominator;
+                } else {
+                    showMessage("Cannot calculate slope: X values have no variance.", 'error');
+                    return;
+                }
+                const b0 = meanY - b1 * meanX;
+
+                olsInterceptSpan.innerText = b0.toFixed(4);
+                olsSlopeSpan.innerText = b1.toFixed(4);
+                olsEquationSpan.innerText = `$\\hat{Y} = ${b0.toFixed(2)} + ${b1.toFixed(2)} X$`;
+
+                // Calculate predicted Y and residuals
+                currentPredictedYData = currentXData.map(x => b0 + b1 * x);
+                currentResiduals = currentYData.map((y, i) => y - currentPredictedYData[i]);
+            }
+
+            function drawOlsScatterPlot() {
+                const ctx = document.getElementById('olsScatterPlotChart').getContext('2d');
+                if (olsScatterPlotChartInstance) {
+                    olsScatterPlotChartInstance.destroy();
+                }
+
+                const dataPoints = currentXData.map((x, i) => ({ x: x, y: currentYData[i] }));
+                
+                // Prepare data for the regression line
+                const minX = Math.min(...currentXData);
+                const maxX = Math.max(...currentXData);
+                const b0 = parseFloat(olsInterceptSpan.innerText);
+                const b1 = parseFloat(olsSlopeSpan.innerText);
+
+                const regressionLinePoints = [
+                    { x: minX, y: b0 + b1 * minX },
+                    { x: maxX, y: b0 + b1 * maxX }
+                ];
+
+                // Prepare data for residuals
+                const residualLines = [];
+                for (let i = 0; i < currentXData.length; i++) {
+                    residualLines.push({
+                        x1: currentXData[i],
+                        y1: currentYData[i],
+                        x2: currentXData[i],
+                        y2: currentPredictedYData[i]
+                    });
+                }
+
+                olsScatterPlotChartInstance = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Observed Data Points',
+                                data: dataPoints,
+                                backgroundColor: '#4338CA', // Indigo
+                                pointRadius: 5,
+                                pointHoverRadius: 7
+                            },
+                            {
+                                label: 'OLS Regression Line',
+                                data: regressionLinePoints,
+                                type: 'line',
+                                borderColor: '#EF4444', // Red
+                                borderWidth: 2,
+                                fill: false,
+                                pointRadius: 0, // No points on the line
+                                showLine: true
+                            },
+                            {
+                                label: 'Residuals',
+                                data: residualLines.flatMap(d => [{x: d.x1, y: d.y1}, {x: d.x2, y: d.y2}, {x: d.x2, y: d.y2}]), // Add extra point to break line
+                                type: 'line',
+                                borderColor: '#10B981', // Green
+                                borderWidth: 0.8,
+                                borderDash: [5, 5],
+                                fill: false,
+                                pointRadius: 0,
+                                showLine: true,
+                                // Custom drawing for residuals
+                                segment: {
+                                    borderColor: ctx => {
+                                        const { p0, p1 } = ctx;
+                                        // Only draw if x values are the same (vertical line)
+                                        if (p0.parsed.x === p1.parsed.x) {
+                                            return '#10B981';
+                                        }
+                                        return 'transparent'; // Don't draw horizontal segments
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'OLS Regression: Observed Data, Regression Line, and Residuals',
+                                font: { size: 16, weight: 'bold' },
+                                color: '#374151'
+                            },
+                            legend: {
+                                display: true,
+                                labels: {
+                                    filter: function(legendItem, chartData) {
+                                        // Only show legend for 'Observed Data Points' and 'OLS Regression Line'
+                                        return legendItem.text === 'Observed Data Points' || legendItem.text === 'OLS Regression Line';
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        if (context.dataset.label === 'Observed Data Points') {
+                                            const x = context.parsed.x.toFixed(2);
+                                            const y = context.parsed.y.toFixed(2);
+                                            const predictedY = (b0 + b1 * context.parsed.x).toFixed(2);
+                                            const residual = (y - predictedY).toFixed(2);
+                                            return [`X: ${x}`, `Y: ${y}`, `Predicted Y: ${predictedY}`, `Residual: ${residual}`];
+                                        }
+                                        return null;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: {
+                                    display: true,
+                                    text: 'Independent Variable (X)',
+                                    color: '#4B5563',
+                                    font: { size: 14, weight: 'bold' }
+                                },
+                                ticks: {
+                                    color: '#4B5563',
+                                    font: { size: 12 }
+                                },
+                                grid: {
+                                    color: '#e5e7eb'
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Dependent Variable (Y)',
+                                    color: '#4B5563',
+                                    font: { size: 14, weight: 'bold' }
+                                },
+                                ticks: {
+                                    color: '#4B5563',
+                                    font: { size: 12 }
+                                },
+                                grid: {
+                                    color: '#e5e7eb'
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+            }
+
+            // Function to update the Python code block dynamically
+            function updateOlsPythonCodeBlock(numPoints, noiseFactor) {
+                const fullCode = `
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm # For OLS model
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# --- Data Generation (based on interactive inputs) ---
+num_points = ${numPoints}
+noise_factor = ${noiseFactor}
+
+np.random.seed(42) # For reproducibility
+
+# Generate X values
+X = np.random.uniform(low=10, high=100, size=num_points)
+
+# Generate Y values with a true linear relationship + noise
+# True relationship: Y = 5 + 1.5 * X
+true_slope = 1.5
+true_intercept = 5
+noise = np.random.normal(loc=0, scale=noise_factor * 20, size=num_points) # Scale noise based on factor
+Y = true_intercept + true_slope * X + noise
+
+data_df = pd.DataFrame({'X': X, 'Y': Y})
+
+# --- Perform OLS Regression ---
+# Add a constant (intercept) to the independent variable for statsmodels
+X_with_const = sm.add_constant(X)
+model = sm.OLS(Y, X_with_const)
+results = model.fit()
+
+# Get estimated coefficients
+b0_intercept = results.params[0]
+b1_slope = results.params[1]
+
+print(f"Estimated Intercept (b0): {b0_intercept:.4f}")
+print(f"Estimated Slope (b1): {b1_slope:.4f}")
+print(f"Regression Equation: Y_hat = {b0_intercept:.2f} + {b1_slope:.2f} * X")
+
+# Get predicted Y values
+predicted_Y = results.predict(X_with_const)
+data_df['Predicted_Y'] = predicted_Y
+data_df['Residuals'] = Y - predicted_Y
+
+# --- Visualize OLS Regression Line and Residuals ---
+plt.figure(figsize=(10, 7))
+sns.scatterplot(x='X', y='Y', data=data_df, label='Observed Data Points', color='#4338CA', s=80, alpha=0.8)
+
+# Plot the regression line
+plt.plot(data_df['X'], data_df['Predicted_Y'], color='#EF4444', linewidth=2, label=f'OLS Regression Line: Y_hat = {b0_intercept:.2f} + {b1_slope:.2f}X')
+
+# Plot residuals (vertical lines from observed to predicted)
+for i in range(num_points):
+    plt.plot([data_df['X'].iloc[i], data_df['X'].iloc[i]],
+             [data_df['Y'].iloc[i], data_df['Predicted_Y'].iloc[i]],
+             color='#10B981', linestyle='--', linewidth=0.8, alpha=0.6)
+
+plt.title('OLS Regression: Observed Data, Regression Line, and Residuals')
+plt.xlabel('Independent Variable (X)')
+plt.ylabel('Dependent Variable (Y)')
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+
+# --- Residuals Plot (for checking assumptions) ---
+plt.figure(figsize=(8, 5))
+sns.scatterplot(x=data_df['Predicted_Y'], y=data_df['Residuals'], color='#4338CA', s=80, alpha=0.8)
+plt.axhline(y=0, color='red', linestyle='--', linewidth=1)
+plt.title('Residuals vs. Predicted Values Plot')
+plt.xlabel('Predicted Values (Y_hat)')
+plt.ylabel('Residuals')
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+                `;
+                olsPythonCode.textContent = fullCode.trim();
+            }
+
+            // Initial render of MathJax for the theory section on load
+            renderMathInElement('theory-slr');
+        });
+
+        // Load MathJax for rendering LaTeX
+        const mathJaxScript = document.createElement('script');
+        mathJaxScript.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
+        mathJaxScript.async = true;
+        document.body.appendChild(mathJaxScript);
+    </script>
+</body>
+</html>

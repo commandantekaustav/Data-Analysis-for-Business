@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S63: Excel for Statistical Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="number"], textarea {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            max-width: 250px; /* Constrain width for inputs */
+            margin-bottom: 0.5rem;
+        }
+        textarea {
+            max-width: 100%;
+            min-height: 80px;
+            resize: vertical;
+        }
+        .action-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+        }
+        .action-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .code-block {
+            background-color: #2D3748; /* Dark background for code */
+            color: #E2E8F0; /* Light text */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', monospace; /* Monospace font */
+            overflow-x: auto; /* Allow horizontal scrolling for long lines */
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .code-block pre {
+            margin: 0;
+        }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #4A5568;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .copy-button:hover {
+            background-color: #6366F1;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px; /* Increased height for better visibility */
+            width: 100%;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        /* Message Box Styling */
+        #messageBox {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .input-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4B5563;
+        }
+
+        /* Excel-like Table Styling */
+        .excel-table-container {
+            overflow-x: auto;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .excel-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        .excel-table th, .excel-table td {
+            border: 1px solid #e2e8f0; /* gray-200 */
+            padding: 0.75rem 1rem;
+            text-align: left;
+            white-space: nowrap; /* Prevent text wrapping in cells */
+        }
+        .excel-table thead th {
+            background-color: #f8fafc; /* gray-50 */
+            font-weight: 600;
+            color: #475569; /* slate-600 */
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .excel-table tbody tr:nth-child(even) {
+            background-color: #f1f5f9; /* gray-100 */
+        }
+        .excel-table tbody tr:hover {
+            background-color: #e2e8f0; /* gray-200 */
+        }
+        .excel-table .row-header {
+            background-color: #f8fafc; /* gray-50 */
+            font-weight: 600;
+            color: #475569;
+            position: sticky;
+            left: 0;
+            z-index: 2; /* Keep row headers above scrolling content */
+        }
+        .excel-output-header {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem;
+            font-weight: 600;
+            border-radius: 0.5rem 0.5rem 0 0;
+            text-align: center;
+        }
+        .excel-output-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0 0 0.5rem 0.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            font-family: 'Consolas', 'Courier New', monospace; /* Monospace for output */
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre; /* Preserve whitespace and line breaks */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S63: Excel for Statistical Analysis</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#intro" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">🚀 Intro</a></li>
+                    <li><a href="#theory" class="nav-button text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💻 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="intro" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">🚀</span>Introduction: Excel as a Statistical Tool</h2>
+            <p class="section-intro">Microsoft Excel is more than just a spreadsheet program; it's a powerful and accessible tool for performing a wide range of statistical analyses. For many business professionals, it's the first (and sometimes only) tool they use to gain insights from data.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Why Excel for Statistics?</h3>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>**Accessibility:** Widely available and familiar to most business users.</li>
+                    <li>**Simplicity:** Easy to input, organize, and visualize data.</li>
+                    <li>**Built-in Functions:** Offers a rich library of functions for basic statistical calculations.</li>
+                    <li>**Data Analysis Toolpak:** Provides advanced statistical procedures with a user-friendly interface.</li>
+                </ul>
+                <p class="mt-4 text-gray-700 leading-relaxed font-bold">While not suitable for very large datasets or complex machine learning, Excel is an excellent starting point for understanding statistical concepts and performing quick analyses.</p>
+            </div>
+        </section>
+
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Excel's Statistical Capabilities</h2>
+            <p class="section-intro">Excel offers two main ways to perform statistical analysis: built-in functions and the Data Analysis Toolpak.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. Built-in Statistical Functions</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Excel has hundreds of functions, many of which are statistical. Here are some commonly used ones:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>`AVERAGE(range)`: Calculates the arithmetic mean.</li>
+                    <li>`MEDIAN(range)`: Returns the median (middle value).</li>
+                    <li>`MODE.SNGL(range)`: Returns the most frequently occurring value.</li>
+                    <li>`STDEV.S(range)`: Calculates the standard deviation based on a sample.</li>
+                    <li>`VAR.S(range)`: Calculates the variance based on a sample.</li>
+                    <li>`MAX(range)`, `MIN(range)`: Returns the largest/smallest value.</li>
+                    <li>`COUNT(range)`: Counts the number of cells that contain numbers.</li>
+                    <li>`CORREL(array1, array2)`: Returns the correlation coefficient between two data sets.</li>
+                    <li>`T.TEST(array1, array2, tails, type)`: Performs a t-test.</li>
+                    <li>`FORECAST.LINEAR(x, known_y's, known_x's)`: Predicts a future value along a linear trend.</li>
+                </ul>
+                <p class="mt-4 text-gray-700 leading-relaxed">These functions are great for quick calculations directly in your spreadsheet cells.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. The Data Analysis Toolpak</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">The Data Analysis Toolpak is an Excel add-in that provides a more comprehensive set of data analysis tools. It's often used for more complex statistical procedures that would be cumbersome with individual functions.</p>
+                
+                <h4 class="text-lg font-semibold text-gray-800 mb-2">How to Enable the Data Analysis Toolpak:</h4>
+                <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                    <li>Go to **File > Options**.</li>
+                    <li>Select **Add-ins** from the left pane.</li>
+                    <li>At the bottom, next to "Manage: Excel Add-ins", click **Go...**.</li>
+                    <li>In the "Add-ins" dialog box, check the box next to **"Analysis ToolPak"** and click **OK**.</li>
+                    <li>You should now see "Data Analysis" under the **Data** tab in the Excel ribbon.</li>
+                </ol>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-6">Key Tools in the Toolpak:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>**Descriptive Statistics:** Generates a report of central tendency, variability, and distribution for a dataset.</li>
+                    <li>**Correlation:** Calculates the correlation matrix for multiple variables.</li>
+                    <li>**Regression:** Performs linear regression analysis, providing coefficients, R-squared, ANOVA, and residual plots.</li>
+                    <li>**t-Test:** Various types of t-tests (paired, two-sample assuming equal/unequal variances).</li>
+                    <li>**ANOVA (Analysis of Variance):** For comparing means across two or more groups.</li>
+                    <li>**Sampling:** Creates a sample from a population.</li>
+                </ul>
+                <p class="mt-4 text-gray-700 leading-relaxed font-bold">The Toolpak provides structured output tables that are easy to interpret for statistical reports.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💻</span>Practical: Hands-on Excel Simulation</h2>
+            <p class="section-intro">Let's simulate how you would use Excel's features for statistical analysis. First, we'll generate some synthetic data, then walk through common analyses.</p>
+
+            <div class="interactive-panel">
+                <div class="panel-title">Simulated Excel Environment</div>
+
+                <div class="text-center mb-4">
+                    <button id="generateExcelDataBtn" class="action-button bg-indigo-600 hover:bg-indigo-700">Generate Data for Excel</button>
+                    <button id="showExcelPythonCodeBtn" class="action-button bg-green-600 hover:bg-green-700">Show Python Data Code</button>
+                </div>
+
+                <div id="excelPythonCodeSection" class="hidden mt-4">
+                    <h4 class="text-indigo-600">Python Code to Generate Data for Excel:</h4>
+                    <div class="code-block">
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="excelPythonCode">
+import numpy as np
+import pandas as pd
+
+np.random.seed(42) # For reproducibility
+
+num_obs = 100
+
+# Simulated Sales Data (in thousands $)
+advertising_spend = np.random.normal(loc=10, scale=3, size=num_obs)
+advertising_spend = np.clip(advertising_spend, 2, 20) # Clip to realistic range
+
+sales = 50 + 2.5 * advertising_spend + np.random.normal(loc=0, scale=10, size=num_obs)
+sales = np.clip(sales, 30, 150)
+
+# Simulated Customer Data for t-Test
+# Group A: Customers who received a discount
+group_a_satisfaction = np.random.normal(loc=7.5, scale=1.5, size=50)
+group_a_satisfaction = np.clip(group_a_satisfaction, 1, 10)
+
+# Group B: Customers who did not receive a discount
+group_b_satisfaction = np.random.normal(loc=6.0, scale=1.8, size=50)
+group_b_satisfaction = np.clip(group_b_satisfaction, 1, 10)
+
+# Create DataFrame for Sales & Advertising
+sales_df = pd.DataFrame({
+    'Advertising_Spend': advertising_spend,
+    'Sales': sales
+})
+
+# Create DataFrame for t-Test (can be combined or separate in Excel)
+satisfaction_df = pd.DataFrame({
+    'Group_A_Satisfaction': group_a_satisfaction,
+    'Group_B_Satisfaction': group_b_satisfaction
+})
+
+print("--- Sales & Advertising Data (for Regression/Correlation) ---")
+print(sales_df.head())
+print("\n--- Customer Satisfaction Data (for t-Test) ---")
+print(satisfaction_df.head())
+
+# To export to CSV for Excel:
+# sales_df.to_csv('sales_data.csv', index=False)
+# satisfaction_df.to_csv('satisfaction_data.csv', index=False)
+# print("\nData saved to sales_data.csv and satisfaction_data.csv")
+</code></pre>
+                    </div>
+                </div>
+
+                <div id="excelDataSection" class="hidden mt-4">
+                    <h4 class="text-indigo-600 text-center mb-4">Simulated Data for Excel:</h4>
+                    <div class="excel-table-container">
+                        <table class="excel-table">
+                            <thead>
+                                <tr>
+                                    <th>Row</th>
+                                    <th>Advertising_Spend</th>
+                                    <th>Sales</th>
+                                    <th>Group_A_Satisfaction</th>
+                                    <th>Group_B_Satisfaction</th>
+                                </tr>
+                            </thead>
+                            <tbody id="excel_data_body">
+                                </tbody>
+                        </table>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">Imagine this data is in your Excel spreadsheet, ready for analysis.</p>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. Descriptive Statistics in Excel</h3>
+                    <p class="mb-4 text-gray-700">To get summary statistics for 'Sales' in Excel:</p>
+                    <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                        <li>Go to **Data** tab > **Data Analysis**.</li>
+                        <li>Select **Descriptive Statistics** and click **OK**.</li>
+                        <li>For "Input Range", select the 'Sales' column (e.g., `B1:B101`).</li>
+                        <li>Check "Labels in first row" if your data has headers.</li>
+                        <li>Check "Summary statistics".</li>
+                        <li>Choose "Output Range" (e.g., `D1`) and click **OK**.</li>
+                    </ol>
+                    <div class="text-center mt-4">
+                        <button id="showDescriptiveStatsBtn" class="action-button">Show Simulated Output</button>
+                    </div>
+                    <div id="descriptiveStatsOutput" class="hidden mt-4">
+                        <div class="excel-output-header">Descriptive Statistics: Sales</div>
+                        <div class="excel-output-content">
+<pre>
+-------------------------------------------------------------------------
+Sales
+-------------------------------------------------------------------------
+Mean                               74.98
+Standard Error                      0.97
+Median                             75.50
+Mode                               68.20
+Standard Deviation                 9.70
+Sample Variance                    94.09
+Kurtosis                           -0.15
+Skewness                            0.02
+Range                              40.00
+Minimum                            55.00
+Maximum                            95.00
+Sum                              7498.00
+Count                              100
+-------------------------------------------------------------------------
+</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. Correlation Analysis in Excel</h3>
+                    <p class="mb-4 text-gray-700">To find the correlation between 'Sales' and 'Advertising_Spend':</p>
+                    <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                        <li>Go to **Data** tab > **Data Analysis**.</li>
+                        <li>Select **Correlation** and click **OK**.</li>
+                        <li>For "Input Range", select both 'Advertising_Spend' and 'Sales' columns (e.g., `A1:B101`).</li>
+                        <li>Check "Labels in first row".</li>
+                        <li>Choose "Output Range" (e.g., `F1`) and click **OK**.</li>
+                    </ol>
+                    <div class="text-center mt-4">
+                        <button id="showCorrelationBtn" class="action-button">Show Simulated Output</button>
+                    </div>
+                    <div id="correlationOutput" class="hidden mt-4">
+                        <div class="excel-output-header">Correlation Matrix</div>
+                        <div class="excel-output-content">
+<pre>
+-------------------------------------------------------------------------
+                Advertising_Spend   Sales
+-------------------------------------------------------------------------
+Advertising_Spend             1.000
+Sales                         0.850           1.000
+-------------------------------------------------------------------------
+</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. t-Test in Excel (Two-Sample Assuming Unequal Variances)</h3>
+                    <p class="mb-4 text-gray-700">To compare average satisfaction between 'Group A' and 'Group B':</p>
+                    <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                        <li>Go to **Data** tab > **Data Analysis**.</li>
+                        <li>Select **t-Test: Two-Sample Assuming Unequal Variances** and click **OK**.</li>
+                        <li>For "Variable 1 Range", select 'Group_A_Satisfaction' column (e.g., `C1:C51`).</li>
+                        <li>For "Variable 2 Range", select 'Group_B_Satisfaction' column (e.g., `D1:D51`).</li>
+                        <li>Set "Hypothesized Mean Difference" to `0`.</li>
+                        <li>Check "Labels".</li>
+                        <li>Set "Alpha" to `0.05`.</li>
+                        <li>Choose "Output Range" (e.g., `H1`) and click **OK**.</li>
+                    </ol>
+                    <div class="text-center mt-4">
+                        <button id="showTTestBtn" class="action-button">Show Simulated Output</button>
+                    </div>
+                    <div id="tTestOutput" class="hidden mt-4">
+                        <div class="excel-output-header">t-Test: Two-Sample Assuming Unequal Variances</div>
+                        <div class="excel-output-content">
+<pre>
+-------------------------------------------------------------------------
+                    Group_A_Satisfaction   Group_B_Satisfaction
+-------------------------------------------------------------------------
+Mean                               7.500                6.000
+Variance                           2.250                3.240
+Observations                      50                   50
+Hypothesized Mean Difference       0
+df                                98
+t Stat                             4.500
+P(T<=t) one-tail                   0.00001
+t Critical one-tail                1.660
+P(T<=t) two-tail                   0.00002
+t Critical two-tail                1.984
+-------------------------------------------------------------------------
+</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-xl font-semibold text-indigo-500 mb-3">4. Regression Analysis in Excel</h3>
+                    <p class="mb-4 text-gray-700">To perform a Simple Linear Regression of 'Sales' (Y) on 'Advertising_Spend' (X):</p>
+                    <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                        <li>Go to **Data** tab > **Data Analysis**.</li>
+                        <li>Select **Regression** and click **OK**.</li>
+                        <li>For "Input Y Range", select the 'Sales' column (e.g., `B1:B101`).</li>
+                        <li>For "Input X Range", select the 'Advertising_Spend' column (e.g., `A1:A101`).</li>
+                        <li>Check "Labels".</li>
+                        <li>Check "Confidence Level" and ensure it's `95%`.</li>
+                        <li>Check "Residuals" and "Standardized Residuals" for more output.</li>
+                        <li>Choose "Output Range" (e.g., `J1`) and click **OK**.</li>
+                    </ol>
+                    <div class="text-center mt-4">
+                        <button id="showRegressionBtn" class="action-button">Show Simulated Output</button>
+                    </div>
+                    <div id="regressionOutput" class="hidden mt-4">
+                        <div class="excel-output-header">Regression Analysis: Sales vs. Advertising Spend</div>
+                        <div class="excel-output-content">
+<pre>
+-------------------------------------------------------------------------
+SUMMARY OUTPUT
+-------------------------------------------------------------------------
+Regression Statistics
+Multiple R                       0.850
+R Square                         0.723
+Adjusted R Square                0.720
+Standard Error                   5.180
+Observations                   100
+
+ANOVA
+  df        SS        MS         F    Significance F
+Regression   1    13500.00   13500.00   503.00   1.00E-45
+Residual    98     5250.00      53.57
+Total       99    18750.00
+
+Coefficients
+              Coefficients   Standard Error   t Stat   P-value   Lower 95%   Upper 95%
+Intercept          49.50          2.00        24.75   1.00E-40     45.54       53.46
+Advertising_Spend   2.55          0.11        23.00   1.00E-40      2.33        2.77
+
+-------------------------------------------------------------------------
+</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <div id="messageBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg z-50" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span id="messageText" class="block sm:inline"></span>
+        <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" onclick="document.getElementById('messageBox').classList.add('hidden');">
+            <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+        </span>
+    </div>
+
+    <script>
+        // Global variables for simulated data
+        let salesData = [];
+        let advertisingSpendData = [];
+        let groupASatisfactionData = [];
+        let groupBSatisfactionData = [];
+
+        // --- Message Box Function ---
+        function showMessage(message, type = 'error') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            messageText.innerText = message;
+            messageBox.classList.remove('hidden');
+            if (type === 'error') {
+                messageBox.classList.remove('bg-green-100', 'border-green-400', 'text-green-700');
+                messageBox.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+            } else {
+                messageBox.classList.remove('bg-red-100', 'border-red-400', 'text-red-700'); // Remove red if previously error
+                messageBox.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+            }
+        }
+
+        // --- Code Copy Function ---
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const textToCopy = codeBlock.textContent;
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                button.textContent = 'Copied!';
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                button.textContent = 'Error!';
+            }
+            document.body.removeChild(textarea);
+
+            setTimeout(() => {
+                button.textContent = 'Copy';
+            }, 2000);
+        }
+
+        // --- MathJax Rendering Function ---
+        function renderMathInElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element && typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                // Ensure MathJax is ready and then typeset
+                MathJax.startup.promise.then(() => {
+                    MathJax.typesetPromise([element]).catch(err => console.error("MathJax rendering error for element:", elementId, err));
+                });
+            } else if (!element) {
+                console.warn(`Element with ID '${elementId}' not found for MathJax rendering.`);
+            } else {
+                console.warn("MathJax not fully loaded or configured. Skipping MathJax rendering for:", elementId);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation button active state logic
+            document.querySelectorAll('nav a').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // --- Data Generation & Display ---
+            const generateExcelDataBtn = document.getElementById('generateExcelDataBtn');
+            const showExcelPythonCodeBtn = document.getElementById('showExcelPythonCodeBtn');
+            const excelPythonCodeSection = document.getElementById('excelPythonCodeSection');
+            const excelDataSection = document.getElementById('excelDataSection');
+            const excelDataBody = document.getElementById('excel_data_body');
+
+            showExcelPythonCodeBtn.addEventListener('click', function() {
+                excelPythonCodeSection.classList.toggle('hidden');
+            });
+
+            generateExcelDataBtn.addEventListener('click', function() {
+                generateSyntheticData();
+                displayExcelData();
+                excelDataSection.classList.remove('hidden');
+            });
+
+            function generateSyntheticData() {
+                const numObs = 100;
+                Math.seedrandom('42'); // Fixed seed for consistent demo data
+
+                advertisingSpendData = [];
+                salesData = [];
+                groupASatisfactionData = [];
+                groupBSatisfactionData = [];
+
+                for (let i = 0; i < numObs; i++) {
+                    const adv = Math.random() * (20 - 2) + 2; // 2 to 20
+                    advertisingSpendData.push(adv);
+                    salesData.push(50 + 2.5 * adv + (Math.random() - 0.5) * 2 * 10); // Noise factor 10
+                }
+
+                for (let i = 0; i < 50; i++) {
+                    groupASatisfactionData.push(7.5 + (Math.random() - 0.5) * 2 * 1.5); // Mean 7.5, Std 1.5
+                    groupBSatisfactionData.push(6.0 + (Math.random() - 0.5) * 2 * 1.8); // Mean 6.0, Std 1.8
+                }
+
+                // Clip data to realistic ranges
+                salesData = salesData.map(val => Math.max(30, Math.min(150, val)));
+                advertisingSpendData = advertisingSpendData.map(val => Math.max(2, Math.min(20, val)));
+                groupASatisfactionData = groupASatisfactionData.map(val => Math.max(1, Math.min(10, val)));
+                groupBSatisfactionData = groupBSatisfactionData.map(val => Math.max(1, Math.min(10, val)));
+
+                console.log("Synthetic data generated for Excel simulation.");
+            }
+
+            function displayExcelData() {
+                excelDataBody.innerHTML = ''; // Clear previous data
+                const maxRows = Math.max(salesData.length, groupASatisfactionData.length);
+
+                for (let i = 0; i < maxRows; i++) {
+                    const row = document.createElement('tr');
+                    const rowNumCell = document.createElement('td');
+                    rowNumCell.classList.add('row-header');
+                    rowNumCell.textContent = i + 1;
+                    row.appendChild(rowNumCell);
+
+                    const advCell = document.createElement('td');
+                    advCell.textContent = advertisingSpendData[i] !== undefined ? advertisingSpendData[i].toFixed(2) : '';
+                    row.appendChild(advCell);
+
+                    const salesCell = document.createElement('td');
+                    salesCell.textContent = salesData[i] !== undefined ? salesData[i].toFixed(2) : '';
+                    row.appendChild(salesCell);
+
+                    const groupACell = document.createElement('td');
+                    groupACell.textContent = groupASatisfactionData[i] !== undefined ? groupASatisfactionData[i].toFixed(2) : '';
+                    row.appendChild(groupACell);
+
+                    const groupBCell = document.createElement('td');
+                    groupBCell.textContent = groupBSatisfactionData[i] !== undefined ? groupBSatisfactionData[i].toFixed(2) : '';
+                    row.appendChild(groupBCell);
+
+                    excelDataBody.appendChild(row);
+                }
+            }
+
+
+            // --- Simulated Output Buttons ---
+            const showDescriptiveStatsBtn = document.getElementById('showDescriptiveStatsBtn');
+            const descriptiveStatsOutput = document.getElementById('descriptiveStatsOutput');
+            showDescriptiveStatsBtn.addEventListener('click', function() {
+                descriptiveStatsOutput.classList.toggle('hidden');
+            });
+
+            const showCorrelationBtn = document.getElementById('showCorrelationBtn');
+            const correlationOutput = document.getElementById('correlationOutput');
+            showCorrelationBtn.addEventListener('click', function() {
+                correlationOutput.classList.toggle('hidden');
+            });
+
+            const showTTestBtn = document.getElementById('showTTestBtn');
+            const tTestOutput = document.getElementById('tTestOutput');
+            showTTestBtn.addEventListener('click', function() {
+                tTestOutput.classList.toggle('hidden');
+            });
+
+            const showRegressionBtn = document.getElementById('showRegressionBtn');
+            const regressionOutput = document.getElementById('regressionOutput');
+            showRegressionBtn.addEventListener('click', function() {
+                regressionOutput.classList.toggle('hidden');
+            });
+
+            // Initial render of MathJax for the theory section on load
+            renderMathInElement('theory');
+        });
+
+        // Load MathJax for rendering LaTeX
+        const mathJaxScript = document.createElement('script');
+        mathJaxScript.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
+        mathJaxScript.async = true;
+        document.body.appendChild(mathJaxScript);
+
+        // Simple Math.seedrandom for client-side data generation consistency
+        (function(global) {
+            let seed = 0;
+            global.Math.seedrandom = function(s) {
+                let hash = 0;
+                for (let i = 0; i < s.length; i++) {
+                    const char = s.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash |= 0;
+                }
+                seed = Math.abs(hash) % 2147483647;
+            };
+            global.Math.random = function() {
+                seed = (seed * 9301 + 49297) % 233280;
+                return seed / 233280;
+            };
+        })(this);
+    </script>
+</body>
+</html>

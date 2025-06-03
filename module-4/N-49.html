@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S49: Measures of Central Tendency</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            font-family: monospace;
+            resize: vertical;
+        }
+        .calculate-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .calculate-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .interpretation-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .chart-illustrative {
+            position: relative;
+            height: 250px;
+            width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .example-buttons button {
+            background-color: #6366F1;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.4rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 0.4rem;
+        }
+        .example-buttons button:hover {
+            background-color: #4338CA;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S49: Measures of Central Tendency</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Measures of Central Tendency</h2>
+            <p class="section-intro">Measures of central tendency are single values that attempt to describe a set of data by identifying the central position within that set of data. They are often called averages. These measures are fundamental in statistics and data analysis, providing a quick summary of the typical value in a dataset, helping us understand where most of the data points cluster.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. Mean (Arithmetic Mean)</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">The mean is the most commonly used measure of central tendency. It is calculated by summing all the values in a dataset and then dividing by the number of values. It represents the "balancing point" of the data.</p>
+                <p class="mb-2 text-gray-700"><strong>Calculation:</strong> Sum of all values / Number of values</p>
+                <p class="mb-4 text-gray-700"><strong>Formula:</strong> $\bar{x} = \frac{\sum x_i}{n}$</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>When to Use:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>When the data is symmetrically distributed without significant outliers.</li>
+                            <li>For interval or ratio scale data.</li>
+                            <li>When you need to perform further statistical calculations (e.g., variance, standard deviation).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Sensitivity to Outliers:</strong> Highly sensitive to outliers. A single extremely large or small value can significantly skew the mean, making it a less representative measure of the "typical" value. This is a crucial characteristic to remember.</li>
+                    <li><em>Example:</em> Imagine a small class's test scores: 70, 75, 80, 85, 90. The mean is 80. If one student scored 10, the mean would drop significantly, becoming less representative of the majority.</li>
+                </ul>
+                <div class="chart-illustrative">
+                    <canvas id="meanChart"></canvas>
+                </div>
+                <p class="chart-description text-center text-sm text-gray-600"><em>Illustration of Mean's sensitivity to an outlier. The red line indicates the mean.</em></p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. Median</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">The median is the middle value in a dataset that has been ordered from least to greatest. It divides the data into two equal halves, meaning 50% of the data points are below it and 50% are above it.</p>
+                <p class="mb-4 text-gray-700"><strong>Calculation:</strong></p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Odd Number of Values:</strong> The median is the single middle value.</li>
+                    <li><strong>Even Number of Values:</strong> The median is the average of the two middle values.</li>
+                </ul>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>When to Use:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>When the data is skewed or contains outliers, as it is robust to extreme values.</li>
+                            <li>For ordinal, interval, or ratio scale data.</li>
+                            <li>When you want to represent the "typical" value without being unduly influenced by extreme values, such as in income or property value distributions.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Sensitivity to Outliers:</strong> Not sensitive to outliers. It is a more robust measure of central tendency in the presence of extreme values, making it ideal for skewed distributions.</li>
+                    <li><em>Example:</em> House prices in a neighborhood: $200k, $250k, $300k, $350k, $5M. The mean would be heavily influenced by the $5M mansion. The median ($300k) would better represent the typical home value.</li>
+                </ul>
+                <div class="chart-illustrative">
+                    <canvas id="medianChart"></canvas>
+                </div>
+                <p class="chart-description text-center text-sm text-gray-600"><em>Illustration of Median's robustness to an outlier. The green line indicates the median.</em></p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. Mode</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">The mode is the value that appears most frequently in a dataset. It's the only measure of central tendency that can be used with nominal (categorical) data.</p>
+                <p class="mb-4 text-gray-700"><strong>Calculation:</strong> Count the frequency of each value and identify the one(s) with the highest frequency.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>When to Use:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>For nominal data (categorical data where order doesn't matter, e.g., favorite color, brand preference).</li>
+                            <li>When you want to find the most common category or value in any type of dataset.</li>
+                            <li>Can be used for all types of data (nominal, ordinal, interval, ratio).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Sensitivity to Outliers:</strong> Not sensitive to outliers. Outliers are typically unique values and thus do not affect the mode's position.</li>
+                    <li><strong>Types of Mode:</strong>
+                        <ul class="list-square pl-5 mt-1">
+                            <li><strong>Unimodal:</strong> A dataset with one mode.</li>
+                            <li><strong>Bimodal:</strong> A dataset with two modes (two values appear with the same highest frequency).</li>
+                            <li><strong>Multimodal:</strong> A dataset with more than two modes.</li>
+                            <li><strong>No Mode:</strong> A dataset where all values appear with the same frequency (e.g., each value appears once).</li>
+                        </ul>
+                    </li>
+                    <li><em>Example:</em> In a survey of favorite fruits: Apple, Banana, Orange, Apple, Grape, Banana, Apple. The mode is "Apple" as it appears most frequently.</li>
+                </ul>
+                <div class="chart-illustrative">
+                    <canvas id="modeChart"></canvas>
+                </div>
+                <p class="chart-description text-center text-sm text-gray-600"><em>Illustration of Mode: The most frequent value(s) in a dataset.</em></p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Calculate & Interpret Central Tendency</h2>
+            <p class="section-intro">In this hands-on activity, you will input a dataset (numbers separated by commas) and calculate its mean, median, and mode. Observe how these values change with different inputs, especially when outliers are present. The chart will visually represent your data and the calculated measures.</p>
+
+            <div class="interactive-panel">
+                <div class="panel-title">Data Input & Calculation</div>
+                <label for="dataInput" class="block text-gray-700 font-semibold mb-2">Enter your data (numbers separated by commas):</label>
+                <textarea id="dataInput" placeholder="e.g., 10, 12, 15, 12, 18, 20, 12, 100"></textarea>
+                <div class="flex flex-wrap justify-center gap-2 mt-4 example-buttons">
+                    <button data-example="symmetrical">Symmetrical Data</button>
+                    <button data-example="right-skewed">Right-Skewed (Outlier)</button>
+                    <button data-example="bimodal">Bimodal Data</button>
+                    <button data-example="no-mode">No Clear Mode</button>
+                </div>
+                <button id="calculateBtn" class="calculate-button">Calculate Measures</button>
+
+                <div id="resultsOutput" class="results-box hidden">
+                    <div class="chart-illustrative">
+                        <canvas id="dynamicDataChart"></canvas>
+                    </div>
+                    <h4>Calculated Measures:</h4>
+                    <div class="result-item">
+                        <span class="result-label">Mean:</span>
+                        <span id="meanResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Median:</span>
+                        <span id="medianResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Mode(s):</span>
+                        <span id="modeResult" class="result-value"></span>
+                    </div>
+                    <div id="interpretationBox" class="interpretation-box mt-4">
+                        <h5 class="font-semibold text-base mb-1">Interpretation:</h5>
+                        <p id="interpretationText" class="text-sm"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mt-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Discussion Points:</h3>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>How does the visual representation of the data (the histogram) help you understand the distribution and the position of the mean, median, and mode?</li>
+                    <li>When you load the "Right-Skewed (Outlier)" example, observe how the mean is pulled towards the outlier, while the median remains more central. Why is this important for real-world data like income?</li>
+                    <li>For the "Bimodal Data" example, notice how the mode effectively captures the two peaks in the distribution, which the mean or median might not fully represent.</li>
+                    <li>In what business scenarios would understanding the mode be more critical than the mean or median (e.g., product sizing, customer preferences)?</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">This exercise helps solidify your understanding of how each measure of central tendency behaves and when to apply them appropriately in real-world data analysis scenarios, emphasizing the importance of visualizing data alongside numerical summaries.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        // Global variable to hold dynamic chart instance
+        let dynamicChartInstance = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation button active state logic
+            document.querySelectorAll('nav a').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            const dataInput = document.getElementById('dataInput');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultsOutput = document.getElementById('resultsOutput');
+            const meanResult = document.getElementById('meanResult');
+            const medianResult = document.getElementById('medianResult');
+            const modeResult = document.getElementById('modeResult');
+            const interpretationText = document.getElementById('interpretationText');
+            const dynamicDataChartCanvas = document.getElementById('dynamicDataChart');
+
+            // Pre-defined example datasets
+            const exampleData = {
+                'symmetrical': '5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15',
+                'right-skewed': '10, 12, 15, 12, 18, 20, 12, 100, 25, 30',
+                'bimodal': '1, 1, 2, 3, 3, 4, 5, 5, 6, 7, 7',
+                'no-mode': '1, 2, 3, 4, 5, 6, 7, 8, 9, 10'
+            };
+
+            // Event listeners for example buttons
+            document.querySelectorAll('.example-buttons button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const type = this.dataset.example;
+                    dataInput.value = exampleData[type];
+                    calculateMeasures(); // Recalculate and update chart
+                });
+            });
+
+            // Set a default example data and calculate on load
+            dataInput.value = exampleData['right-skewed'];
+            calculateBtn.addEventListener('click', calculateMeasures);
+            calculateMeasures(); // Initial calculation on page load
+
+            // --- Chart.js for Theory Section Illustrations ---
+
+            // Mean Chart
+            const meanCtx = document.getElementById('meanChart').getContext('2d');
+            new Chart(meanCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Value 1', 'Value 2', 'Value 3', 'Value 4', 'Outlier'],
+                    datasets: [{
+                        label: 'Data Points',
+                        data: [10, 20, 30, 40, 150],
+                        backgroundColor: ['#6366F1', '#6366F1', '#6366F1', '#6366F1', '#EF4444'], // Outlier red
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Mean: Sensitive to Outliers (Data: 10,20,30,40,150)', font: { size: 14 } },
+                        tooltip: { enabled: false }
+                    },
+                    scales: {
+                        x: { display: false }, // Hide x-axis labels for simplicity
+                        y: { beginAtZero: true, title: { display: true, text: 'Value' } }
+                    },
+                    // Custom drawing to add mean line
+                    animation: {
+                        onComplete: function() {
+                            const chart = this;
+                            const ctx = chart.ctx;
+                            const meta = chart.getDatasetMeta(0);
+                            if (meta.data.length > 0) {
+                                const meanValue = (10 + 20 + 30 + 40 + 150) / 5; // Calculate mean for this static data
+                                const yScale = chart.scales.y;
+                                const meanY = yScale.getPixelForValue(meanValue);
+
+                                ctx.save();
+                                ctx.beginPath();
+                                ctx.strokeStyle = '#4338CA'; // Blue for mean line
+                                ctx.lineWidth = 2;
+                                ctx.setLineDash([5, 5]); // Dashed line
+                                ctx.moveTo(chart.chartArea.left, meanY);
+                                ctx.lineTo(chart.chartArea.right, meanY);
+                                ctx.stroke();
+                                ctx.restore();
+
+                                // Add text label for mean
+                                ctx.save();
+                                ctx.fillStyle = '#4338CA';
+                                ctx.font = 'bold 12px Inter';
+                                ctx.textAlign = 'right';
+                                ctx.fillText(`Mean: ${meanValue.toFixed(1)}`, chart.chartArea.right - 5, meanY - 5);
+                                ctx.restore();
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Median Chart
+            const medianCtx = document.getElementById('medianChart').getContext('2d');
+            new Chart(medianCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Val 1', 'Val 2', 'Val 3', 'Val 4', 'Val 5', 'Outlier'],
+                    datasets: [{
+                        label: 'Data Points',
+                        data: [10, 20, 30, 40, 50, 200], // Example with outlier
+                        backgroundColor: ['#34D399', '#34D399', '#34D399', '#34D399', '#34D399', '#EF4444'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Median: Robust to Outliers (Data: 10,20,30,40,50,200)', font: { size: 14 } },
+                        tooltip: { enabled: false }
+                    },
+                    scales: {
+                        x: { display: false },
+                        y: { beginAtZero: true, title: { display: true, text: 'Value' } }
+                    },
+                    // Custom drawing for median line
+                    animation: {
+                        onComplete: function() {
+                            const chart = this;
+                            const ctx = chart.ctx;
+                            const meta = chart.getDatasetMeta(0);
+                            if (meta.data.length > 0) {
+                                const sortedData = [10, 20, 30, 40, 50, 200].sort((a,b)=>a-b);
+                                const mid = Math.floor(sortedData.length / 2);
+                                const medianValue = (sortedData[mid - 1] + sortedData[mid]) / 2; // Median for even number
+                                const yScale = chart.scales.y;
+                                const medianY = yScale.getPixelForValue(medianValue);
+
+                                ctx.save();
+                                ctx.beginPath();
+                                ctx.strokeStyle = '#065F46'; // Green for median line
+                                ctx.lineWidth = 2;
+                                ctx.setLineDash([5, 5]);
+                                ctx.moveTo(chart.chartArea.left, medianY);
+                                ctx.lineTo(chart.chartArea.right, medianY);
+                                ctx.stroke();
+                                ctx.restore();
+
+                                // Add text label for median
+                                ctx.save();
+                                ctx.fillStyle = '#065F46';
+                                ctx.font = 'bold 12px Inter';
+                                ctx.textAlign = 'right';
+                                ctx.fillText(`Median: ${medianValue.toFixed(1)}`, chart.chartArea.right - 5, medianY - 5);
+                                ctx.restore();
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Mode Chart
+            const modeCtx = document.getElementById('modeChart').getContext('2d');
+            new Chart(modeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Red', 'Blue', 'Green', 'Yellow'],
+                    datasets: [{
+                        label: 'Frequency',
+                        data: [5, 8, 3, 5], // Blue is mode (8), Red/Yellow are also frequent (5)
+                        backgroundColor: ['#EF4444', '#3B82F6', '#22C55E', '#FBBF24'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Mode: Most Frequent Value (Favorite Colors)', font: { size: 14 } },
+                        tooltip: { enabled: false }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'Color' } },
+                        y: { beginAtZero: true, title: { display: true, text: 'Count' }, ticks: { precision: 0 } }
+                    }
+                }
+            });
+
+            // --- Dynamic Chart for Practical Section ---
+
+            function calculateMeasures() {
+                const rawData = dataInput.value;
+                const numbers = rawData.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+
+                if (numbers.length === 0) {
+                    alert("Please enter valid numbers separated by commas.");
+                    resultsOutput.classList.add('hidden');
+                    return;
+                }
+
+                // Sort the numbers for median calculation
+                numbers.sort((a, b) => a - b);
+
+                // Calculate Mean
+                const mean = numbers.reduce((sum, val) => sum + val, 0) / numbers.length;
+                meanResult.innerText = mean.toFixed(2);
+
+                // Calculate Median
+                let median;
+                const mid = Math.floor(numbers.length / 2);
+                if (numbers.length % 2 === 0) {
+                    median = (numbers[mid - 1] + numbers[mid]) / 2;
+                } else {
+                    median = numbers[mid];
+                }
+                medianResult.innerText = median.toFixed(2);
+
+                // Calculate Mode
+                const frequencyMap = {};
+                numbers.forEach(num => {
+                    frequencyMap[num] = (frequencyMap[num] || 0) + 1;
+                });
+
+                let maxFrequency = 0;
+                for (const num in frequencyMap) {
+                    if (frequencyMap[num] > maxFrequency) {
+                        maxFrequency = frequencyMap[num];
+                    }
+                }
+
+                const modes = [];
+                // A dataset has no mode if all values appear with the same frequency (e.g., all unique)
+                // Or if all values have frequency 1 (no repeats)
+                const allUnique = Object.values(frequencyMap).every(freq => freq === 1);
+                if (maxFrequency > 1 || (maxFrequency === 1 && !allUnique)) { // If there's a repeat, or if there are multiple values with same highest frequency > 1
+                    for (const num in frequencyMap) {
+                        if (frequencyMap[num] === maxFrequency) {
+                            modes.push(parseFloat(num));
+                        }
+                    }
+                }
+                
+                if (modes.length === 0 || allUnique) {
+                    modeResult.innerText = "No clear mode (all values unique or same frequency)";
+                } else {
+                    modeResult.innerText = modes.sort((a, b) => a - b).join(', ');
+                }
+
+                // Provide interpretation
+                let interpretation = "";
+                const meanMedianDiff = Math.abs(mean - median);
+                const percentageDiff = (meanMedianDiff / mean) * 100;
+
+                if (percentageDiff > 5) { // If mean and median differ by more than 5% (a common heuristic for skewness)
+                    if (mean > median) {
+                        interpretation = `The mean (${mean.toFixed(2)}) is greater than the median (${median.toFixed(2)}). This suggests the data is likely **right-skewed** (or positively skewed), meaning there are some higher values (outliers) pulling the mean towards the right (higher end). The median is a more robust measure for such distributions.`;
+                    } else {
+                        interpretation = `The mean (${mean.toFixed(2)}) is less than the median (${median.toFixed(2)}). This suggests the data is likely **left-skewed** (or negatively skewed), meaning there are some lower values (outliers) pulling the mean towards the left (lower end). The median is a more robust measure for such distributions.`;
+                    }
+                } else {
+                    interpretation = `The mean (${mean.toFixed(2)}) and median (${median.toFixed(2)}) are relatively close. This indicates a more **symmetrical distribution** of your data, or that outliers are not significantly skewing the average.`;
+                }
+
+                if (modes.length > 0 && modes.length < numbers.length) {
+                    interpretation += ` The mode(s) (${modeResult.innerText}) represent the most frequently occurring value(s) in your dataset.`;
+                } else if (modes.length === 0 || allUnique) {
+                    interpretation += ` There is no clear mode as all values are unique or have the same frequency.`;
+                }
+                interpretationText.innerText = interpretation;
+
+                resultsOutput.classList.remove('hidden');
+
+                // Render dynamic chart
+                renderDynamicChart(numbers, mean, median, modes);
+            }
+
+            function renderDynamicChart(numbers, mean, median, modes) {
+                if (dynamicChartInstance) {
+                    dynamicChartInstance.destroy(); // Destroy previous chart instance
+                }
+
+                // Create bins for histogram (simple approach)
+                const minVal = Math.min(...numbers);
+                const maxVal = Math.max(...numbers);
+                const binCount = Math.min(10, Math.max(5, Math.ceil(Math.sqrt(numbers.length)))); // Simple rule for bin count
+                const binWidth = (maxVal - minVal) / binCount;
+
+                const bins = Array(binCount).fill(0);
+                const binLabels = [];
+
+                for (let i = 0; i < binCount; i++) {
+                    const lowerBound = minVal + i * binWidth;
+                    const upperBound = minVal + (i + 1) * binWidth;
+                    binLabels.push(`${lowerBound.toFixed(1)}-${upperBound.toFixed(1)}`);
+                    numbers.forEach(num => {
+                        if (num >= lowerBound && (i === binCount - 1 ? num <= upperBound : num < upperBound)) {
+                            bins[i]++;
+                        }
+                    });
+                }
+
+                // Create datasets for histogram and for mean/median/mode lines
+                const datasets = [{
+                    label: 'Frequency',
+                    data: bins,
+                    backgroundColor: 'rgba(67, 56, 202, 0.6)', // Indigo
+                    borderColor: 'rgba(67, 56, 202, 1)',
+                    borderWidth: 1,
+                    type: 'bar', // This is the main histogram
+                    order: 1 // Draw bars first
+                }];
+
+                // Add mean, median, mode as vertical lines/markers
+                // This is a simplified approach without chartjs-plugin-annotation
+                // We'll use custom drawing in the afterDraw callback
+
+                dynamicChartInstance = new Chart(dynamicDataChartCanvas.getContext('2d'), {
+                    data: {
+                        labels: binLabels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: 'Distribution of Your Data with Measures of Central Tendency',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(context) {
+                                        return `Range: ${context[0].label}`;
+                                    },
+                                    label: function(context) {
+                                        return `Count: ${context.raw}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Value Range' },
+                                ticks: { autoSkip: false, maxRotation: 45, minRotation: 45 }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Frequency' },
+                                ticks: { precision: 0 }
+                            }
+                        },
+                        animation: {
+                            onComplete: function() {
+                                const chart = this;
+                                const ctx = chart.ctx;
+                                const xAxis = chart.scales.x;
+                                const yAxis = chart.scales.y;
+
+                                // Helper to draw vertical line and label
+                                const drawLineAndLabel = (value, label, color) => {
+                                    // Find the x-pixel position for the value. This is tricky for bar charts.
+                                    // A simpler approach is to use the chart's overall width and map the value proportionally.
+                                    const chartWidth = chart.chartArea.right - chart.chartArea.left;
+                                    const dataRange = maxVal - minVal;
+                                    const xPos = chart.chartArea.left + chartWidth * ((value - minVal) / dataRange);
+
+                                    ctx.save();
+                                    ctx.beginPath();
+                                    ctx.strokeStyle = color;
+                                    ctx.lineWidth = 2;
+                                    ctx.setLineDash([5, 5]);
+                                    ctx.moveTo(xPos, chart.chartArea.top);
+                                    ctx.lineTo(xPos, chart.chartArea.bottom);
+                                    ctx.stroke();
+
+                                    ctx.fillStyle = color;
+                                    ctx.font = 'bold 12px Inter';
+                                    ctx.textAlign = 'center';
+                                    ctx.fillText(`${label}: ${value.toFixed(2)}`, xPos, chart.chartArea.top - 10);
+                                    ctx.restore();
+                                };
+
+                                drawLineAndLabel(mean, 'Mean', '#4338CA'); // Mean: Indigo
+                                drawLineAndLabel(median, 'Median', '#065F46'); // Median: Dark Green
+
+                                // Draw modes (if any)
+                                modes.forEach(modeVal => {
+                                    drawLineAndLabel(modeVal, 'Mode', '#FBBF24'); // Mode: Amber
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

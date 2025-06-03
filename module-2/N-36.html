@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S36: Python (Pandas) - Merging, Grouping & Comprehensive Prep Exercise</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices:
+        - Merging/Joining DataFrames: Report Info: Concepts, types of joins. Goal: Inform. Viz/Method: Detailed text explanation for each join type (inner, outer, left, right) with conceptual code examples and illustrative output. Justification: Explains how to combine data from multiple sources.
+        - Grouping Data (.groupby()): Report Info: Concepts, aggregation. Goal: Inform. Viz/Method: Detailed text explanation with conceptual code examples for grouping and aggregation. Justification: Explains how to summarize data by categories.
+        - Comprehensive Data Prep Task: Report Info: Load, clean, transform, aggregate, save. Goal: Apply, synthesize. Viz/Method: Detailed Python code snippets for each step of a multi-stage data preparation task, with extensive comments and explanations. Justification: Provides a capstone exercise for Module II skills.
+        CONFIRMATION: No charts used (Chart.js/Plotly.js not needed as report is conceptual/textual).
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); /* Adjust based on header/footer height */ }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S36: Python (Pandas) - Merging, Grouping & Comprehensive Prep Exercise</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory: Advanced Ops</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical: Comprehensive Prep</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Advanced DataFrame Operations - Merging & Grouping</h2>
+            <p class="section-intro">Beyond basic selection and filtering, two of the most powerful and frequently used operations in Pandas for data preparation are merging (or joining) DataFrames and grouping data for aggregation. These techniques are essential for combining disparate datasets and summarizing information effectively.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Merging/Joining DataFrames: Combining Data from Multiple Sources</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">In real-world scenarios, relevant data is often spread across multiple tables or files. Merging (or joining) DataFrames allows you to combine these datasets based on common columns, similar to how JOIN operations work in SQL databases. Pandas' `pd.merge()` function is highly versatile for this.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Conceptual DataFrames for Merging:</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h5 class="font-semibold text-amber-600 mb-2">DataFrame 1: `df_orders` (Order Details)</h5>
+                        <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-xs font-mono text-gray-800 mb-2">
+                            <pre><code>
+OrderID  CustomerID  OrderAmount
+0      101         C01        150.0
+1      102         C02         75.5
+2      103         C01         25.0
+3      104         C03        300.0
+4      105         C04        120.0
+                            </code></pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="font-semibold text-amber-600 mb-2">DataFrame 2: `df_customers` (Customer Details)</h5>
+                        <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-xs font-mono text-gray-800 mb-2">
+                            <pre><code>
+CustomerID  CustomerName      City
+0         C01   Alice Smith  New York
+1         C02   Bob Johnson  Los Angeles
+2         C03  Charlie Brown   Chicago
+3         C05   Eve Davis   Houston
+                            </code></pre>
+                        </div>
+                    </div>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">We want to combine these two DataFrames using `CustomerID` as the common key.</p>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Types of Joins (Merge Operations):</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">The `how` parameter in `pd.merge()` specifies the type of join, determining which rows are kept from each DataFrame.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Inner Join (`how='inner'`, default):</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> Returns only the rows where the key column(s) have matching values in *both* DataFrames. It's like finding the intersection.</li>
+                            <li><em>Conceptual Code:</em> `pd.merge(df_orders, df_customers, on='CustomerID', how='inner')`</li>
+                            <li><em>Conceptual Output:</em> (Only C01, C02, C03 will appear, C04 from orders and C05 from customers will be dropped as they don't have matches in both)
+                                <pre class="bg-gray-100 p-3 rounded-md overflow-x-auto text-xs font-mono text-gray-800 mt-2"><code>
+OrderID  CustomerID  OrderAmount CustomerName      City
+0      101         C01        150.0  Alice Smith  New York
+1      103         C01         25.0  Alice Smith  New York
+2      102         C02         75.5  Bob Johnson  Los Angeles
+3      104         C03        300.0 Charlie Brown   Chicago
+                                </code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Outer Join (`how='outer'`):</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> Returns all rows from *both* DataFrames. Where there is no match, it fills with `NaN` (Not a Number). It's like finding the union.</li>
+                            <li><em>Conceptual Code:</em> `pd.merge(df_orders, df_customers, on='CustomerID', how='outer')`</li>
+                            <li><em>Conceptual Output:</em> (All customers and orders will appear, `NaN` where no match)
+                                <pre class="bg-gray-100 p-3 rounded-md overflow-x-auto text-xs font-mono text-gray-800 mt-2"><code>
+OrderID  CustomerID  OrderAmount CustomerName         City
+0      101         C01        150.0  Alice Smith     New York
+1      103         C01         25.0  Alice Smith     New York
+2      102         C02         75.5  Bob Johnson  Los Angeles
+3      104         C03        300.0 Charlie Brown      Chicago
+4      105         C04        120.0          NaN          NaN
+5      NaN         C05          NaN    Eve Davis      Houston
+                                </code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Left Join (`how='left'`):</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> Returns all rows from the *left* DataFrame (`df_orders` in this case) and matching rows from the right DataFrame. If there's no match in the right, it fills with `NaN`.</li>
+                            <li><em>Conceptual Code:</em> `pd.merge(df_orders, df_customers, on='CustomerID', how='left')`</li>
+                            <li><em>Conceptual Output:</em> (All orders, `NaN` for C04's customer details)
+                                <pre class="bg-gray-100 p-3 rounded-md overflow-x-auto text-xs font-mono text-gray-800 mt-2"><code>
+OrderID  CustomerID  OrderAmount CustomerName         City
+0      101         C01        150.0  Alice Smith     New York
+1      102         C02         75.5  Bob Johnson  Los Angeles
+2      103         C01         25.0  Alice Smith     New York
+3      104         C03        300.0 Charlie Brown      Chicago
+4      105         C04        120.0          NaN          NaN
+                                </code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Right Join (`how='right'`):</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> Returns all rows from the *right* DataFrame (`df_customers` in this case) and matching rows from the left DataFrame. If there's no match in the left, it fills with `NaN`.</li>
+                            <li><em>Conceptual Code:</em> `pd.merge(df_orders, df_customers, on='CustomerID', how='right')`</li>
+                            <li><em>Conceptual Output:</em> (All customers, `NaN` for C05's order details)
+                                <pre class="bg-gray-100 p-3 rounded-md overflow-x-auto text-xs font-mono text-gray-800 mt-2"><code>
+OrderID  CustomerID  OrderAmount CustomerName         City
+0      101         C01        150.0  Alice Smith     New York
+1      102         C02         75.5  Bob Johnson  Los Angeles
+2      103         C01         25.0  Alice Smith     New York
+3      104         C03        300.0 Charlie Brown      Chicago
+4      NaN         C05          NaN    Eve Davis      Houston
+                                </code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Choosing the correct join type is crucial as it directly impacts the resulting dataset and the observations included in your analysis. The `on` parameter specifies the column(s) to join on. If column names are different, you can use `left_on` and `right_on`.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Grouping Data (`.groupby()`): Summarizing Information</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Grouping data is a fundamental analytical operation that allows you to aggregate (summarize) data based on categories or unique values in one or more columns. It's akin to creating pivot tables in Excel but with much greater flexibility and programmatic control. The `groupby()` method in Pandas is used for this.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Conceptual Data for Grouping: `df_sales` (from N-S35)</h4>
+                <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-xs font-mono text-gray-800 mb-2">
+                    <pre><code>
+OrderID ProductCategory  SalesAmount   OrderDate   Region CustomerRating DiscountApplied
+0      101     Electronics       150.00  2024-01-05    North              4            True
+1      102        Clothing        75.50  2024-01-06    South              5           False
+2      103           Books        25.00  2024-01-05    North              3           False
+3      104     Electronics       300.00  2024-01-07     West              5            True
+4      105        Clothing       120.00  2024-01-08     East              4           False
+5      106           Books        40.00  2024-01-07    South              2           False
+6      107     Electronics        80.00  2024-01-09    North              4            True
+7      108        Clothing        90.00  2024-01-08     West              5           False
+                    </code></pre>
+                </div>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Basic Grouping & Aggregation Steps:</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">The `groupby()` operation typically involves three steps:</p>
+                <ol class="list-decimal pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Split:</strong> Divide the DataFrame into groups based on the values in one or more columns.</li>
+                    <li><strong>Apply:</strong> Apply a function (e.g., sum, mean, count, min, max) to each group.</li>
+                    <li><strong>Combine:</strong> Combine the results into a new DataFrame or Series.</li>
+                </ol>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Conceptual Examples of Grouping:</h4>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <h5 class="font-semibold text-indigo-700 mb-2">Conceptual Code: Total Sales by Product Category</h5>
+                    <pre><code class="language-python">
+# Group by 'ProductCategory' and calculate the sum of 'SalesAmount' for each category
+total_sales_by_category = df_sales.groupby('ProductCategory')['SalesAmount'].sum()
+print("--- Total Sales by Product Category ---")
+print(total_sales_by_category)
+# Output:
+# ProductCategory
+# Books          65.0
+# Clothing      285.5
+# Electronics   530.0
+# Name: SalesAmount, dtype: float64
+                    </code></pre>
+                    <h5 class="font-semibold text-indigo-700 mt-4 mb-2">Conceptual Code: Average Sales Amount by Region</h5>
+                    <pre><code class="language-python">
+# Group by 'Region' and calculate the average of 'SalesAmount'
+average_sales_by_region = df_sales.groupby('Region')['SalesAmount'].mean()
+print("\n--- Average Sales Amount by Region ---")
+print(average_sales_by_region)
+# Output:
+# Region
+# East     120.0
+# North    87.5
+# South    57.75
+# West    195.0
+# Name: SalesAmount, dtype: float64
+                    </code></pre>
+                    <h5 class="font-semibold text-indigo-700 mt-4 mb-2">Conceptual Code: Multiple Aggregations (e.g., count, sum, mean)</h5>
+                    <pre><code class="language-python">
+# Group by 'ProductCategory' and get count, sum, and average of 'SalesAmount'
+multi_agg = df_sales.groupby('ProductCategory')['SalesAmount'].agg(['count', 'sum', 'mean'])
+print("\n--- Multiple Aggregations by ProductCategory ---")
+print(multi_agg)
+# Output:
+#                count    sum    mean
+# ProductCategory                     
+# Books              2   65.0   32.50
+# Clothing           3  285.5   95.17
+# Electronics        3  530.0  176.67
+                    </code></pre>
+                    <h5 class="font-semibold text-indigo-700 mt-4 mb-2">Conceptual Code: Grouping by Multiple Columns</h5>
+                    <pre><code class="language-python">
+# Group by 'Region' AND 'ProductCategory'
+sales_by_region_category = df_sales.groupby(['Region', 'ProductCategory'])['SalesAmount'].sum()
+print("\n--- Total Sales by Region and ProductCategory ---")
+print(sales_by_region_category)
+# Output:
+# Region     ProductCategory
+# East       Clothing           120.0
+# North      Books               25.0
+#            Electronics        230.0
+# South      Books               40.0
+#            Clothing            75.5
+# West       Clothing            90.0
+#            Electronics        300.0
+# Name: SalesAmount, dtype: float64
+                    </code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">The `groupby()` method is incredibly powerful for summarizing and analyzing data at different levels of aggregation. It's a cornerstone of exploratory data analysis and reporting, allowing you to quickly derive key metrics from your raw data.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Comprehensive Data Preparation Exercise</h2>
+            <p class="section-intro">This comprehensive exercise serves as a capstone for Module II, integrating various data preparation skills learned. You will conceptually apply loading, cleaning, transforming, aggregating, and saving data using Python (Pandas) to prepare a dataset for analysis. This mirrors a typical real-world data preparation workflow.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Scenario: Preparing Customer Order Data for Analysis</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Imagine you're a data analyst for an online retail company. You have two CSV files: `customer_info.csv` (containing customer demographics) and `order_details.csv` (containing individual product line items from orders). Your goal is to combine these, clean them, derive new features, and aggregate sales data to understand customer spending patterns by region and product category, and then save the prepared data.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Conceptual Data Files:</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h5 class="font-semibold text-amber-600 mb-2">`customer_info.csv`</h5>
+                        <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-xs font-mono text-gray-800 mb-2">
+                            <pre><code>
+CustID,Name,Email,City,Region,Age
+C001,Alice Smith,alice@email.com,New York,North,28
+C002,Bob Johnson,bob@email.com,Los Angeles,West,35
+C003,Charlie Brown,charlie@email.com,Chicago,Central,42
+C004,David Lee,david@email.com,Houston,South,29
+C005,Eve Davis,eve@email.com,Miami,South,31
+                            </code></pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="font-semibold text-amber-600 mb-2">`order_details.csv`</h5>
+                        <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-xs font-mono text-gray-800 mb-2">
+                            <pre><code>
+OrderID,CustID,OrderDate,Product,Category,Quantity,Price
+ORD001,C001,2024-01-15,Laptop,Electronics,1,1200.00
+ORD002,C002,2024-01-16,Mouse,Electronics,2,25.00
+ORD003,C001,2024-01-15,Keyboard,Electronics,1,75.00
+ORD004,C003,2024-01-17,Monitor,Electronics,1,300.00
+ORD005,C004,2024-01-18,Webcam,Electronics,1,50.00
+ORD006,C001,2024-02-01,Headphones,Electronics,1,150.00
+ORD007,C005,2024-02-02,USB Drive,Electronics,3,10.00
+ORD008,C002,2024-02-03,Gaming Chair,Furniture,1,250.00
+                            </code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Python Data Preparation Workflow (Conceptual Steps):</h4>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800">
+                    <h5 class="font-semibold text-indigo-700 mb-2">Python Code Snippet (Comprehensive Workflow)</h5>
+                    <pre><code class="language-python">
+import pandas as pd
+import numpy as np
+
+# --- Step 1: Load Data ---
+# Load customer and order data into DataFrames.
+print("--- Step 1: Loading Data ---")
+try:
+    df_customers = pd.read_csv('customer_info.csv')
+    df_orders = pd.read_csv('order_details.csv')
+    print("DataFrames loaded successfully.")
+except FileNotFoundError:
+    print("Error: CSV files not found. Creating dummy DataFrames for demonstration.")
+    # Dummy data for demonstration if files are not present
+    customer_data = {
+        'CustID': ['C001', 'C002', 'C003', 'C004', 'C005'],
+        'Name': ['Alice Smith', 'Bob Johnson', 'Charlie Brown', 'David Lee', 'Eve Davis'],
+        'Email': ['alice@email.com', 'bob@email.com', 'charlie@email.com', 'david@email.com', 'eve@email.com'],
+        'City': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Miami'],
+        'Region': ['North', 'West', 'Central', 'South', 'South'],
+        'Age': [28, 35, 42, 29, 31]
+    }
+    order_data = {
+        'OrderID': ['ORD001', 'ORD002', 'ORD003', 'ORD004', 'ORD005', 'ORD006', 'ORD007', 'ORD008'],
+        'CustID': ['C001', 'C002', 'C001', 'C003', 'C004', 'C001', 'C005', 'C002'],
+        'OrderDate': ['2024-01-15', '2024-01-16', '2024-01-15', '2024-01-17', '2024-01-18', '2024-02-01', '2024-02-02', '2024-02-03'],
+        'Product': ['Laptop', 'Mouse', 'Keyboard', 'Monitor', 'Webcam', 'Headphones', 'USB Drive', 'Gaming Chair'],
+        'Category': ['Electronics', 'Electronics', 'Electronics', 'Electronics', 'Electronics', 'Electronics', 'Electronics', 'Furniture'],
+        'Quantity': [1, 2, 1, 1, 1, 1, 3, 1],
+        'Price': [1200.00, 25.00, 75.00, 300.00, 50.00, 150.00, 10.00, 250.00]
+    }
+    df_customers = pd.DataFrame(customer_data)
+    df_orders = pd.DataFrame(order_data)
+
+print("\ndf_customers head:\n", df_customers.head())
+print("\ndf_orders head:\n", df_orders.head())
+print("\n")
+
+# --- Step 2: Initial Data Inspection & Type Conversion ---
+# Check data types and identify potential issues.
+print("--- Step 2: Initial Inspection & Type Conversion ---")
+print("df_orders info before conversion:")
+df_orders.info()
+
+# Convert 'OrderDate' to datetime objects
+df_orders['OrderDate'] = pd.to_datetime(df_orders['OrderDate'])
+
+# Calculate 'LineTotal' (Quantity * Price)
+df_orders['LineTotal'] = df_orders['Quantity'] * df_orders['Price']
+
+print("\ndf_orders info after conversion and new column creation:")
+df_orders.info()
+print("\n")
+
+# --- Step 3: Merge DataFrames ---
+# Combine customer demographics with order details using 'CustID'.
+# Use an inner join to keep only matching records.
+print("--- Step 3: Merging DataFrames ---")
+df_merged = pd.merge(df_orders, df_customers, on='CustID', how='inner')
+print("Merged DataFrame head:\n", df_merged.head())
+print(f"\nMerged DataFrame shape: {df_merged.shape}\n")
+
+# --- Step 4: Data Cleaning (Conceptual - assuming no complex missing/outliers for this demo) ---
+# In a real scenario, you would apply techniques from N-S29, N-S30, N-S31, N-S32 here.
+# For simplicity, we'll assume basic cleaning is done or not needed for this specific demo.
+# Example: df_merged.dropna(subset=['Age', 'Region'], inplace=True)
+# Example: df_merged['SalesAmount'].fillna(df_merged['SalesAmount'].mean(), inplace=True)
+print("--- Step 4: Data Cleaning (Conceptual) ---")
+print("Assuming data cleaning (missing values, outliers, inconsistencies) would be performed here.\n")
+
+# --- Step 5: Feature Engineering / Transformation ---
+# Extract 'OrderMonth' and 'OrderYear' from 'OrderDate'
+print("--- Step 5: Feature Engineering ---")
+df_merged['OrderMonth'] = df_merged['OrderDate'].dt.month
+df_merged['OrderYear'] = df_merged['OrderDate'].dt.year
+print("DataFrame with new date features:\n", df_merged[['OrderDate', 'OrderMonth', 'OrderYear']].head())
+print("\n")
+
+# Create a 'CustomerAgeGroup' based on 'Age'
+def age_group(age):
+    if age < 30:
+        return '18-29'
+    elif 30 <= age < 40:
+        return '30-39'
+    else:
+        return '40+'
+df_merged['CustomerAgeGroup'] = df_merged['Age'].apply(age_group)
+print("DataFrame with 'CustomerAgeGroup':\n", df_merged[['Age', 'CustomerAgeGroup']].head())
+print("\n")
+
+# --- Step 6: Data Aggregation / Grouping ---
+# Aggregate total sales by 'Region' and 'Category'
+print("--- Step 6: Data Aggregation ---")
+regional_category_sales = df_merged.groupby(['Region', 'Category']).agg(
+    TotalSales=('LineTotal', 'sum'),
+    NumOrders=('OrderID', 'nunique'), # Count unique orders
+    AvgOrderValue=('LineTotal', 'mean')
+).reset_index() # reset_index to turn groupby keys back into columns
+
+print("Aggregated Sales by Region and Category:\n", regional_category_sales)
+print("\n")
+
+# --- Step 7: Save Prepared Data ---
+# Save the aggregated DataFrame to a new CSV file for further analysis or reporting.
+print("--- Step 7: Saving Prepared Data ---")
+output_filename = 'prepared_regional_category_sales.csv'
+regional_category_sales.to_csv(output_filename, index=False)
+print(f"Prepared data saved to '{output_filename}'\n")
+
+# Display final prepared DataFrame (optional)
+print("--- Final Prepared Data (Aggregated) ---")
+print(regional_category_sales)
+                    </code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">This comprehensive exercise demonstrates a typical end-to-end data preparation workflow using Pandas. You've seen how to load data from multiple sources, perform initial inspections, merge datasets, create new features through transformations, aggregate data for summary insights, and finally, save the clean, prepared data for downstream analysis or reporting. This workflow is central to the role of a data analyst.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-6 mt-auto">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        // No specific interactive elements beyond nav buttons for this module.
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scroll for nav links and initial active state
+            document.querySelectorAll('a.nav-button').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll('a.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Set initial active nav button based on URL hash or first section
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'theory';
+            const initialNavButton = document.querySelector(`a.nav-button[href="#${initialSection}"]`);
+            if (initialNavButton) {
+                initialNavButton.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

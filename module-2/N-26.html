@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S26: Exploring Unstructured & Intro to Semi-Structured Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices:
+        - Tool Teaser (NLP/Image): Report Info: High-level demo. Goal: Illustrate, inspire. Viz/Method: Detailed descriptive text for conceptual demos, explaining the output and its business value. Justification: Shows practical applications of complex unstructured data analysis.
+        - Brainstorm Activity (Customer Reviews): Report Info: Activity prompt. Goal: Engage, apply. Viz/Method: Text instructions with guiding questions and example insights. Justification: Encourages critical thinking about extracting value from unstructured text.
+        - Semi-Structured Data Definition: Report Info: Definition, characteristics, formats. Goal: Inform. Viz/Method: Detailed text explanation with clear examples for JSON, XML, and NoSQL records. Justification: Provides a thorough understanding of this flexible data type.
+        CONFIRMATION: No charts used (Chart.js/Plotly.js not needed as report is conceptual/textual).
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); /* Adjust based on header/footer height */ }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+
+        .accordion-header { cursor: pointer; user-select: none; }
+        .accordion-content { display: none; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; }
+        .accordion-item.open .accordion-content { display: block; max-height: 1000px; /* Arbitrary large value */ padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .accordion-arrow { transition: transform 0.3s ease; }
+        .accordion-item.open .accordion-arrow { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S26: Exploring Unstructured & Intro to Semi-Structured Data</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#practical" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                    <li><a href="#theory" class="nav-button text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Analyzing Unstructured Data & Brainstorming</h2>
+            <p class="section-intro">Extracting value from unstructured data requires specialized techniques and tools. This section offers a high-level conceptual look at how advanced analytics, particularly AI-driven methods, can transform raw unstructured data into actionable insights, and then challenges you to brainstorm practical applications.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Tool Teaser: High-Level Demos for Unstructured Data Analysis</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">While we won't delve into the code for these complex tools, it's important to understand the capabilities that modern data analytics and AI provide for unstructured data. These conceptual demos illustrate how raw text or images can be processed to reveal valuable insights.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+                        <h4 class="font-semibold text-indigo-700 mb-2 flex items-center"><span class="text-xl mr-2">☁️</span>Natural Language Processing (NLP) - Word Cloud Demo</h4>
+                        <p class="text-sm text-gray-800 italic leading-relaxed mb-3">Imagine you have thousands of customer reviews for a new smartphone. Manually reading them all is impossible. NLP tools can process this text to identify common themes and frequently used words.</p>
+                        <p class="text-sm text-gray-800 leading-relaxed"><strong>Conceptual Demo:</strong> A "word cloud" visualization generated from these reviews. Larger words in the cloud represent terms that appear more frequently. For example, you might see "battery life," "camera," "screen," "performance," "bug," "support" prominently displayed.</p>
+                        <p class="mt-3 text-xs text-gray-600"><em>Business Value:</em> Quickly identifies key customer concerns, popular features, or recurring issues without reading every review. This can inform product development, marketing messages, or customer service training.</p>
+                    </div>
+                    <div class="p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+                        <h4 class="font-semibold text-indigo-700 mb-2 flex items-center"><span class="text-xl mr-2">👁️</span>Computer Vision - Object Identification Demo</h4>
+                        <p class="text-sm text-gray-800 italic leading-relaxed mb-3">Consider a retail chain that wants to monitor shelf stock in their stores or analyze customer behavior from security camera footage. Manually watching hours of video is impractical.</p>
+                        <p class="text-sm text-gray-800 leading-relaxed"><strong>Conceptual Demo:</strong> An AI model processing an image of a retail shelf. The model draws bounding boxes around identified objects like "soda cans," "cereal boxes," "milk cartons," and labels them. It can also detect "empty space."</p>
+                        <p class="mt-3 text-xs text-gray-600"><em>Business Value:</em> Automates inventory checks, identifies stockouts in real-time, ensures planogram compliance, or analyzes customer movement patterns within a store. This leads to improved operational efficiency and sales.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Brainstorming Activity: Analyzing Customer Reviews</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Customer reviews are a goldmine of unstructured text data. Imagine you work for an electronics company and have access to thousands of online reviews for your latest laptop model. How could you leverage data analytics to extract actionable insights from these reviews? Brainstorm specific analytical tasks and the potential business value.</p>
+                <p class="text-sm text-gray-500 italic">Think about what questions a product manager, marketing team, or customer service department might have, and how analyzing free-form text could provide answers.</p>
+                <div class="mt-4 p-4 bg-indigo-50 rounded-md border border-indigo-200">
+                    <h4 class="font-semibold text-indigo-700 mb-2">Example Brainstorm Ideas (for self-reflection and guidance):</h4>
+                    <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
+                        <li><strong>Sentiment Analysis:</strong>
+                            <ul class="list-circle pl-5">
+                                <li><em>Task:</em> Determine the overall sentiment (positive, negative, neutral) of reviews for different features (e.g., "battery life," "keyboard," "display").</li>
+                                <li><em>Business Value:</em> Quickly identify features that customers love or hate, guiding product improvements and marketing messaging.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Topic Modeling:</strong>
+                            <ul class="list-circle pl-5">
+                                <li><em>Task:</em> Automatically discover recurring themes or topics within the reviews (e.g., "performance issues," "design aesthetics," "software bugs," "customer support experience").</li>
+                                <li><em>Business Value:</em> Understand the most common discussion points and prioritize areas for attention by product development or support teams.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Keyword Extraction & Frequency Analysis:</strong>
+                            <ul class="list-circle pl-5">
+                                <li><em>Task:</em> Identify the most frequently used keywords and phrases in positive vs. negative reviews.</li>
+                                <li><em>Business Value:</em> Pinpoint specific pain points (e.g., "overheating," "slow startup") or delights (e.g., "fast processing," "crisp display") that might not be immediately obvious.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Competitor Comparison:</strong>
+                            <ul class="list-circle pl-5">
+                                <li><em>Task:</em> Analyze reviews for competitor laptops to compare sentiment and common themes against your own product.</li>
+                                <li><em>Business Value:</em> Identify competitive advantages or disadvantages, and spot opportunities for differentiation in future product iterations or marketing.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Urgency/Action Item Detection:</strong>
+                            <ul class="list-circle pl-5">
+                                <li><em>Task:</em> Use NLP to flag reviews that indicate urgent issues requiring customer service follow-up (e.g., "my laptop crashed," "I need a refund").</li>
+                                <li><em>Business Value:</em> Improve customer service response times for critical issues and proactively address problems before they escalate.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Introduction to Semi-Structured Data</h2>
+            <p class="section-intro">Bridging the gap between the rigid order of structured data and the free-form nature of unstructured data lies semi-structured data. This section defines this increasingly prevalent data type, explores its characteristics, and highlights common formats like JSON and XML, which are crucial for modern web and application development.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">What is Semi-Structured Data? A Flexible Approach</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Semi-structured data does not conform to the strict, tabular data model associated with relational databases, but it does contain tags or other markers to separate semantic elements and enforce a hierarchy of records and fields within the data. It's a hybrid, offering some organizational properties that make it easier to process than unstructured data, but with more flexibility than structured data.</p>
+                <p class="mb-4 text-gray-700 leading-relaxed">Think of it as having a "partial schema" or a flexible schema. While it might not fit neatly into rows and columns, it contains self-describing elements that provide structure and meaning. This makes it particularly well-suited for web data, data exchange between systems, and modern applications that require agility.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Key Characteristics of Semi-Structured Data:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Flexible Schema:</strong> Unlike structured data, the schema is not fixed. Fields can be added or removed without breaking the entire structure. Not all records need to have the same fields, and the order of fields might not matter.</li>
+                    <li><strong>Self-Describing:</strong> Data often contains tags or markers that describe the data elements themselves, making it easier to interpret. For example, in JSON, keys explicitly name the data values.</li>
+                    <li><strong>Hierarchical Structure:</strong> Data is often organized in a tree-like or graph-like structure, with nested elements. This allows for representing complex relationships that are difficult to model in flat, tabular formats.</li>
+                    <li><strong>NoSQL Database Compatibility:</strong> It is the native data model for many NoSQL (Not only SQL) databases, which are designed to handle flexible schemas and large volumes of diverse data.</li>
+                    <li><strong>Easier to Process than Unstructured:</strong> While not as straightforward as structured data, the embedded tags and hierarchical nature make it significantly easier to parse and extract information compared to raw unstructured data like text or images.</li>
+                    <li><strong>Common for Data Exchange:</strong> Widely used for exchanging data between different applications, especially over the internet (e.g., web APIs often return data in JSON format).</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Common Formats & Examples:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>JSON (JavaScript Object Notation):</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> A lightweight, human-readable data interchange format. It uses key-value pairs and ordered lists of values. It's the most popular format for web APIs and NoSQL databases.</li>
+                            <li><em>Example:</em>
+                                <pre class="bg-gray-100 p-3 rounded-md overflow-x-auto text-xs font-mono text-gray-800 mt-2"><code>
+{
+  "customer_id": "C001",
+  "name": "Alice Smith",
+  "email": "alice@example.com",
+  "orders": [
+    { "order_id": "ORD001", "date": "2023-01-10", "total": 120.50 },
+    { "order_id": "ORD002", "date": "2023-03-22", "total": 45.00, "discount_applied": true }
+  ],
+  "address": {
+    "street": "123 Main St",
+    "city": "Anytown",
+    "zip": "12345"
+  }
+}
+                                </code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>XML (Extensible Markup Language):</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> A markup language that defines a set of rules for encoding documents in a format that is both human-readable and machine-readable. Uses tags to define elements. Historically widely used for data exchange.</li>
+                            <li><em>Example:</em>
+                                <pre class="bg-gray-100 p-3 rounded-md overflow-x-auto text-xs font-mono text-gray-800 mt-2"><code>
+&lt;customer&gt;
+  &lt;customer_id&gt;C001&lt;/customer_id&gt;
+  &lt;name&gt;Alice Smith&lt;/name&gt;
+  &lt;email&gt;alice@example.com&lt;/email&gt;
+  &lt;orders&gt;
+    &lt;order&gt;
+      &lt;order_id&gt;ORD001&lt;/order_id&gt;
+      &lt;date&gt;2023-01-10&lt;/date&gt;
+      &lt;total&gt;120.50&lt;/total&gt;
+    &lt;/order&gt;
+    &lt;order&gt;
+      &lt;order_id&gt;ORD002&lt;/order_id&gt;
+      &lt;date&gt;2023-03-22&lt;/date&gt;
+      &lt;total&gt;45.00&lt;/total&gt;
+      &lt;discount_applied&gt;true&lt;/discount_applied&gt;
+    &lt;/order&gt;
+  &lt;/orders&gt;
+&lt;/customer&gt;
+                                </code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>NoSQL Database Records:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> Many NoSQL databases (e.g., MongoDB, Cassandra, Couchbase) are designed to store and query semi-structured data natively, often using document-oriented models (like JSON-like documents).</li>
+                            <li><em>Example:</em> A single document in MongoDB might represent a user profile, containing various fields, some of which might be nested objects or arrays, and not all user profiles need to have the exact same set of fields.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Semi-structured data offers a powerful balance between the rigidity of structured data and the flexibility of unstructured data, making it highly adaptable for modern data environments and applications that require rapid iteration and diverse data models.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-6 mt-auto">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        // No specific interactive cards or accordions for this module's data that need JS population.
+        // The content is primarily descriptive text and conceptual code snippets.
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scroll for nav links and initial active state
+            document.querySelectorAll('a.nav-button').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll('a.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Set initial active nav button based on URL hash or first section
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'practical';
+            const initialNavButton = document.querySelector(`a.nav-button[href="#${initialSection}"]`);
+            if (initialNavButton) {
+                initialNavButton.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

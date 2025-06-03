@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S51: Distribution Shape, Skewness, Kurtosis & Percentiles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            font-family: monospace;
+            resize: vertical;
+        }
+        .calculate-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .calculate-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .interpretation-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .chart-illustrative { /* Applied to canvas elements */
+            position: relative;
+            height: 250px !important; /* Fixed height */
+            width: 100%;
+            max-height: 250px !important; /* Maximum height */
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .example-buttons button {
+            background-color: #6366F1;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.4rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 0.4rem;
+        }
+        .example-buttons button:hover {
+            background-color: #4338CA;
+        }
+        .chart-container-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        .chart-container-group > div { /* These divs wrap the canvases in the theory groups */
+            flex: 1 1 calc(50% - 1.5rem); 
+            min-width: 300px; 
+            max-width: 500px; 
+            height: 280px !important; /* Container height = chart height + margins */
+            position: relative; /* Crucial for Chart.js responsive calculations for child canvases */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S51: Distribution Shape, Skewness, Kurtosis & Percentiles</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Distribution Shape, Skewness, Kurtosis & Percentiles</h2>
+            <p class="section-intro">Beyond central tendency and dispersion, understanding the *shape* of a data distribution is crucial for comprehensive data analysis. This involves examining its symmetry, the peakedness of its central tendency, and the spread of its tails. We'll also revisit percentiles and introduce box plots as a powerful visualization tool.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. Distribution Shape & Skewness</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">The shape of a distribution describes how data points are distributed across the range of values. A key aspect of shape is **skewness**, which measures the asymmetry of the probability distribution of a real-valued random variable about its mean. It tells us if the data is concentrated on one side and has a longer "tail" on the other.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Symmetrical Distribution (Zero Skew):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Data is evenly distributed around the mean, forming a balanced shape.</li>
+                            <li>Mean, Median, and Mode are approximately equal and located at the center.</li>
+                            <li>Example: Heights of adult humans, results of a fair coin toss over many trials.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Positive Skew (Right-Skewed):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>The tail of the distribution extends to the right (positive direction), indicating a few high values.</li>
+                            <li>Most data points are clustered on the left side (lower values).</li>
+                            <li>Mean > Median > Mode (typically). The mean is pulled towards the longer, positive tail by extreme high values.</li>
+                            <li>Example: Income distribution (a few high earners pull the average income up significantly).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Negative Skew (Left-Skewed):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>The tail of the distribution extends to the left (negative direction), indicating a few low values.</li>
+                            <li>Most data points are clustered on the right side (higher values).</li>
+                            <li>Mode > Median > Mean (typically). The mean is pulled towards the longer, negative tail by extreme low values.</li>
+                            <li>Example: Test scores on an easy exam (most students score high, but a few low scores pull the average down slightly).</li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="chart-container-group">
+                    <div>
+                        <canvas id="symmetricalSkewChart" class="chart-illustrative"></canvas>
+                        <p class="chart-description text-center text-sm text-gray-600"><em>Symmetrical Distribution: Mean ≈ Median ≈ Mode</em></p>
+                    </div>
+                    <div>
+                        <canvas id="positiveSkewChart" class="chart-illustrative"></canvas>
+                        <p class="chart-description text-center text-sm text-gray-600"><em>Positive Skew (Right-Skewed): Mean > Median > Mode</em></p>
+                    </div>
+                    <div>
+                        <canvas id="negativeSkewChart" class="chart-illustrative"></canvas>
+                        <p class="chart-description text-center text-sm text-gray-600"><em>Negative Skew (Left-Skewed): Mode > Median > Mean</em></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. Kurtosis</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">Kurtosis measures the "tailedness" of the probability distribution of a real-valued random variable. In simpler terms, it tells us how much the tails of the distribution differ from the tails of a normal distribution. It indicates the presence of outliers and the "peakedness" of the distribution. A higher kurtosis means more of the variance comes from infrequent extreme deviations, as opposed to frequent modestly sized deviations.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Mesokurtic (Kurtosis ≈ 0 for Excess Kurtosis):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Similar peakedness and tail thickness to a normal distribution (bell curve).</li>
+                            <li>This is the standard reference point for kurtosis.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Leptokurtic (Kurtosis > 0 for Excess Kurtosis):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Has a sharper peak and heavier (fatter) tails than a normal distribution.</li>
+                            <li>Indicates a higher probability of extreme values (outliers) and less data in the "shoulders" of the distribution.</li>
+                            <li>Often seen in financial returns data, implying higher risk due to more frequent large gains or losses.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Platykurtic (Kurtosis < 0 for Excess Kurtosis):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Has a flatter peak and lighter (thinner) tails than a normal distribution.</li>
+                            <li>Indicates fewer extreme values or outliers. Data points are more spread out from the center, leading to a more uniform distribution.</li>
+                            <li>The probability of extreme events is lower.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="chart-container-group">
+                    <div>
+                        <canvas id="mesokurticChart" class="chart-illustrative"></canvas>
+                        <p class="chart-description text-center text-sm text-gray-600"><em>Mesokurtic (Normal Distribution-like)</em></p>
+                    </div>
+                    <div>
+                        <canvas id="leptokurticChart" class="chart-illustrative"></canvas>
+                        <p class="chart-description text-center text-sm text-gray-600"><em>Leptokurtic (High Peak, Fat Tails)</em></p>
+                    </div>
+                    <div>
+                        <canvas id="platykurticChart" class="chart-illustrative"></canvas>
+                        <p class="chart-description text-center text-sm text-gray-600"><em>Platykurtic (Flat Peak, Thin Tails)</em></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. Percentiles and Quartiles</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">Percentiles are measures that indicate the value below which a given percentage of observations in a group of observations falls. For example, the 20th percentile is the value below which 20% of the observations may be found. They are very useful for understanding the relative standing of a data point within a dataset.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Percentiles:</strong> Divide a dataset into 100 equal parts. If you are in the 90th percentile for a test, it means you scored higher than 90% of the other test-takers.</li>
+                    <li><strong>Quartiles:</strong> Specific percentiles that divide the data into four equal parts:
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Q1 (First Quartile):</strong> 25th percentile. 25% of data falls below this value.</li>
+                            <li><strong>Q2 (Second Quartile):</strong> 50th percentile. This is precisely the **Median**. 50% of data falls below this value.</li>
+                            <li><strong>Q3 (Third Quartile):</strong> 75th percentile. 75% of data falls below this value.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Interquartile Range (IQR):</strong> The range between Q1 and Q3 (\(IQR = Q3 - Q1\)). It represents the middle 50% of the data and is robust to outliers, making it a valuable measure of spread for skewed distributions.</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">4. Box Plots as a Visualization</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">A box plot (or box-and-whisker plot) is a standardized way of displaying the distribution of data based on a five-number summary: minimum, first quartile (Q1), median (Q2), third quartile (Q3), and maximum. It's an excellent tool for quickly visualizing the spread and skewness of a distribution, comparing distributions across groups, and identifying outliers.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Components:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Box:</strong> Extends from Q1 to Q3, representing the Interquartile Range (IQR). The length of the box indicates the spread of the central 50% of the data.</li>
+                            <li><strong>Line in the Box:</strong> Represents the Median (Q2). Its position within the box indicates the skewness.</li>
+                            <li><strong>Whiskers:</strong> Extend from the box to the minimum and maximum values within a certain range (typically 1.5 times the IQR) from Q1 and Q3, respectively. They show the spread of the remaining data.</li>
+                            <li><strong>Outliers:</strong> Data points that fall outside the whiskers are plotted individually as points, indicating extreme values.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Interpreting Skewness from Box Plots:</strong>
+                        <ul class="list-square pl-5 mt-1">
+                            <li><strong>Symmetrical:</strong> Median line is roughly in the middle of the box, and both whiskers are of similar length.</li>
+                            <li><strong>Right-Skewed:</strong> Median line is closer to Q1, and the right whisker is longer than the left. Outliers may appear on the right.</li>
+                            <li><strong>Left-Skewed:</strong> Median line is closer to Q3, and the left whisker is longer than the right. Outliers may appear on the left.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <canvas id="boxplotExampleChart" class="chart-illustrative"></canvas>
+                <p class="chart-description text-center text-sm text-gray-600"><em>Example Box Plot: Visualizing the five-number summary and potential outliers.</em></p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Analyze Distribution Shape & Percentiles</h2>
+            <p class="section-intro">In this hands-on activity, you will input a dataset and calculate its skewness, kurtosis, and key percentiles (Q1, Median, Q3). The interactive histogram with a KDE overlay and a simulated box plot will visually represent your data's distribution, allowing you to interpret these measures directly.</p>
+
+            <div class="interactive-panel">
+                <div class="panel-title">Data Input & Analysis</div>
+                <label for="dataInput" class="block text-gray-700 font-semibold mb-2">Enter your data (numbers separated by commas):</label>
+                <textarea id="dataInput" placeholder="e.g., 10, 12, 15, 12, 18, 20, 12, 100"></textarea>
+                <div class="flex flex-wrap justify-center gap-2 mt-4 example-buttons">
+                    <button data-example="normal">Normal-like Data</button>
+                    <button data-example="right-skewed">Right-Skewed Data</button>
+                    <button data-example="left-skewed">Left-Skewed Data</button>
+                    <button data-example="leptokurtic">Leptokurtic Data</button>
+                    <button data-example="platykurtic">Platykurtic Data</button>
+                </div>
+                <button id="analyzeBtn" class="calculate-button">Analyze Distribution</button>
+
+                <div id="resultsOutput" class="results-box hidden">
+                    <div class="chart-container-group">
+                        <div>
+                            <canvas id="practicalHistogramChart" class="chart-illustrative"></canvas>
+                            <p class="chart-description text-center text-sm text-gray-600"><em>Histogram with KDE of your data.</em></p>
+                        </div>
+                        <div>
+                            <canvas id="practicalBoxplotChart" class="chart-illustrative"></canvas>
+                            <p class="chart-description text-center text-sm text-gray-600"><em>Box Plot of your data.</em></p>
+                        </div>
+                    </div>
+                    <h4>Calculated Measures:</h4>
+                    <div class="result-item">
+                        <span class="result-label">Count (n):</span>
+                        <span id="countResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Mean:</span>
+                        <span id="meanResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Median (Q2):</span>
+                        <span id="medianResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Q1 (25th Percentile):</span>
+                        <span id="q1Result" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Q3 (75th Percentile):</span>
+                        <span id="q3Result" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Interquartile Range (IQR):</span>
+                        <span id="iqrResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Skewness:</span>
+                        <span id="skewnessResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Kurtosis (Excess):</span>
+                        <span id="kurtosisResult" class="result-value"></span>
+                    </div>
+                    <div id="interpretationBox" class="interpretation-box mt-4">
+                        <h5 class="font-semibold text-base mb-1">Interpretation:</h5>
+                        <p id="interpretationText" class="text-sm"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mt-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Discussion Points:</h3>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>Load the "Normal-like Data" example. Observe the histogram's symmetry, the KDE curve's bell shape, the box plot's balanced appearance, and the skewness/kurtosis values. How do they align with theoretical expectations?</li>
+                    <li>Load the "Right-Skewed Data" example. Notice how the mean is pulled right of the median, the histogram's tail, the KDE curve's shape, and the box plot's longer right whisker. What does the skewness coefficient tell you?</li>
+                    <li>Experiment with the "Leptokurtic Data" example. How do the histogram's peak and tails, and the KDE curve, compare to the "Normal-like Data"? What does the kurtosis value indicate about the presence of extreme values?</li>
+                    <li>Why are both numerical measures (skewness, kurtosis) and visual plots (histogram, KDE, box plot) important for understanding data distribution? Can one replace the other?</li>
+                    <li>Imagine you're analyzing customer spending. If the data is highly right-skewed, why might the median be a better measure of "typical" spending than the mean?</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Understanding distribution shape, skewness, and kurtosis provides deeper insights into your data, helping you choose appropriate statistical methods and make more informed business decisions.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>© FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        // Global chart instances for practical section
+        let practicalHistogramChartInstance = null;
+        let practicalBoxplotChartInstance = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation button active state logic
+            document.querySelectorAll('nav a').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    const targetElement = document.querySelector(this.getAttribute('href'));
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+
+            const dataInput = document.getElementById('dataInput');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const resultsOutput = document.getElementById('resultsOutput');
+            const countResult = document.getElementById('countResult');
+            const meanResult = document.getElementById('meanResult');
+            const medianResult = document.getElementById('medianResult');
+            const q1Result = document.getElementById('q1Result');
+            const q3Result = document.getElementById('q3Result');
+            const iqrResult = document.getElementById('iqrResult');
+            const skewnessResult = document.getElementById('skewnessResult');
+            const kurtosisResult = document.getElementById('kurtosisResult');
+            const interpretationText = document.getElementById('interpretationText');
+
+            const exampleData = {
+                'normal': '50, 51, 49, 52, 50, 53, 48, 51, 50, 49, 52, 50, 51, 49, 50, 50.5',
+                'right-skewed': '1, 2, 2, 3, 3, 3, 4, 4, 5, 10, 15, 20, 25, 30, 40, 50',
+                'left-skewed': '1, 5, 10, 15, 15, 16, 17, 17, 18, 18, 19, 20, 19.5',
+                'leptokurtic': '10, 10, 10, 11, 11, 12, 12, 12, 13, 13, 14, 14, 15, 15, 15, 1, 25, 12, 12',
+                'platykurtic': '8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22'
+            };
+
+            document.querySelectorAll('.example-buttons button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const type = this.dataset.example;
+                    if (exampleData[type] && dataInput) {
+                        dataInput.value = exampleData[type];
+                        analyzeDistribution();
+                    }
+                });
+            });
+
+            if (analyzeBtn) {
+                analyzeBtn.addEventListener('click', analyzeDistribution);
+            }
+            
+            if (dataInput) {
+                 dataInput.value = exampleData['right-skewed']; // Default example
+                 analyzeDistribution(); 
+            }
+
+            function generateNormalData(mean, stdDev, count) {
+                const data = [];
+                for (let i = 0; i < count; i++) {
+                    let u = 0, v = 0;
+                    while(u === 0) u = Math.random();
+                    while(v === 0) v = Math.random();
+                    let num = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+                    data.push(num * stdDev + mean);
+                }
+                return data;
+            }
+
+            function createHistogramData(numbers, binCount = 10) {
+                if (numbers.length === 0) return { labels: [], data: [], minVal: 0, maxVal: 0, binWidth: 0 };
+                const minVal = Math.min(...numbers);
+                const maxVal = Math.max(...numbers);
+                const range = maxVal - minVal;
+                const binWidth = range === 0 ? 1 : range / binCount; 
+
+                const bins = Array(binCount).fill(0);
+                const labels = [];
+
+                for (let i = 0; i < binCount; i++) {
+                    const lowerBound = minVal + i * binWidth;
+                    const upperBound = minVal + (i + 1) * binWidth;
+                    labels.push(`${lowerBound.toFixed(1)}-${upperBound.toFixed(1)}`);
+                    numbers.forEach(num => {
+                        if (num >= lowerBound && (i === binCount - 1 ? num <= upperBound + Number.EPSILON : num < upperBound)) {
+                            bins[i]++;
+                        }
+                    });
+                }
+                return { labels, data: bins, minVal, maxVal, binWidth };
+            }
+            
+            function calculateKDE(data, numPoints = 100) {
+                if (data.length === 0) return { x: [], y: [] };
+
+                const sortedData = [...data].sort((a, b) => a - b);
+                const minVal = sortedData[0];
+                const maxVal = sortedData[sortedData.length - 1];
+                let range = maxVal - minVal;
+                if (range === 0) range = 1; 
+
+                const mean = data.reduce((sum, val) => sum + val, 0) / data.length;
+                const sumOfSquaredDifferences = data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0);
+                const stdDev = data.length > 1 ? Math.sqrt(sumOfSquaredDifferences / (data.length - 1)) : 0;
+
+                const getQuartileKDE = (arr, percentile) => {
+                    const index = (percentile / 100) * (arr.length - 1);
+                    const floorIndex = Math.floor(index);
+                    const ceilIndex = Math.ceil(index);
+                    if (floorIndex === ceilIndex) return arr[floorIndex];
+                    return arr[floorIndex] + (arr[ceilIndex] - arr[floorIndex]) * (index - floorIndex);
+                };
+                const q1_kde = data.length > 1 ? getQuartileKDE(sortedData, 25) : minVal;
+                const q3_kde = data.length > 1 ? getQuartileKDE(sortedData, 75) : maxVal;
+                const iqr_kde = q3_kde - q1_kde;
+                
+                let h;
+                if (stdDev === 0 && iqr_kde === 0) { 
+                    h = 0.1 * range; 
+                } else if (stdDev === 0 || iqr_kde === 0) { 
+                    h = 0.9 * (stdDev > 0 ? stdDev : (iqr_kde > 0 ? iqr_kde/1.34 : range*0.1)) * Math.pow(data.length, -0.2);
+                }
+                else {
+                    h = 0.9 * Math.min(stdDev, iqr_kde / 1.34) * Math.pow(data.length, -0.2);
+                }
+                if (h <= 0) h = 0.01 * range; 
+                if (h === 0) h = 0.01; 
+
+                const kernel = (u) => (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * u * u); 
+                const xValues = [];
+                const yValues = [];
+                const plotMin = minVal - range * 0.2;
+                const plotMax = maxVal + range * 0.2;
+                const step = numPoints <= 1 ? (plotMax - plotMin) : (plotMax - plotMin) / (numPoints -1) ;
+
+                for (let i = 0; i < numPoints; i++) {
+                    const x = plotMin + i * step;
+                    let density = 0;
+                    for (let j = 0; j < data.length; j++) {
+                        density += kernel((x - data[j]) / h);
+                    }
+                    yValues.push(density / (data.length * h));
+                    xValues.push(x);
+                }
+
+                const histogramBins = createHistogramData(data, 10).data;
+                const maxHistFreq = histogramBins.length > 0 ? Math.max(...histogramBins) : 1;
+                const maxKdeDensity = yValues.length > 0 ? Math.max(...yValues) : 1;
+                
+                const scaledYValues = yValues.map(y => (maxKdeDensity > 0 ? (y / maxKdeDensity) : 0) * maxHistFreq * 1.1);
+
+                return { x: xValues, y: scaledYValues };
+            }
+
+            function renderTheoryHistogramWithKDE(canvasId, numbers, title, barColor, kdeColor) {
+                const canvasElement = document.getElementById(canvasId);
+                if (!canvasElement) return;
+                const ctx = canvasElement.getContext('2d');
+                const histogramData = createHistogramData(numbers, 10);
+                const kdeData = calculateKDE(numbers, 100);
+
+                if (canvasElement.chartInstance) {
+                    canvasElement.chartInstance.destroy();
+                }
+
+                canvasElement.chartInstance = new Chart(ctx, {
+                    data: {
+                        labels: histogramData.labels,
+                        datasets: [{
+                            label: 'Frequency',
+                            data: histogramData.data,
+                            backgroundColor: barColor,
+                            borderColor: barColor.replace('0.6', '1'),
+                            borderWidth: 1,
+                            type: 'bar',
+                            order: 2
+                        },
+                        {
+                            label: 'KDE',
+                            data: kdeData.x.map((x, i) => ({ x: x, y: kdeData.y[i] })),
+                            borderColor: kdeColor,
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.4,
+                            type: 'line',
+                            order: 1, 
+                            pointRadius: 0,
+                            xAxisID: 'x-axis-kde', 
+                            yAxisID: 'y' 
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: title, font: { size: 14 } },
+                            tooltip: { enabled: false } 
+                        },
+                        scales: {
+                            x: { 
+                                type: 'category',
+                                labels: histogramData.labels,
+                                title: { display: false },
+                                grid: { display: false },
+                                display: true,
+                            },
+                            'x-axis-kde': { 
+                                type: 'linear',
+                                position: 'bottom',
+                                min: kdeData.x.length > 0 ? Math.min(...kdeData.x) : 0,
+                                max: kdeData.x.length > 0 ? Math.max(...kdeData.x) : 1,
+                                grid: { display: false },
+                                display: false, 
+                            },
+                            y: { 
+                                beginAtZero: true,
+                                title: { display: true, text: 'Count / Scaled Density' },
+                                ticks: { precision: 0 },
+                            }
+                        },
+                        layout: {
+                            padding: {
+                                top: 10,
+                                bottom: 10,
+                                left: 10,
+                                right: 10
+                            }
+                        }
+                    }
+                });
+            }
+
+            const symmetricalData = generateNormalData(50, 5, 100).sort((a,b)=>a-b);
+            renderTheoryHistogramWithKDE('symmetricalSkewChart', symmetricalData, 'Symmetrical Distribution', 'rgba(67, 56, 202, 0.6)', '#4338CA');
+
+            const positiveSkewData = [1, 2, 2, 3, 3, 3, 4, 4, 5, 10, 15, 20, 25, 30, 40, 50];
+            renderTheoryHistogramWithKDE('positiveSkewChart', positiveSkewData.sort((a,b)=>a-b), 'Positive Skew (Right-Skewed)', 'rgba(239, 68, 68, 0.6)', '#EF4444');
+
+            const negativeSkewDataTheory = [1, 5, 10, 15, 20, 25, 25, 26, 27, 27, 28, 28, 29, 29, 30, 30].map(x => 31 - x); 
+            renderTheoryHistogramWithKDE('negativeSkewChart', negativeSkewDataTheory.sort((a,b)=>a-b), 'Negative Skew (Left-Skewed)', 'rgba(34, 197, 94, 0.6)', '#22C55E');
+
+            const mesokurticData = generateNormalData(50, 5, 100);
+            renderTheoryHistogramWithKDE('mesokurticChart', mesokurticData.sort((a,b)=>a-b), 'Mesokurtic (Normal-like)', 'rgba(67, 56, 202, 0.6)', '#4338CA');
+            
+            const leptokurticTheoryData = generateNormalData(50, 3, 80).concat(generateNormalData(50, 1, 20)).concat([10, 90]);
+            renderTheoryHistogramWithKDE('leptokurticChart', leptokurticTheoryData.sort((a,b)=>a-b), 'Leptokurtic (Sharp Peak, Fat Tails)', 'rgba(249, 115, 22, 0.6)', '#F97316');
+
+            const platykurticTheoryData = Array.from({length: 100}, (_, i) => 25 + Math.random() * 50); 
+            renderTheoryHistogramWithKDE('platykurticChart', platykurticTheoryData.sort((a,b)=>a-b), 'Platykurtic (Flat Peak, Thin Tails)', 'rgba(59, 130, 246, 0.6)', '#3B82F6');
+
+
+            const boxplotExampleCtxCanvas = document.getElementById('boxplotExampleChart')
+            if (boxplotExampleCtxCanvas) {
+                const boxplotExampleCtx = boxplotExampleCtxCanvas.getContext('2d');
+                if (boxplotExampleCtxCanvas.chartInstance) {
+                    boxplotExampleCtxCanvas.chartInstance.destroy();
+                }
+                boxplotExampleCtxCanvas.chartInstance = new Chart(boxplotExampleCtx, {
+                    type: 'scatter', 
+                    data: { datasets: [{ label: 'Data Points (Conceptual)', data: [], pointRadius: 0 }] },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, title: { display: true, text: 'Box Plot Components', font: { size: 14 } }, tooltip: { enabled: false } },
+                        scales: { x: { type: 'linear', position: 'bottom', min: 0, max: 100, title: { display: true, text: 'Value' } }, y: { display: false, min: 0, max: 1 } },
+                        animation: {
+                            onComplete: function(animation) {
+                                const chart = animation.chart; 
+                                if (!chart.chartArea) return;
+                                const ctx = chart.ctx; const xScale = chart.scales.x;
+                                const yCenter = chart.chartArea.height / 2 + chart.chartArea.top;
+                                const min = 10, q1 = 25, median = 40, q3 = 65, max = 90, outlier = 98;
+                                ctx.save();
+                                ctx.fillStyle = 'rgba(67, 56, 202, 0.2)'; ctx.strokeStyle = '#4338CA'; ctx.lineWidth = 2;
+                                const boxHeight = Math.min(30, chart.chartArea.height * 0.25); const boxY = yCenter - (boxHeight / 2);
+                                ctx.fillRect(xScale.getPixelForValue(q1), boxY, xScale.getPixelForValue(q3) - xScale.getPixelForValue(q1), boxHeight);
+                                ctx.strokeRect(xScale.getPixelForValue(q1), boxY, xScale.getPixelForValue(q3) - xScale.getPixelForValue(q1), boxHeight);
+                                ctx.beginPath(); ctx.strokeStyle = '#EF4444'; ctx.lineWidth = 3;
+                                ctx.moveTo(xScale.getPixelForValue(median), boxY); ctx.lineTo(xScale.getPixelForValue(median), boxY + boxHeight); ctx.stroke();
+                                ctx.strokeStyle = '#4338CA'; ctx.lineWidth = 2;
+                                ctx.beginPath(); ctx.moveTo(xScale.getPixelForValue(min), yCenter); ctx.lineTo(xScale.getPixelForValue(q1), yCenter); ctx.stroke();
+                                ctx.beginPath(); ctx.moveTo(xScale.getPixelForValue(min), yCenter - 5); ctx.lineTo(xScale.getPixelForValue(min), yCenter + 5); ctx.stroke();
+                                ctx.beginPath(); ctx.moveTo(xScale.getPixelForValue(q3), yCenter); ctx.lineTo(xScale.getPixelForValue(max), yCenter); ctx.stroke();
+                                ctx.beginPath(); ctx.moveTo(xScale.getPixelForValue(max), yCenter - 5); ctx.lineTo(xScale.getPixelForValue(max), yCenter + 5); ctx.stroke();
+                                ctx.fillStyle = '#FBBF24'; ctx.beginPath(); ctx.arc(xScale.getPixelForValue(outlier), yCenter, 5, 0, 2 * Math.PI); ctx.fill();
+                                ctx.strokeStyle = '#92400E'; ctx.stroke();
+                                ctx.fillStyle = '#1F2937'; ctx.font = '10px Inter'; ctx.textAlign = 'center';
+                                const labelsAndValues = [
+                                    {label: 'Min', value: min, yOffset: 25}, {label: 'Q1', value: q1, yOffset: 25},
+                                    {label: 'Median', value: median, yOffset: 25}, {label: 'Q3', value: q3, yOffset: 25},
+                                    {label: 'Max', value: max, yOffset: 25}, {label: 'Outlier', value: outlier, yOffset: -15}
+                                ];
+                                labelsAndValues.forEach(item => {
+                                     ctx.fillText(`${item.label}: ${item.value}`, xScale.getPixelForValue(item.value), yCenter + item.yOffset );
+                                });
+                                ctx.restore();
+                            }
+                        }
+                    }
+                });
+            }
+
+            function analyzeDistribution() {
+                if (!dataInput || !resultsOutput || !countResult || !meanResult || !medianResult || 
+                    !q1Result || !q3Result || !iqrResult || !skewnessResult || !kurtosisResult || !interpretationText) {
+                    console.error("One or more DOM elements for analysis are missing.");
+                    return;
+                }
+
+                const rawData = dataInput.value;
+                const numbers = rawData.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+
+                if (numbers.length < 2) {
+                    alert("Please enter at least two valid numbers separated by commas for analysis.");
+                    resultsOutput.classList.add('hidden');
+                    return;
+                }
+
+                numbers.sort((a, b) => a - b);
+                const n = numbers.length;
+                const mean = numbers.reduce((sum, val) => sum + val, 0) / n;
+                
+                let median;
+                const mid = Math.floor(n / 2);
+                median = n % 2 === 0 ? (numbers[mid - 1] + numbers[mid]) / 2 : numbers[mid];
+
+                const getQuartile = (arr, percentile) => {
+                    const index = (percentile / 100) * (arr.length - 1);
+                    const floorIndex = Math.floor(index);
+                    const ceilIndex = Math.ceil(index);
+                    if (floorIndex === ceilIndex) return arr[floorIndex];
+                    return arr[floorIndex] + (arr[ceilIndex] - arr[floorIndex]) * (index - floorIndex);
+                };
+
+                const q1 = getQuartile(numbers, 25);
+                const q3 = getQuartile(numbers, 75);
+                const iqr = q3 - q1;
+
+                const sumOfSquaredDifferences = numbers.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0);
+                const stdDev = n > 1 ? Math.sqrt(sumOfSquaredDifferences / (n - 1)) : 0; 
+
+                let skewness = 'N/A (n < 3)';
+                if (n >= 3) {
+                    if (stdDev === 0) { 
+                        skewness = 0;
+                    } else { 
+                        const sumOfCubedStandardizedDifferences = numbers.reduce((sum, val) => sum + Math.pow((val - mean) / stdDev, 3), 0);
+                        skewness = (n / ((n - 1) * (n - 2))) * sumOfCubedStandardizedDifferences;
+                    }
+                }
+
+                let kurtosis = 'N/A (n < 4)'; 
+                if (n >= 4) {
+                    if (stdDev === 0) { 
+                        kurtosis = 0; 
+                    } else { 
+                        const sumOfFourthPowerStandardizedDifferences = numbers.reduce((sum, val) => sum + Math.pow((val - mean) / stdDev, 4), 0);
+                        const term1 = (n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3));
+                        const term2 = sumOfFourthPowerStandardizedDifferences;
+                        const term3 = (3 * Math.pow(n - 1, 2)) / ((n - 2) * (n - 3));
+                        kurtosis = (term1 * term2) - term3;
+                    }
+                }
+                
+                countResult.innerText = n;
+                meanResult.innerText = mean.toFixed(2);
+                medianResult.innerText = median.toFixed(2);
+                q1Result.innerText = q1.toFixed(2);
+                q3Result.innerText = q3.toFixed(2);
+                iqrResult.innerText = iqr.toFixed(2);
+                skewnessResult.innerText = typeof skewness === 'number' ? skewness.toFixed(3) : skewness;
+                kurtosisResult.innerText = typeof kurtosis === 'number' ? kurtosis.toFixed(3) : kurtosis;
+
+                let interpretation = "";
+                if (typeof skewness === 'number') {
+                    if (skewness > 0.5) interpretation += `The distribution is <strong>positively (right) skewed</strong> (Skewness: ${skewness.toFixed(3)}), indicating a longer tail on the right. Mean (${mean.toFixed(2)}) is likely greater than Median (${median.toFixed(2)}). `;
+                    else if (skewness < -0.5) interpretation += `The distribution is <strong>negatively (left) skewed</strong> (Skewness: ${skewness.toFixed(3)}), indicating a longer tail on the left. Mean (${mean.toFixed(2)}) is likely less than Median (${median.toFixed(2)}). `;
+                    else interpretation += `The distribution is relatively <strong>symmetrical</strong> (Skewness: ${skewness.toFixed(3)}). Mean (${mean.toFixed(2)}) and Median (${median.toFixed(2)}) are close. `;
+                } else interpretation += `Skewness not calculated (requires n ≥ 3). `;
+
+                if (typeof kurtosis === 'number') {
+                    if (kurtosis > 0.5) interpretation += `It is <strong>leptokurtic</strong> (Kurtosis: ${kurtosis.toFixed(3)}): sharper peak, fatter tails (more outliers).`;
+                    else if (kurtosis < -0.5) interpretation += `It is <strong>platykurtic</strong> (Kurtosis: ${kurtosis.toFixed(3)}): flatter peak, thinner tails (fewer outliers).`;
+                    else interpretation += `It is <strong>mesokurtic</strong> (Kurtosis: ${kurtosis.toFixed(3)}): similar to a normal distribution.`;
+                } else interpretation += `Kurtosis not calculated (requires n ≥ 4).`;
+                
+                interpretationText.innerHTML = interpretation;
+                resultsOutput.classList.remove('hidden');
+
+                renderPracticalHistogramWithKDE(numbers, mean, median);
+                renderPracticalBoxplot(numbers, median, q1, q3, iqr);
+            }
+
+            function renderPracticalHistogramWithKDE(numbers, mean, median) {
+                if (practicalHistogramChartInstance) practicalHistogramChartInstance.destroy();
+                
+                const histogramData = createHistogramData(numbers, 10);
+                const kdeData = calculateKDE(numbers, 100);
+                const practicalHistCanvas = document.getElementById('practicalHistogramChart');
+                if (!practicalHistCanvas) return;
+
+                practicalHistogramChartInstance = new Chart(practicalHistCanvas.getContext('2d'), {
+                    data: {
+                        labels: histogramData.labels,
+                        datasets: [{
+                            label: 'Frequency',
+                            data: histogramData.data,
+                            backgroundColor: 'rgba(67, 56, 202, 0.6)',
+                            borderColor: 'rgba(67, 56, 202, 1)',
+                            borderWidth: 1,
+                            type: 'bar',
+                            order: 2
+                        },
+                        {
+                            label: 'KDE',
+                            data: kdeData.x.map((x, i) => ({ x: x, y: kdeData.y[i] })),
+                            borderColor: '#F97316', 
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.4,
+                            type: 'line',
+                            order: 1, 
+                            pointRadius: 0,
+                            xAxisID: 'x-axis-kde', 
+                            yAxisID: 'y' 
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'Data Histogram with KDE', font: { size: 14 } },
+                            tooltip: { /* default tooltips */ }
+                        },
+                        scales: {
+                            x: { 
+                                type: 'category',
+                                labels: histogramData.labels,
+                                title: { display: true, text: 'Value Range' },
+                                ticks: { autoSkip: false, maxRotation: 45, minRotation: 45 },
+                                grid: { display: false },
+                            },
+                            'x-axis-kde': { 
+                                type: 'linear',
+                                position: 'bottom',
+                                min: kdeData.x.length > 0 ? Math.min(...kdeData.x) : 0,
+                                max: kdeData.x.length > 0 ? Math.max(...kdeData.x) : 1,
+                                grid: { display: false },
+                                display: false, 
+                            },
+                            y: { 
+                                beginAtZero: true,
+                                title: { display: true, text: 'Frequency / Scaled Density' },
+                                ticks: { precision: 0 },
+                            }
+                        },
+                        layout: {
+                            padding: {
+                                top: 10,
+                                bottom: 10,
+                                left: 10,
+                                right: 10
+                            }
+                        },
+                        animation: {
+                            onComplete: function(animation) {
+                                const chart = animation.chart;
+                                if (!chart.chartArea) return;
+                                const ctx = chart.ctx;
+                                const xScaleKDE = chart.scales['x-axis-kde']; 
+                                
+                                const drawLineAndLabel = (value, label, color, yTextOffset = 5) => {
+                                    if (typeof value !== 'number' || isNaN(value) || !xScaleKDE || !chart.chartArea) return;
+                                    const xPos = xScaleKDE.getPixelForValue(value);
+                                    if (xPos < chart.chartArea.left || xPos > chart.chartArea.right) return; 
+
+                                    ctx.save();
+                                    ctx.beginPath();
+                                    ctx.strokeStyle = color;
+                                    ctx.lineWidth = 2;
+                                    ctx.setLineDash([5, 5]);
+                                    ctx.moveTo(xPos, chart.chartArea.top);
+                                    ctx.lineTo(xPos, chart.chartArea.bottom);
+                                    ctx.stroke();
+                                    
+                                    ctx.fillStyle = color;
+                                    ctx.font = 'bold 11px Inter';
+                                    
+                                    let textAlign = 'center';
+                                    if (xPos < chart.chartArea.left + 50) textAlign = 'left';
+                                    else if (xPos > chart.chartArea.right - 50) textAlign = 'right';
+                                    ctx.textAlign = textAlign;
+                                    
+                                    ctx.fillText(`${label}: ${value.toFixed(2)}`, xPos, chart.chartArea.top + yTextOffset);
+                                    ctx.restore();
+                                };
+                                drawLineAndLabel(mean, 'Mean', '#EF4444', 15); 
+                                drawLineAndLabel(median, 'Median', '#22C55E', 30);
+                            }
+                        }
+                    }
+                });
+            }
+
+            function renderPracticalBoxplot(numbers, median, q1, q3, iqr) {
+                if (practicalBoxplotChartInstance) practicalBoxplotChartInstance.destroy();
+
+                const minVal = numbers[0]; 
+                const maxVal = numbers[numbers.length - 1];
+
+                const lowerWhiskerBound = q1 - 1.5 * iqr;
+                const upperWhiskerBound = q3 + 1.5 * iqr;
+
+                const nonOutliers = numbers.filter(num => num >= lowerWhiskerBound && num <= upperWhiskerBound);
+                const minWhisker = nonOutliers.length > 0 ? Math.min(...nonOutliers) : q1;
+                const maxWhisker = nonOutliers.length > 0 ? Math.max(...nonOutliers) : q3;
+                const outliers = numbers.filter(num => num < lowerWhiskerBound || num > upperWhiskerBound);
+                
+                const practicalBoxplotCanvas = document.getElementById('practicalBoxplotChart');
+                if (!practicalBoxplotCanvas) return;
+
+                const range = maxVal - minVal;
+                let padding = range === 0 ? (Math.abs(minVal) * 0.1 || 1) : range * 0.1;
+                const axisMin = minVal - padding;
+                const axisMax = maxVal + padding;
+
+                practicalBoxplotChartInstance = new Chart(practicalBoxplotCanvas.getContext('2d'), {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Outliers',
+                                data: outliers.map(val => ({ x: val, y: 0.5 })),
+                                backgroundColor: '#FBBF24', pointRadius: 5, pointStyle: 'circle', showLine: false
+                            },
+                            { label: 'Bounds', data: [{x: axisMin, y:0.5}, {x:axisMax, y:0.5}], pointRadius:0, showLine: false }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'Data Box Plot', font: { size: 14 } },
+                            tooltip: { callbacks: { label: ctxVal => `Value: ${ctxVal.parsed.x.toFixed(2)}` } }
+                        },
+                        scales: {
+                            x: { type: 'linear', position: 'bottom', title: { display: true, text: 'Value' }, min: axisMin, max: axisMax },
+                            y: { display: false, min: 0, max: 1 }
+                        },
+                        animation: {
+                            onComplete: function(animation) {
+                                const chart = animation.chart; 
+                                if (!chart.chartArea) return; 
+                                const ctx = chart.ctx; const xScale = chart.scales.x;
+                                const yCenter = chart.chartArea.height / 2 + chart.chartArea.top;
+                                const boxHeight = Math.min(40, chart.chartArea.height * 0.3); 
+                                const boxY = yCenter - (boxHeight / 2);
+
+                                ctx.save();
+                                ctx.fillStyle = 'rgba(59, 130, 246, 0.3)'; ctx.strokeStyle = '#3B82F6'; ctx.lineWidth = 1.5;
+                                const q1Px = xScale.getPixelForValue(q1);
+                                const q3Px = xScale.getPixelForValue(q3);
+                                ctx.fillRect(q1Px, boxY, q3Px - q1Px, boxHeight);
+                                ctx.strokeRect(q1Px, boxY, q3Px - q1Px, boxHeight);
+                                
+                                ctx.beginPath(); ctx.strokeStyle = '#EF4444'; ctx.lineWidth = 2.5;
+                                const medianPx = xScale.getPixelForValue(median);
+                                ctx.moveTo(medianPx, boxY); ctx.lineTo(medianPx, boxY + boxHeight); ctx.stroke();
+                                
+                                ctx.strokeStyle = '#3B82F6'; ctx.lineWidth = 1.5;
+                                const minWhiskerPx = xScale.getPixelForValue(minWhisker);
+                                const maxWhiskerPx = xScale.getPixelForValue(maxWhisker);
+                                ctx.beginPath(); ctx.moveTo(minWhiskerPx, yCenter); ctx.lineTo(q1Px, yCenter); ctx.stroke(); 
+                                ctx.beginPath(); ctx.moveTo(minWhiskerPx, yCenter - boxHeight/4); ctx.lineTo(minWhiskerPx, yCenter + boxHeight/4); ctx.stroke(); 
+                                ctx.beginPath(); ctx.moveTo(maxWhiskerPx, yCenter); ctx.lineTo(q3Px, yCenter); ctx.stroke(); 
+                                ctx.beginPath(); ctx.moveTo(maxWhiskerPx, yCenter - boxHeight/4); ctx.lineTo(maxWhiskerPx, yCenter + boxHeight/4); ctx.stroke(); 
+                                ctx.restore();
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

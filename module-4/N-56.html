@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S56: Confidence Intervals - Concept & Calculation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+      <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    
+    <script>
+        // Wait for Chart.js and its plugin to load
+        window.addEventListener('load', function() {
+            if (typeof Chart !== 'undefined' && typeof ChartAnnotation !== 'undefined') {
+                Chart.register(ChartAnnotation);
+                console.log("Chart.js Annotation Plugin registered successfully.");
+                // Trigger initial calculation after plugins are registered
+                if (typeof calculateConfidenceInterval === 'function') {
+                    calculateConfidenceInterval();
+                }
+            } else {
+                console.error("Chart.js or Chart.js Annotation Plugin not loaded correctly. Chart annotations will not work.");
+            }
+        });
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="number"], select, textarea {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            max-width: 250px;
+            margin-bottom: 0.5rem;
+        }
+        textarea {
+            max-width: 100%;
+            min-height: 80px;
+            resize: vertical;
+        }
+        .calculate-button, .simulate-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .calculate-button:hover, .simulate-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .interpretation-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;  /* Fixed height for charts */
+            width: 100%;
+            margin: 1rem 0;
+            background-color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .input-group label {
+            font-weight: 500;
+            color: #4B5563;
+            min-width: 120px; /* Align labels */
+        }
+        /* Message Box Styling */
+        #messageBox {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S56: Confidence Intervals - Concept & Calculation</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Confidence Intervals - Concept & Calculation</h2>
+            <p class="section-intro">In the realm of inferential statistics, our primary goal is often to draw conclusions about a larger <strong>population</strong> based on data collected from a smaller <strong>sample</strong>. While a single value (a point estimate) from a sample can give us a guess about a population parameter, it doesn't convey the inherent uncertainty in that guess. This is precisely where <strong>Confidence Intervals (CIs)</strong> become indispensable, offering a robust range of plausible values for the unknown population parameter.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">1. What are Confidence Intervals?</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">At its core, a confidence interval is an estimated range of values which is likely to include an unknown population parameter, calculated from a given set of sample data. It provides a measure of the reliability of an estimate.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Point Estimate vs. Interval Estimate: The Need for a Range</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>A <strong>point estimate</strong> is a single value, such as the sample mean (\(\bar{x}\)), sample proportion (\(\hat{p}\)), or sample standard deviation (\(s\)), used to estimate a corresponding population parameter (e.g., population mean \(\mu\), population proportion \(p\), population standard deviation \(\sigma\)). While it's the "best guess," it's almost certainly not exactly equal to the true population parameter due to sampling variability.</li>
+                            <li>An <strong>interval estimate</strong>, or confidence interval, addresses this limitation by providing a range of values within which the true population parameter is likely to fall. This range gives us a more realistic understanding of the precision and reliability of our estimate.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Understanding the Confidence Level: The Long-Run Frequency</strong>
+                        <p class="mt-2">The <strong>confidence level</strong>, typically expressed as a percentage (e.g., 90%, 95%, 99%), represents the long-run probability that the confidence interval constructed from a random sample will contain the true population parameter. It's crucial to interpret this correctly:</p>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>If you were to take many, many independent random samples from the same population and construct a 95% confidence interval for each sample, approximately 95% of those intervals would contain the true population parameter.</li>
+                            <li><strong>Common Misinterpretation:</strong> It does NOT mean there's a 95% chance that the true parameter is within <em>this specific</em> interval you just calculated. Once an interval is calculated, the true parameter is either in it or it isn't; there's no probability associated with a single, fixed interval. The probability refers to the <em>method</em> of interval construction.</li>
+                            <li>A higher confidence level (e.g., 99%) implies a broader, less precise interval, as you need to cast a wider net to be more confident of capturing the true parameter. Conversely, a lower confidence level (e.g., 90%) results in a narrower, more precise interval, but with a higher risk of missing the true parameter.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Margin of Error (E): The Half-Width of Uncertainty</strong>
+                        <p class="mt-2">The <strong>Margin of Error (E)</strong> is the value added to and subtracted from the point estimate to create the confidence interval. It quantifies the amount of uncertainty or precision in our estimate. A larger margin of error indicates greater uncertainty and a wider interval, while a smaller margin of error indicates higher precision and a narrower interval.</p>
+                        <p class="mt-2 text-center">\[\text{Confidence Interval} = \text{Point Estimate} \pm \text{Margin of Error}\]</p>
+                        <p class="mt-2 text-center">\[CI = \bar{x} \pm E\]</p>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">2. Relationship to Hypothesis Testing: Two Sides of the Same Coin</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">Confidence intervals and hypothesis tests are deeply intertwined and often lead to consistent conclusions. They are based on the same underlying statistical theory and distributions.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>The Duality Principle:</strong>
+                        <p class="mt-2">For a two-tailed hypothesis test conducted at a significance level of \(\alpha\) (e.g., \(\alpha = 0.05\)), if the hypothesized null value (e.g., \(\mu_0\) for a population mean) falls <em>outside</em> the \((1-\alpha)\%\) confidence interval (e.g., a 95% CI), then you would <strong>reject the null hypothesis (\(H_0\))</strong>. This is equivalent to finding a p-value less than \(\alpha\).</p>
+                        <p class="mt-2">Conversely, if the hypothesized null value falls <em>within</em> the \((1-\alpha)\%\) confidence interval, you would <strong>fail to reject \(H_0\)</strong>. This is equivalent to finding a p-value greater than \(\alpha\).</p>
+                        <p class="mt-2 font-semibold">Example:</p>
+                        <p class="mt-1">Suppose a company claims its light bulbs have an average lifespan of 1000 hours. You take a sample and calculate a 95% confidence interval for the average lifespan to be \([980, 1010]\) hours.</p>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>If \(H_0: \mu = 1000\) hours, then 1000 falls within \([980, 1010]\). You would <strong>fail to reject \(H_0\)</strong>. The p-value would be greater than 0.05.</li>
+                            <li>If \(H_0: \mu = 970\) hours, then 970 falls outside \([980, 1010]\). You would <strong>reject \(H_0\)</strong>. The p-value would be less than 0.05.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Beyond P-values: The Advantage of CIs</strong>
+                        <p class="mt-2">While p-values tell you *whether* there is a statistically significant effect or difference, confidence intervals provide additional, often more practical, information about the *magnitude* and *direction* of that effect. This makes CIs incredibly valuable for business and scientific decision-making.</p>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Effect Size:</strong> A p-value doesn't tell you if a statistically significant difference is also practically significant. A CI, by providing a range of plausible values for the parameter, helps assess the practical importance of the finding. For example, a p-value might indicate a significant difference in sales, but a CI of \([0.1, 0.5]\) units might show the difference is too small to be economically meaningful.</li>
+                            <li><strong>Uncertainty Quantification:</strong> CIs explicitly show the precision of your estimate. A narrow CI indicates a precise estimate, while a wide CI suggests more uncertainty.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">3. Calculating Confidence Intervals for a Mean: Z-Interval vs. T-Interval</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">The specific formula used to calculate a confidence interval for a population mean (\(\mu\)) depends on whether the population standard deviation (\(\sigma\)) is known or unknown. This distinction dictates whether we use the Z-distribution (Normal distribution) or the t-distribution to find our critical value.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-600 mb-2 mt-4">General Formula for Confidence Interval for a Mean:</h4>
+                <p class="mb-2 text-center">$$\text{Confidence Interval} = \text{Sample Mean} \pm \text{Critical Value} \times \text{Standard Error of the Mean}$$</p>
+                <p class="mb-4 text-center">$$CI = \bar{x} \pm \text{Critical Value} \times \text{SEM}$$</p>
+
+                <h4 class="text-lg font-semibold text-indigo-600 mb-2 mt-4">3.1. Case 1: Population Standard Deviation (\(\sigma\)) is Known (Z-Interval)</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">This scenario is quite rare in real-world applications because if we don't know the population mean, it's highly unlikely we would know the population standard deviation. However, it's an important theoretical case.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Formula:</strong>
+                        <pre><code>\[\bar{x} \pm Z_{\alpha/2} \frac{\sigma}{\sqrt{n}}\]</code></pre>
+                        Where:
+                        <ul>
+                            <li>\(\bar{x}\) = the sample mean (our point estimate for \(\mu\))</li>
+                            <li>\(Z_{\alpha/2}\) = the critical Z-value from the standard normal distribution. This value corresponds to the chosen confidence level. For example, for a 95% CI, \(\alpha = 0.05\), so \(\alpha/2 = 0.025\). The \(Z\)-value that leaves 0.025 in the upper tail (and 0.025 in the lower tail) is 1.96.</li>
+                            <li>\(\sigma\) = the known population standard deviation</li>
+                            <li>\(n\) = the sample size</li>
+                            <li>\(\frac{\sigma}{\sqrt{n}}\) = the <strong>Standard Error of the Mean (SEM)</strong>, which is the standard deviation of the sampling distribution of the sample mean. It measures how much sample means are expected to vary from the true population mean.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Assumptions:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>The sample is a simple random sample.</li>
+                            <li>The population is normally distributed, OR the sample size (\(n\)) is sufficiently large (\(n \ge 30\)) for the Central Limit Theorem (CLT) to apply, ensuring the sampling distribution of the mean is approximately normal.</li>
+                            <li>The population standard deviation (\(\sigma\)) is known.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Example:</strong> A quality control engineer knows from historical data that the standard deviation of the fill volume of soda bottles is \(\sigma = 5 \text{ ml}\). A sample of 36 bottles is taken, and the sample mean fill volume is \(\bar{x} = 300 \text{ ml}\). To construct a 95% CI:
+                        <br> $Z_{\alpha/2}$ for 95% CI is 1.96.
+                        <br> $SEM = \frac{5}{\sqrt{36}} = \frac{5}{6} \approx 0.833 \text{ ml}$.
+                        <br> $CI = 300 \pm 1.96 \times 0.833 = 300 \pm 1.63 \text{ ml}$.
+                        <br> $CI = [298.37, 301.63] \text{ ml}$.
+                        <br> We are 95% confident that the true average fill volume is between 298.37 ml and 301.63 ml.
+                    </li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-600 mb-2 mt-4">3.2. Case 2: Population Standard Deviation (\(\sigma\)) is Unknown (T-Interval)</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">This is the most common and realistic scenario in practical statistics. Since \(\sigma\) is unknown, we must estimate it using the sample standard deviation (\(s\)). When we use \(s\) instead of \(\sigma\), the sampling distribution of the mean follows a <strong>t-distribution</strong> instead of a normal distribution, especially for smaller sample sizes.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>The t-distribution:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>The t-distribution is similar to the normal distribution (bell-shaped, symmetric, centered at 0) but has <strong>fatter tails</strong>. This accounts for the additional uncertainty introduced by estimating \(\sigma\) with \(s\).</li>
+                            <li>It is characterized by its <strong>degrees of freedom (df)</strong>, which for a single sample mean is \(df = n - 1\). As \(df\) increases (i.e., as sample size \(n\) increases), the t-distribution approaches the standard normal (Z) distribution.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Formula:</strong>
+                        <pre><code>\[\bar{x} \pm t_{\alpha/2, df} \frac{s}{\sqrt{n}}\]</code></pre>
+                        Where:
+                        <ul>
+                            <li>\(\bar{x}\) = the sample mean</li>
+                            <li>\(t_{\alpha/2, df}\) = the critical t-value from the t-distribution with \(df = n - 1\) degrees of freedom, corresponding to the desired confidence level. This value is found using a t-distribution table or statistical software.</li>
+                            <li>\(s\) = the sample standard deviation (our best estimate for \(\sigma\))</li>
+                            <li>\(n\) = the sample size</li>
+                            <li>\(\frac{s}{\sqrt{n}}\) = the <strong>Estimated Standard Error of the Mean (SEM)</strong>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Assumptions:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>The sample is a simple random sample.</li>
+                            <li>The population is approximately normally distributed, OR the sample size (\(n\)) is sufficiently large (\(n \ge 30\)) for the Central Limit Theorem (CLT) to apply, making the t-distribution robust to minor deviations from normality.</li>
+                            <li>The population standard deviation (\(\sigma\)) is unknown.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Example:</strong> A business wants to estimate the average time customers spend on their website. They collect data from a random sample of 25 customers, finding a sample mean of \(\bar{x} = 15 \text{ minutes}\) and a sample standard deviation of \(s = 4 \text{ minutes}\). To construct a 90% CI:
+                        <br> $df = n - 1 = 25 - 1 = 24$.
+                        <br> For a 90% CI, \(\alpha = 0.10\), so \(\alpha/2 = 0.05\). The \(t\)-value for \(df=24\) and \(\alpha/2=0.05\) (two-tailed) is approximately 1.711.
+                        <br> $SEM = \frac{4}{\sqrt{25}} = \frac{4}{5} = 0.8 \text{ minutes}$.
+                        <br> $CI = 15 \pm 1.711 \times 0.8 = 15 \pm 1.3688 \text{ minutes}$.
+                        <br> $CI = [13.63, 16.37] \text{ minutes}$.
+                        <br> We are 90% confident that the true average time customers spend on the website is between 13.63 and 16.37 minutes.
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">4. Factors Affecting Confidence Interval Width</h3>
+                <p class="mb-2 text-gray-700 leading-relaxed">The precision of our estimate, as reflected by the width of the confidence interval (which is twice the margin of error), is critically influenced by three key factors:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Confidence Level:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>**Impact:** A higher desired confidence level (e.g., 99% instead of 95%) requires a larger critical value (\(Z_{\alpha/2}\) or \(t_{\alpha/2, df}\)). This is because to be more certain of capturing the true parameter, you must expand the range of plausible values.</li>
+                            <li>**Relationship:** Increasing confidence level $\implies$ wider CI.</li>
+                            <li>**Example:** A 99% CI will always be wider than a 95% CI for the same data, reflecting the increased certainty.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Sample Size (\(n\)):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>**Impact:** A larger sample size leads to a more precise estimate of the population parameter. Mathematically, the standard error (\(\frac{s}{\sqrt{n}}\) or \(\frac{\sigma}{\sqrt{n}}\)) decreases as \(n\) increases (because \(\sqrt{n}\) is in the denominator). This reduction in standard error directly shrinks the margin of error.</li>
+                            <li>**Relationship:** Increasing sample size $\implies$ narrower CI.</li>
+                            <li>**Example:** A CI calculated from a sample of \(n=100\) will be narrower than one from \(n=25\) (assuming similar standard deviations), as larger samples provide more information about the population.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Variability (Standard Deviation \(s\) or \(\sigma\)):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>**Impact:** Greater variability within the population (indicated by a larger standard deviation) means the data points are more spread out. This inherent spread translates to more uncertainty in estimating the population mean, thus requiring a wider interval.</li>
+                            <li>**Relationship:** Increasing variability $\implies$ wider CI.</li>
+                            <li>**Example:** If you're measuring the height of trees in a forest, and some are very tall while others are very short (high standard deviation), your CI for the average height will be wider than if all trees were roughly the same height (low standard deviation).</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Understanding how these factors interrelate is crucial for designing effective studies, interpreting statistical results, and making informed decisions about the precision of your estimates.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">5. Steps to Construct a Confidence Interval for a Mean</h3>
+                <ol class="list-decimal pl-5 space-y-3 text-gray-700">
+                    <li><strong>Identify the Goal:</strong> Determine which population parameter you want to estimate (e.g., population mean \(\mu\)).</li>
+                    <li><strong>Collect Sample Data:</strong> Obtain a random sample from the population of interest.
+                        <ul>
+                            <li>Calculate the sample mean (\(\bar{x}\)).</li>
+                            <li>Calculate the sample standard deviation (\(s\)).</li>
+                            <li>Note the sample size (\(n\)).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Choose the Confidence Level:</strong> Select the desired confidence level (e.g., 90%, 95%, 99%). This determines \(\alpha\) and \(\alpha/2\).</li>
+                    <li><strong>Determine the Appropriate Distribution and Critical Value:</strong>
+                        <ul>
+                            <li>If population standard deviation (\(\sigma\)) is known: Use the Z-distribution and find \(Z_{\alpha/2}\). (Rare)</li>
+                            <li>If population standard deviation (\(\sigma\)) is unknown: Use the t-distribution with \(df = n - 1\) and find \(t_{\alpha/2, df}\). (Most common)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Calculate the Standard Error of the Mean (SEM):</strong>
+                        <ul>
+                            <li>If \(\sigma\) is known: $SEM = \frac{\sigma}{\sqrt{n}}$</li>
+                            <li>If \(\sigma\) is unknown: $SEM = \frac{s}{\sqrt{n}}$</li>
+                        </ul>
+                    </li>
+                    <li><strong>Calculate the Margin of Error (E):</strong>
+                        <pre><code>\[E = \text{Critical Value} \times SEM\]</code></pre>
+                    </li>
+                    <li><strong>Construct the Confidence Interval:</strong>
+                        <pre><code>\[\text{Lower Bound} = \bar{x} - E\]
+\[\text{Upper Bound} = \bar{x} + E\]</code></pre>
+                        The CI is expressed as \([\text{Lower Bound}, \text{Upper Bound}]\).
+                    </li>
+                    <li><strong>Interpret the Interval:</strong> State your conclusion clearly in the context of the problem, referencing the confidence level and the estimated parameter.</li>
+                </ol>
+                <p class="mt-4 text-sm text-gray-600">By following these steps, you can systematically construct and interpret confidence intervals, providing a robust estimate of population parameters.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Confidence Interval Calculator for a Mean</h2>
+            <p class="section-intro">This interactive tool allows you to calculate confidence intervals for a population mean using sample data. You can input your sample statistics and desired confidence level, and the tool will compute the interval and provide an interpretation. Experiment with different values to observe the impact of sample mean, standard deviation, sample size, and confidence level on the resulting interval's width and precision.</p>
+
+            <div class="interactive-panel">
+                <div class="panel-title">Confidence Interval Calculator (for Mean)</div>
+                
+                <div class="input-group">
+                    <label for="sampleMean">Sample Mean (\(\bar{x}\)):</label>
+                    <input type="number" id="sampleMean" value="50" step="0.1">
+                </div>
+                <div class="input-group">
+                    <label for="sampleStdDev">Sample Standard Deviation (\(s\)):</label>
+                    <input type="number" id="sampleStdDev" value="10" step="0.1" min="0.01">
+                </div>
+                <div class="input-group">
+                    <label for="sampleSize">Sample Size (\(n\)):</label>
+                    <input type="number" id="sampleSize" value="30" step="1" min="2">
+                </div>
+                <div class="input-group">
+                    <label for="confidenceLevel">Confidence Level (%):</label>
+                    <input type="number" id="confidenceLevel" value="95" step="1" min="80" max="99">
+                </div>
+                
+                <button id="calculateCIBtn" class="calculate-button">Calculate Confidence Interval</button>
+
+                <div id="ciResults" class="results-box hidden">
+                    <h4>Confidence Interval Results:</h4>
+                    <div class="result-item">
+                        <span class="result-label">Critical Value:</span>
+                        <span id="criticalValueResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Standard Error of Mean (SEM):</span>
+                        <span id="semResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Margin of Error (E):</span>
+                        <span id="marginOfErrorResult" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Confidence Interval:</span>
+                        <span id="ciIntervalResult" class="result-value"></span>
+                    </div>
+
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Confidence Interval & Sample Mean</h5>
+                    <div class="chart-container">
+                        <canvas id="ciChart"></canvas>
+                    </div>
+
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-8 mb-2 text-center">Simulated Population Distribution with CI</h5>
+                    <p class="text-sm text-gray-600 text-center mb-4">This chart shows a normal distribution based on your sample's mean and standard deviation, with the calculated confidence interval highlighted.</p>
+                    <div class="chart-container">
+                        <canvas id="normalDistributionChart"></canvas>
+                    </div>
+
+                    <div id="ciInterpretationBox" class="interpretation-box mt-4">
+                        <h5 class="font-semibold text-base mb-1">Interpretation:</h5>
+                        <p id="ciInterpretationText" class="text-sm"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mt-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Discussion Points:</h3>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>Start with the default values: Sample Mean=50, Sample Std Dev=10, Sample Size=30, Confidence Level=95%. What is the calculated 95% CI? Explain what this interval means in practical terms. Observe its representation on both charts.</li>
+                    <li>**Impact of Confidence Level:**
+                        <ul>
+                            <li>Change the "Confidence Level" to 90%. How do the critical value, margin of error, and the width of the interval change? Why does a lower confidence level lead to a narrower interval? Observe how both charts update, especially the highlighted region on the normal distribution chart.</li>
+                            <li>Now change the "Confidence Level" to 99%. Observe the changes. What are the trade-offs between a higher confidence level and the precision of your estimate? See how the interval widens on both charts.</li>
+                        </ul>
+                    </li>
+                    <li>**Impact of Sample Size:**
+                        <ul>
+                            <li>With the confidence level back at 95%, change the "Sample Size" to 100. How does the interval change compared to the default 30? Explain why increasing the sample size makes the interval narrower. Notice how the CI becomes more precise on both charts.</li>
+                            <li>What happens if you decrease the "Sample Size" to 10? Notice the change in the critical t-value (it becomes larger) and the resulting interval width. How does the t-distribution account for smaller sample sizes? Observe the wider interval on both charts.</li>
+                        </ul>
+                    </li>
+                    <li>**Impact of Variability:**
+                        <ul>
+                            <li>Set Sample Size back to 30 and Confidence Level to 95%. Increase the "Sample Standard Deviation" to 20. What happens to the interval width? Why does greater variability in the data lead to less precise estimates (wider CIs)? See the significant widening of the interval on both charts.</li>
+                            <li>What would a very small sample standard deviation (e.g., 1) imply about the data and the resulting CI? How do the charts reflect this?</li>
+                        </ul>
+                    </li>
+                    <li>**Business Scenario Application:**
+                        <p class="mt-2">A manufacturing company implements a new production process. They take a random sample of 50 products and measure the time (in minutes) it takes to produce each. The sample mean production time is 12.5 minutes, with a sample standard deviation of 3.2 minutes.</p>
+                        <ul>
+                            <li>Calculate a 90% confidence interval for the true average production time of the new process.</li>
+                            <li>If the old process had an established average production time of 13.5 minutes, what can the company conclude about the effectiveness of the new process based on your calculated CI?</li>
+                            <li>If the company wants to be 99% confident, how would that affect the interval, and what might be the practical implications for decision-making?</li>
+                        </ul>
+                    </li>
+                    <li>**Limitations and Assumptions:**
+                        <ul>
+                            <li>What are the key assumptions for constructing a confidence interval for a mean? What might happen if these assumptions are violated?</li>
+                            <li>Discuss why a confidence interval is generally more informative than just a p-value from a hypothesis test.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Confidence intervals are powerful tools for quantifying uncertainty and providing a range of plausible values for population parameters. They are essential for drawing robust conclusions from sample data and making informed decisions in various fields, from business to science.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <div id="messageBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg z-50" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span id="messageText" class="block sm:inline"></span>
+        <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" onclick="document.getElementById('messageBox').classList.add('hidden');">
+            <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+        </span>
+    </div>
+
+    <script>
+        // --- Message Box Function ---
+        function showMessage(message, type = 'error') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            messageText.innerText = message;
+            messageBox.classList.remove('hidden');
+            if (type === 'error') {
+                messageBox.classList.remove('bg-green-100', 'border-green-400', 'text-green-700');
+                messageBox.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+            } else {
+                messageBox.classList.remove('bg-red-100', 'border-red-400', 'text-red-700'); // Remove red if previously error
+                messageBox.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ensure Chart.js is available
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js not loaded');
+                return;
+            }
+
+            // Register the annotation plugin if available
+            if (typeof ChartAnnotation !== 'undefined') {
+                Chart.register(ChartAnnotation);
+            } else {
+                console.warn('Chart.js Annotation plugin not loaded');
+            }
+
+            // Navigation button active state logic
+            document.querySelectorAll('nav a').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // --- Confidence Interval Calculator Logic ---
+            const sampleMeanInput = document.getElementById('sampleMean');
+            const sampleStdDevInput = document.getElementById('sampleStdDev');
+            const sampleSizeInput = document.getElementById('sampleSize');
+            const confidenceLevelInput = document.getElementById('confidenceLevel');
+            const calculateCIBtn = document.getElementById('calculateCIBtn');
+
+            const ciResultsDiv = document.getElementById('ciResults');
+            const criticalValueResultSpan = document.getElementById('criticalValueResult');
+            const semResultSpan = document.getElementById('semResult');
+            const marginOfErrorResultSpan = document.getElementById('marginOfErrorResult');
+            const ciIntervalResultSpan = document.getElementById('ciIntervalResult');
+            const ciInterpretationText = document.getElementById('ciInterpretationText');
+
+            // Global chart instances
+            let ciChartInstance = null;
+            let normalDistributionChartInstance = null;
+
+            // --- Ensure canvas elements are visible and properly sized ---
+            function ensureCanvasVisibility() {
+                const ciChartCanvas = document.getElementById('ciChart');
+                const normalDistCanvas = document.getElementById('normalDistributionChart');
+                if (ciChartCanvas) {
+                    ciChartCanvas.width = ciChartCanvas.parentElement.offsetWidth;
+                    ciChartCanvas.height = 300;
+                    ciChartCanvas.style.display = 'block';
+                }
+                if (normalDistCanvas) {
+                    normalDistCanvas.width = normalDistCanvas.parentElement.offsetWidth;
+                    normalDistCanvas.height = 300;
+                    normalDistCanvas.style.display = 'block';
+                }
+            }
+
+            // Call this before drawing charts
+            ensureCanvasVisibility();
+
+            calculateCIBtn.addEventListener('click', function() {
+                ensureCanvasVisibility();
+                calculateConfidenceInterval();
+            });
+
+            // Add event listeners for input changes to trigger recalculation
+            sampleMeanInput.addEventListener('input', function() {
+                ensureCanvasVisibility();
+                calculateConfidenceInterval();
+            });
+            sampleStdDevInput.addEventListener('input', function() {
+                ensureCanvasVisibility();
+                calculateConfidenceInterval();
+            });
+            sampleSizeInput.addEventListener('input', function() {
+                ensureCanvasVisibility();
+                calculateConfidenceInterval();
+            });
+            confidenceLevelInput.addEventListener('input', function() {
+                ensureCanvasVisibility();
+                calculateConfidenceInterval();
+            });
+
+            // Initial calculation on page load, ensuring MathJax is ready
+            if (typeof MathJax !== 'undefined' && MathJax.startup && MathJax.startup.promise) {
+                MathJax.startup.promise.then(() => {
+                    ensureCanvasVisibility();
+                    calculateConfidenceInterval();
+                }).catch(err => console.error("MathJax startup error:", err));
+            } else {
+                ensureCanvasVisibility();
+                calculateConfidenceInterval();
+            }
+
+            /**
+             * Helper function to get Z-critical values for common confidence levels.
+             * This is a simplified lookup for demonstration. For arbitrary confidence levels,
+             * a more robust inverse normal CDF function would be needed.
+             * @param {number} confidenceLevel - The confidence level as a percentage (e.g., 95).
+             * @returns {number} The Z-critical value.
+             */
+            function getZCriticalValue(confidenceLevel) {
+                const alpha = (100 - confidenceLevel) / 100;
+                const alpha_half = alpha / 2;
+
+                // Common Z-values for two-tailed tests
+                if (Math.abs(alpha_half - 0.05) < 0.0001) return 1.645; // 90% CI
+                if (Math.abs(alpha_half - 0.025) < 0.0001) return 1.96;  // 95% CI
+                if (Math.abs(alpha_half - 0.005) < 0.0001) return 2.576; // 99% CI
+                
+                // Fallback for other values using an approximation of inverse normal CDF
+                // This approximation is for illustrative purposes and not for production statistical analysis.
+                return -normalCDFInverse(alpha_half); // For two-tailed, we need Z_alpha/2
+            }
+
+            /**
+             * Helper function to get T-critical values based on confidence level and degrees of freedom.
+             * This is a simplified lookup table for demonstration purposes.
+             * In a real-world statistical application, a robust library (like SciPy in Python)
+             * would be used to calculate the exact t-distribution quantile (inverse CDF).
+             * @param {number} confidenceLevel - The confidence level as a percentage (e.g., 95).
+             * @param {number} df - Degrees of freedom (n-1).
+             * @returns {number} The T-critical value.
+             */
+            function getTCriticalValue(confidenceLevel, df) {
+                const alpha = (100 - confidenceLevel) / 100;
+                const alpha_half = alpha / 2;
+
+                // Approximate t-values for selected df and alpha_half (two-tailed)
+                // Values are for illustration and are rounded.
+                const tTable = {
+                    // df: { alpha_half=0.05 (90% CI), alpha_half=0.025 (95% CI), alpha_half=0.005 (99% CI) }
+                    1: { 0.05: 6.314, 0.025: 12.706, 0.005: 63.657 },
+                    2: { 0.05: 2.920, 0.025: 4.303, 0.005: 9.925 },
+                    3: { 0.05: 2.353, 0.025: 3.182, 0.005: 5.841 },
+                    4: { 0.05: 2.132, 0.025: 2.776, 0.005: 4.604 },
+                    5: { 0.05: 2.015, 0.025: 2.571, 0.005: 4.032 },
+                    10: { 0.05: 1.812, 0.025: 2.228, 0.005: 3.169 },
+                    15: { 0.05: 1.753, 0.025: 2.131, 0.005: 2.947 },
+                    20: { 0.05: 1.725, 0.025: 2.086, 0.005: 2.845 },
+                    25: { 0.05: 1.708, 0.025: 2.060, 0.005: 2.787 },
+                    30: { 0.05: 1.697, 0.025: 2.042, 0.005: 2.750 },
+                    40: { 0.05: 1.684, 0.025: 2.021, 0.005: 2.704 },
+                    60: { 0.05: 1.671, 0.025: 2.000, 0.005: 2.660 },
+                    100: { 0.05: 1.660, 0.025: 1.984, 0.005: 2.626 },
+                    Infinity: { 0.05: 1.645, 0.025: 1.96, 0.005: 2.576 } // Z-values for very large df
+                };
+
+                // Find the closest df in the table for interpolation or direct lookup
+                const dfs = Object.keys(tTable).map(Number).sort((a,b) => a-b);
+                let closestDf = Infinity;
+                for (let i = 0; i < dfs.length; i++) {
+                    if (df <= dfs[i]) {
+                        closestDf = dfs[i];
+                        break;
+                    }
+                }
+                
+                // If df is very large, use Z-value (t-distribution approaches normal for large df)
+                if (df >= 120) { // Practical threshold for using Z instead of T
+                    closestDf = Infinity;
+                }
+
+                // Get the critical value from the table
+                const critical = tTable[closestDf] ? tTable[closestDf][alpha_half] : undefined;
+                if (critical) {
+                    return critical;
+                }
+
+                // Fallback to Z-value if specific t-value not found (e.g., unusual alpha_half or df not in table)
+                // This is a safety net, but for proper statistical work, use a dedicated library.
+                return getZCriticalValue(confidenceLevel);
+            }
+
+            /**
+             * Inverse of Standard Normal CDF (approximation for Z-score from probability).
+             * This function is for demonstration purposes only and provides an approximation.
+             * For precise statistical calculations, use a robust library.
+             * @param {number} p - The probability (area to the left of the Z-score).
+             * @returns {number} The Z-score.
+             */
+            function normalCDFInverse(p) {
+                if (p < 0.0000000000000002 || p > 0.9999999999999998) {
+                    // Handle extreme values to prevent errors with approximation
+                    return p < 0.5 ? -Infinity : Infinity;
+                }
+                // Approximation from Abramowitz and Stegun (1964)
+                const a1 = -3.96968302867E+01; const a2 = 2.20946098424E+02;
+                const a3 = -2.75928510446E+02; const a4 = 1.38806040235E+02;
+                const a5 = -3.70498315386E+01; const a6 = 5.10862527953E+00;
+                const b1 = -5.44760987982E+01; const b2 = 1.61570110868E+02;
+                const b3 = -1.55618769835E+02; const b4 = 6.68013118831E+01;
+                const b5 = -1.32806815528E+01;
+                const c1 = -7.78489400243E-03; const c2 = -3.22396458041E-02;
+                const c3 = -3.42374945115E-02; const c4 = -1.20202129753E-02;
+                const d1 = 2.27238449892E-01; const d2 = 2.56852019240E-02;
+                const d3 = 3.56758172176E-02;
+                
+                let q = p - 0.5;
+                let r;
+                if (Math.abs(q) <= 0.425) {
+                    r = q * q;
+                    return q * (((((a6 * r + a5) * r + a4) * r + a3) * r + a2) * r + a1) /
+                           (((((b5 * r + b4) * r + b3) * r + b2) * r + b1) * r + 1);
+                } else {
+                    r = p > 0.5 ? 1 - p : p;
+                    r = Math.log(-Math.log(r));
+                    let retVal = (((((c4 * r + c3) * r + c2) * r + c1) * r + d3) * r + d2) * r + d1;
+                    return p > 0.5 ? -retVal : retVal;
+                }
+            }
+
+            /**
+             * Calculates the Probability Density Function (PDF) of a normal distribution.
+             * @param {number} x - The value at which to evaluate the PDF.
+             * @param {number} mean - The mean of the normal distribution.
+             * @param {number} stdDev - The standard deviation of the normal distribution.
+             * @returns {number} The PDF value at x.
+             */            function normalPDF(x, mean, stdDev) {
+                // Handle special case where stdDev is 0 - return impulse function
+                if (stdDev === 0) {
+                    return x === mean ? 1 : 0;
+                }
+                // Handle invalid stdDev
+                if (stdDev < 0) return 0;
+                
+                // Use a minimum stdDev to prevent extremely narrow distributions
+                const effectiveStdDev = Math.max(stdDev, 0.1);
+                const exponent = -Math.pow(x - mean, 2) / (2 * Math.pow(effectiveStdDev, 2));
+                return (1 / (effectiveStdDev * Math.sqrt(2 * Math.PI))) * Math.exp(exponent);
+            }
+
+            /**
+             * Calculates and displays the Confidence Interval for a mean.
+             * Handles input validation and uses appropriate critical values (t or Z).
+             * Also updates the Chart.js visualizations.
+             */
+            function calculateConfidenceInterval() {
+                document.getElementById('messageBox').classList.add('hidden'); // Hide any previous messages
+
+                const sampleMean = parseFloat(sampleMeanInput.value);
+                const sampleStdDev = parseFloat(sampleStdDevInput.value);
+                const sampleSize = parseInt(sampleSizeInput.value);
+                const confidenceLevel = parseFloat(confidenceLevelInput.value);
+
+                // --- Input Validation ---
+                if (isNaN(sampleMean)) {
+                    showMessage("Please enter a valid number for Sample Mean.", 'error');
+                    ciResultsDiv.classList.add('hidden');
+                    return;
+                }
+                if (isNaN(sampleStdDev) || sampleStdDev < 0) {
+                    showMessage("Sample Standard Deviation must be a non-negative number.", 'error');
+                    ciResultsDiv.classList.add('hidden');
+                    return;
+                }
+                if (sampleStdDev === 0 && sampleSize > 1) {
+                    showMessage("Sample Standard Deviation is 0. This implies no variability in your sample, leading to a point estimate rather than an interval. Consider if your data is truly representative.", 'warning');
+                    // Still proceed with calculation, but the interval will be [mean, mean]
+                }
+                if (isNaN(sampleSize) || sampleSize < 2) {
+                    showMessage("Sample Size must be an integer of at least 2.", 'error');
+                    ciResultsDiv.classList.add('hidden');
+                    return;
+                }
+                if (isNaN(confidenceLevel) || confidenceLevel <= 0 || confidenceLevel >= 100) {
+                    showMessage("Confidence Level must be a percentage between 0 and 100 (e.g., 95).", 'error');
+                    ciResultsDiv.classList.add('hidden');
+                    return;
+                }
+
+                const alpha = (100 - confidenceLevel) / 100;
+                const degreesOfFreedom = sampleSize - 1;
+
+                let criticalValue;
+                let distributionUsed = "t-distribution"; // Default to t-distribution as population std dev is unknown
+
+                // For practical purposes, t-distribution is used when population standard deviation is unknown.
+                // For very large sample sizes (e.g., n >= 30), the t-distribution closely approximates the Z-distribution.
+                if (sampleSize >= 30) {
+                    criticalValue = getZCriticalValue(confidenceLevel); // Use Z-table for approximation
+                    distributionUsed = "t-distribution (approximated by Z)";
+                } else {
+                    criticalValue = getTCriticalValue(confidenceLevel, degreesOfFreedom);
+                    distributionUsed = "t-distribution";
+                }
+
+                if (criticalValue === Infinity || criticalValue === -Infinity) {
+                    showMessage("Could not determine a finite critical value for the given confidence level. Please check inputs.", 'error');
+                    ciResultsDiv.classList.add('hidden');
+                    return;
+                }
+
+                const standardError = sampleStdDev / Math.sqrt(sampleSize);
+                const marginOfError = criticalValue * standardError;
+
+                const lowerBound = sampleMean - marginOfError;
+                const upperBound = sampleMean + marginOfError;
+
+                // --- Display Results ---
+                criticalValueResultSpan.innerText = criticalValue.toFixed(4) + ` (from ${distributionUsed})`;
+                semResultSpan.innerText = standardError.toFixed(4);
+                marginOfErrorResultSpan.innerText = marginOfError.toFixed(4);
+                ciIntervalResultSpan.innerText = `[${lowerBound.toFixed(2)}, ${upperBound.toFixed(2)}]`;
+
+                // Format interpretation text: use <strong> for bold, \( ... \) for inline math
+                let interpretationHtml = `We are <strong>${confidenceLevel}% confident</strong> that the true population mean (\\(\\mu\\)) lies within the interval <strong>[${lowerBound.toFixed(2)}, ${upperBound.toFixed(2)}]</strong>.`;
+                interpretationHtml += `<br><br>This means that if we were to repeat this sampling process many times, approximately ${confidenceLevel}% of the constructed intervals would contain the true population mean.`;
+                interpretationHtml += `<br><br>The <strong>margin of error</strong> of ${marginOfError.toFixed(4)} indicates the precision of our estimate. A smaller margin of error implies a more precise estimate.`;
+                
+                if (sampleSize < 30) {
+                    interpretationHtml += `<br><br>Since the sample size (\\(n=${sampleSize}\\)) is small, the <strong>t-distribution</strong> was used to account for the increased uncertainty due to estimating the population standard deviation from the sample.`;
+                } else {
+                    interpretationHtml += `<br><br>With a larger sample size (\\(n=${sampleSize}\\)), the <strong>t-distribution</strong> closely approximates the <strong>Z-distribution</strong>, providing a robust estimate.`;
+                }
+
+                if (sampleStdDev === 0) {
+                     interpretationHtml += `<br><br>Note: A standard deviation of 0 suggests all data points in your sample are identical. While mathematically possible, this is rare in real-world data and may indicate a need to re-examine your data collection or assumptions. The interval becomes a single point in this case.`;
+                }
+
+                ciInterpretationText.innerHTML = interpretationHtml;
+                
+                ciResultsDiv.classList.remove('hidden');
+
+                // --- Update CI Chart Visualization ---
+                const ciCtx = document.getElementById('ciChart').getContext('2d');
+
+                // Determine x-axis min/max for better visualization, especially when marginOfError is 0
+                let ciXAxisMin = lowerBound - marginOfError * 0.7;
+                let ciXAxisMax = upperBound + marginOfError * 0.7;
+
+                if (sampleStdDev === 0) { // Special handling for stdDev = 0
+                    const buffer = sampleMean === 0 ? 1 : Math.abs(sampleMean) * 0.1;
+                    ciXAxisMin = sampleMean - buffer;
+                    ciXAxisMax = sampleMean + buffer;
+                }
+                if (ciXAxisMin === ciXAxisMax) { // Ensure min < max
+                    ciXAxisMin -= 0.1;
+                    ciXAxisMax += 0.1;
+                }
+
+
+                const ciChartData = {
+                    labels: ['Population Mean Estimate'], // Dummy label for the y-axis
+                    datasets: [
+                        {
+                            label: 'Confidence Interval',
+                            type: 'line', // Use line to draw the range
+                            data: [{ x: lowerBound, y: 0 }, { x: upperBound, y: 0 }],
+                            borderColor: '#34D399', // Green for interval
+                            borderWidth: 6, // Thicker line
+                            pointRadius: 0, // No points for the line itself
+                            fill: false,
+                            tension: 0, // Straight line
+                            xAxisID: 'x-axis-0',
+                            yAxisID: 'y-axis-0',
+                            order: 1 // Draw interval first
+                        },
+                        {
+                            label: 'Sample Mean',
+                            type: 'scatter', // Use scatter for the point estimate
+                            data: [{ x: sampleMean, y: 0 }],
+                            backgroundColor: '#4338CA', // Indigo for mean
+                            borderColor: '#4338CA',
+                            pointRadius: 10, // Larger point
+                            pointBackgroundColor: '#4338CA',
+                            xAxisID: 'x-axis-0',
+                            yAxisID: 'y-axis-0',
+                            order: 0 // Draw mean on top
+                        }
+                    ]
+                };
+
+                const ciChartOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Confidence Interval for Population Mean (${confidenceLevel}%)`,
+                            font: { size: 16, weight: 'bold' },
+                            color: '#374151'
+                        },
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                color: '#4B5563',
+                                font: { size: 14 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.dataset.label === 'Sample Mean') {
+                                        return `Sample Mean: ${context.parsed.x.toFixed(2)}`;
+                                    } else if (context.dataset.label === 'Confidence Interval') {
+                                        return `CI: [${lowerBound.toFixed(2)}, ${upperBound.toFixed(2)}]`;
+                                    }
+                                    return '';
+                                }
+                            }
+                        },
+                        annotation: { // Chart.js Annotation Plugin
+                            annotations: {
+                                lowerBoundLabel: {
+                                    type: 'label',
+                                    xValue: lowerBound,
+                                    yValue: 0.2, // Position above the line
+                                    content: [`Lower: ${lowerBound.toFixed(2)}`],
+                                    font: { size: 12, weight: 'bold', color: '#10B981' },
+                                    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                                    borderColor: '#10B981',
+                                    borderWidth: 1,
+                                    borderRadius: 6,
+                                    callout: {
+                                        display: true,
+                                        side: 5,
+                                        position: 'bottom',
+                                        borderColor: '#10B981'
+                                    }
+                                },
+                                upperBoundLabel: {
+                                    type: 'label',
+                                    xValue: upperBound,
+                                    yValue: 0.2,
+                                    content: [`Upper: ${upperBound.toFixed(2)}`],
+                                    font: { size: 12, weight: 'bold', color: '#10B981' },
+                                    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                                    borderColor: '#10B981',
+                                    borderWidth: 1,
+                                    borderRadius: 6,
+                                    callout: {
+                                        display: true,
+                                        side: 5,
+                                        position: 'bottom',
+                                        borderColor: '#10B981'
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        'x-axis-0': { // Explicitly define x-axis
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'Value',
+                                color: '#4B5563',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            min: ciXAxisMin,
+                            max: ciXAxisMax,
+                            ticks: {
+                                color: '#4B5563',
+                                font: { size: 12 }
+                            },
+                            grid: {
+                                color: '#e5e7eb'
+                            }
+                        },
+                        'y-axis-0': { // Dummy y-axis
+                            display: false, // Hide y-axis labels and ticks
+                            min: -0.5, // Ensure the point and line are visible vertically
+                            max: 0.5,
+                            ticks: {
+                                display: false
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 800,
+                        easing: 'easeOutQuart'
+                    }
+                };                // Destroy existing chart instance if it exists
+                if (ciChartInstance) {
+                    ciChartInstance.destroy();
+                }
+                
+                // Create new chart instance
+                ciChartInstance = new Chart(ciCtx, {
+                    type: 'scatter', // Default type, but datasets override
+                    data: ciChartData,
+                    options: ciChartOptions,
+                    plugins: [ChartAnnotation] // Register the plugin
+                });
+
+                // --- Update Normal Distribution Chart Visualization ---
+                const normalDistCtx = document.getElementById('normalDistributionChart').getContext('2d');
+
+                const numPoints = 100;
+                let normalDistData = [];
+                let shadedArea = [];
+                  // Determine the range for the normal distribution curve
+                const rangeFactor = 4; // Extend to +/- 4 standard deviations from the mean
+                let minX, maxX;
+                
+                if (sampleStdDev === 0) {
+                    // For point estimates, show a small range around the mean
+                    const buffer = Math.max(1, Math.abs(sampleMean) * 0.1);
+                    minX = sampleMean - buffer;
+                    maxX = sampleMean + buffer;
+                } else {
+                    // For normal distribution, use standard deviations
+                    const effectiveStdDev = Math.max(sampleStdDev, Math.abs(sampleMean) * 0.01);
+                    minX = sampleMean - rangeFactor * effectiveStdDev;
+                    maxX = sampleMean + rangeFactor * effectiveStdDev;
+                }
+
+                // Ensure the range includes the confidence interval
+                minX = Math.min(minX, lowerBound - Math.abs(lowerBound) * 0.1);
+                maxX = Math.max(maxX, upperBound + Math.abs(upperBound) * 0.1);
+
+                const step = (maxX - minX) / numPoints;
+
+                for (let i = 0; i <= numPoints; i++) {
+                    const x = minX + i * step;
+                    const y = normalPDF(x, sampleMean, sampleStdDev);
+                    normalDistData.push({ x: x, y: y });
+
+                    // Add points for shaded area within CI
+                    if (x >= lowerBound && x <= upperBound) {
+                        shadedArea.push({ x: x, y: y });
+                    }
+                }
+
+                // Close the shaded area polygon
+                if (shadedArea.length > 0) {
+                    shadedArea.unshift({ x: lowerBound, y: 0 }); // Start from lower bound on x-axis
+                    shadedArea.push({ x: upperBound, y: 0 });    // End at upper bound on x-axis
+                }
+                
+
+                const normalDistChartData = {
+                    datasets: [
+                        {
+                            label: 'Normal Distribution PDF',
+                            data: normalDistData,
+                            borderColor: '#4338CA', // Indigo for the curve
+                            borderWidth: 2,
+                            fill: false,
+                            pointRadius: 0,
+                            tension: 0.4,
+                            type: 'line',
+                            order: 1
+                        },
+                        {
+                            label: 'Confidence Interval Area',
+                            data: shadedArea,
+                            backgroundColor: 'rgba(52, 211, 153, 0.3)', // Light green shaded area
+                            borderColor: 'transparent',
+                            borderWidth: 0,
+                            fill: 'origin', // Fill from the line to the x-axis
+                            pointRadius: 0,
+                            tension: 0.4,
+                            type: 'line',
+                            order: 2 // Draw over the curve
+                        }
+                    ]
+                };
+
+                const normalDistChartOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Simulated Normal Distribution (Mean: ${sampleMean.toFixed(2)}, Std Dev: ${sampleStdDev.toFixed(2)})`,
+                            font: { size: 16, weight: 'bold' },
+                            color: '#374151'
+                        },
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                color: '#4B5563',
+                                font: { size: 14 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.dataset.label === 'Normal Distribution PDF') {
+                                        return `Value: ${context.parsed.x.toFixed(2)}, Density: ${context.parsed.y.toFixed(4)}`;
+                                    } else if (context.dataset.label === 'Confidence Interval Area') {
+                                        return `CI: [${lowerBound.toFixed(2)}, ${upperBound.toFixed(2)}]`;
+                                    }
+                                    return '';
+                                }
+                            }
+                        },
+                        annotation: { // Chart.js Annotation Plugin for vertical lines at CI bounds
+                            annotations: {
+                                lowerBoundLine: {
+                                    type: 'line',
+                                    xMin: lowerBound,
+                                    xMax: lowerBound,
+                                    borderColor: '#10B981',
+                                    borderWidth: 2,
+                                    borderDash: [6, 6],
+                                    label: {
+                                        content: `Lower: ${lowerBound.toFixed(2)}`,
+                                        enabled: true,
+                                        position: 'top',
+                                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                                        font: { size: 12, weight: 'bold', color: '#10B981' }
+                                    }
+                                },
+                                upperBoundLine: {
+                                    type: 'line',
+                                    xMin: upperBound,
+                                    xMax: upperBound,
+                                    borderColor: '#10B981',
+                                    borderWidth: 2,
+                                    borderDash: [6, 6],
+                                    label: {
+                                        content: `Upper: ${upperBound.toFixed(2)}`,
+                                        enabled: true,
+                                        position: 'top',
+                                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                                        font: { size: 12, weight: 'bold', color: '#10B981' }
+                                    }
+                                },
+                                meanLine: {
+                                    type: 'line',
+                                    xMin: sampleMean,
+                                    xMax: sampleMean,
+                                    borderColor: '#4338CA',
+                                    borderWidth: 2,
+                                    borderDash: [2, 2],
+                                    label: {
+                                        content: `Mean: ${sampleMean.toFixed(2)}`,
+                                        enabled: true,
+                                        position: 'top',
+                                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                                        font: { size: 12, weight: 'bold', color: '#4338CA' }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'Value',
+                                color: '#4B5563',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            ticks: {
+                                color: '#4B5563',
+                                font: { size: 12 }
+                            },
+                            grid: {
+                                color: '#e5e7eb'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Probability Density',
+                                color: '#4B5563',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            ticks: {
+                                color: '#4B5563',
+                                font: { size: 12 }
+                            },
+                            grid: {
+                                color: '#e5e7eb'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 800,
+                        easing: 'easeOutQuart'
+                    }
+                };                // Destroy existing chart instance if it exists
+                if (normalDistributionChartInstance) {
+                    normalDistributionChartInstance.destroy();
+                }
+                
+                // Create new chart instance
+                normalDistributionChartInstance = new Chart(normalDistCtx, {
+                    type: 'line', // Default type, but datasets override
+                    data: normalDistChartData,
+                    options: normalDistChartOptions,
+                    plugins: [ChartAnnotation] // Register the plugin
+                });
+
+                // Render MathJax for interpretation text
+                if (typeof MathJax !== 'undefined') {
+                    MathJax.typesetPromise([ciInterpretationText]);
+                }
+            }
+        });
+
+        // Load MathJax for rendering LaTeX
+        // This script is placed at the very end of the body for optimal loading.
+        const mathJaxScript = document.createElement('script');
+        mathJaxScript.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
+        mathJaxScript.async = true;
+        document.body.appendChild(mathJaxScript);
+    </script>
+</body>
+</html>

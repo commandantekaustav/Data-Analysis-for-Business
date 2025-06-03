@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S38: Advanced Chart Types & Introduction to Dashboards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .chart-container { position: relative; height: 350px; width: 100%; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+        .chart-description { margin-top: 1rem; font-size: 0.9rem; color: #555; text-align: center; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S38: Advanced Chart Types & Introduction to Dashboards</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Advanced Chart Types & Introduction to Dashboards</h2>
+            <p class="section-intro">Beyond the common charts, there are several advanced visualization types that offer deeper insights into data distribution, relationships, and hierarchical structures. Understanding these charts expands your toolkit for effective data storytelling. This session also introduces the concept of dashboards, which are crucial for monitoring key business metrics at a glance.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Advanced Chart Types</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">While bar, line, and pie charts are foundational, more complex data requires more sophisticated visual representations. Here are a few advanced chart types:</p>
+                
+                <div class="mb-6">
+                    <h4 class="text-lg font-medium text-gray-800 mb-2">1. Histograms</h4>
+                    <p class="text-gray-700"><strong>Purpose:</strong> Visualize the distribution of a single numerical variable.</p>
+                    <p class="text-gray-700"><strong>When to Use:</strong> Understanding the frequency of different age groups in a customer base, seeing the distribution of product prices, or analyzing the spread of employee salaries.</p>
+                    <p class="text-gray-700"><strong>Key Features:</strong> Bars represent "bins" (ranges of values), and the height of each bar indicates the frequency or count of data points falling into that bin. Unlike bar charts, bars typically touch to denote continuous data.</p>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-lg font-medium text-gray-800 mb-2">2. Box Plots (Box-and-Whisker Plots)</h4>
+                    <p class="text-gray-700"><strong>Purpose:</strong> Display the distribution of numerical data and identify potential outliers, especially useful for comparing distributions across different groups.</p>
+                    <p class="text-gray-700"><strong>When to Use:</strong> Comparing sales performance across different regions (showing median, spread, and outliers for each region), analyzing the distribution of test scores for different classes, or comparing customer spending habits by demographic group.</p>
+                    <p class="text-gray-700"><strong>Key Features:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Box:</strong> Represents the interquartile range (IQR), containing the middle 50% of the data. The line inside the box is the median.</li>
+                            <li><strong>Whiskers:</strong> Extend from the box to indicate the variability outside the quartiles.</li>
+                            <li><strong>Outliers:</strong> Individual points plotted beyond the whiskers, indicating values that are statistically far from the rest of the data.</li>
+                        </ul>
+                    </p>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-lg font-medium text-gray-800 mb-2">3. Heatmaps</h4>
+                    <p class="text-gray-700"><strong>Purpose:</strong> Visualize data in a matrix format where individual values are represented as colors. Excellent for showing patterns, correlations, or densities in large datasets.</p>
+                    <p class="text-gray-700"><strong>When to Use:</strong> Displaying correlation matrices between multiple variables (e.g., how different marketing channels correlate with each other), showing website click patterns (where users click most), or visualizing customer behavior across various product features.</p>
+                    <p class="text-gray-700"><strong>Key Features:</strong> A grid of colored cells, where the color intensity or hue corresponds to the value of the data point. Often includes a color legend.</p>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-lg font-medium text-gray-800 mb-2">4. Treemaps</h4>
+                    <p class="text-gray-700"><strong>Purpose:</strong> Display hierarchical data (data organized in a tree-like structure) using nested rectangles. The size of each rectangle is proportional to its value, and colors can represent categories.</p>
+                    <p class="text-gray-700"><strong>When to Use:</strong> Visualizing sales by product category and sub-category, showing budget allocation across departments and sub-departments, or displaying file sizes within a directory structure.</p>
+                    <p class="text-gray-700"><strong>Key Features:</strong> Rectangles nested within other rectangles. Larger rectangles represent higher-level categories, and their size reflects their aggregated value. Colors often distinguish different top-level categories.</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Introduction to Dashboards</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">In business analytics, individual charts are powerful, but often the need arises to combine multiple related visualizations into a single, cohesive view. This is where dashboards come in.</p>
+                
+                <h4 class="text-lg font-medium text-gray-800 mb-2">What is a Dashboard?</h4>
+                <p class="mb-4 text-gray-700">A dashboard is a visual display of data used to monitor conditions and/or facilitate understanding. It's a collection of visualizations, key performance indicators (KPIs), and other relevant information presented on a single screen or page, designed to provide a holistic and at-a-glance overview of business performance or a specific area of interest.</p>
+
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Purpose and Components of a Dashboard</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Purpose:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Monitoring:</strong> Track real-time or near real-time performance against goals.</li>
+                            <li><strong>Identifying Issues/Opportunities:</strong> Quickly spot anomalies, trends, or areas needing attention.</li>
+                            <li><strong>Tracking Progress:</strong> See how KPIs are evolving over time.</li>
+                            <li><strong>Facilitating Understanding:</strong> Present complex data in an easy-to-digest format for quick decision-making.</li>
+                            <li><strong>Communication:</strong> Serve as a central point of truth for various stakeholders.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Key Components:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Key Performance Indicators (KPIs):</strong> Single, prominent numbers that represent critical metrics (e.g., Total Sales, Conversion Rate, Customer Churn).</li>
+                            <li><strong>Charts & Graphs:</strong> A variety of visualizations (bar, line, pie, gauges, etc.) chosen to answer specific questions related to the KPIs.</li>
+                            <li><strong>Filters & Slicers:</strong> Interactive elements that allow users to drill down into specific subsets of data (e.g., by date, region, product).</li>
+                            <li><strong>Tables (Optional):</strong> For displaying detailed data when necessary, but usually kept minimal.</li>
+                            <li><strong>Titles & Labels:</strong> Clear and concise headings for the dashboard and each visualization.</li>
+                            <li><strong>Annotations & Callouts:</strong> Text or arrows to highlight specific points or explain insights.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Effective dashboards are designed with a specific audience and purpose in mind, ensuring they are not just visually appealing but also highly functional and insightful.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Demo (Tableau/Power BI)</h2>
+            <p class="section-intro">This practical session will demonstrate the creation of a simple dashboard using a business intelligence tool like Tableau or Power BI. While we can't provide a live interactive demo here, we'll conceptually walk through the steps and show simulated outputs using Chart.js to illustrate the dashboard components and their interconnectedness.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Conceptual Demo: Creating a Simple Dashboard with Interconnected Charts</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Imagine we are building a sales performance dashboard for a retail company. We want to see total sales, sales by product category, and sales trend over time. We'll use a hypothetical dataset for this demonstration.</p>
+                
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Hypothetical Sales Data Structure:</h4>
+                <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code>
+OrderID,OrderDate,ProductCategory,SalesAmount,Region
+1,2024-01-01,Electronics,1500,North
+2,2024-01-05,Apparel,250,South
+3,2024-01-10,Home Goods,500,East
+4,2024-01-15,Electronics,800,West
+5,2024-02-01,Apparel,300,North
+6,2024-02-05,Electronics,1200,South
+7,2024-02-10,Home Goods,600,East
+8,2024-02-15,Apparel,400,West
+9,2024-03-01,Electronics,900,North
+10,2024-03-05,Apparel,350,South
+... (more data for March, April, May)
+                    </code></pre>
+                </div>
+
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Dashboard Components & Conceptual Steps:</h4>
+                <ol class="list-decimal pl-5 space-y-4 text-gray-700">
+                    <li>
+                        <strong>Connect to Data:</strong> In Tableau/Power BI, you would typically connect to this CSV file. The tool automatically infers data types (e.g., `OrderDate` as Date, `SalesAmount` as Number).
+                    </li>
+                    <li>
+                        <strong>Create KPI Card: Total Sales</strong>
+                        <p class="mt-2">Drag `SalesAmount` to a text card or a measure well and set it to sum. This gives you a single, prominent number.</p>
+                        <div class="bg-indigo-100 p-4 rounded-md text-center text-indigo-800 font-bold text-3xl my-4 shadow-inner">
+                            Total Sales: $10,500
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Create Chart 1: Sales by Product Category (Bar Chart)</strong>
+                        <p class="mt-2">Drag `ProductCategory` to the columns/rows shelf and `SalesAmount` to the rows/columns shelf. The tool automatically creates a bar chart.</p>
+                        <div class="chart-container">
+                            <canvas id="categorySalesChart"></canvas>
+                        </div>
+                        <p class="chart-description"><em>Simulated Bar Chart: Total Sales by Product Category.</em></p>
+                    </li>
+                    <li>
+                        <strong>Create Chart 2: Sales Trend Over Time (Line Chart)</strong>
+                        <p class="mt-2">Drag `OrderDate` to the columns/rows shelf (tool automatically aggregates to Year/Quarter/Month) and `SalesAmount` to the rows/columns shelf. This creates a line chart.</p>
+                        <div class="chart-container">
+                            <canvas id="salesTrendChart"></canvas>
+                        </div>
+                        <p class="chart-description"><em>Simulated Line Chart: Monthly Sales Trend.</em></p>
+                    </li>
+                    <li>
+                        <strong>Assemble the Dashboard:</strong>
+                        <p class="mt-2">Create a new dashboard canvas. Drag and drop the KPI card, the Category Sales chart, and the Sales Trend chart onto the canvas. Arrange them logically.</p>
+                    </li>
+                    <li>
+                        <strong>Add Interactivity (Filters):</strong>
+                        <p class="mt-2">In Tableau/Power BI, you can easily make charts act as filters. For example, if you click on 'Electronics' in the Category Sales bar chart, the Sales Trend chart will automatically update to show only the trend for Electronics sales. You can also add a global filter for 'Region' or 'OrderDate' to control all charts simultaneously.</p>
+                        <p class="mt-2 text-sm text-gray-600"><em>This interactive behavior is a core strength of BI tools, allowing users to drill down and explore data dynamically without creating new reports.</em></p>
+                    </li>
+                </ol>
+                <p class="mt-6 text-sm text-gray-600"><strong>Refer to Coursera: Data Analysis and Visualization with Power BI</strong> for detailed step-by-step guidance on using Power BI to create such dashboards. The principles demonstrated here are universal across leading BI tools.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('nav a').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Data for Chart.js demos
+        const salesData = [
+            { category: 'Electronics', sales: 1500, month: 'Jan' },
+            { category: 'Apparel', sales: 250, month: 'Jan' },
+            { category: 'Home Goods', sales: 500, month: 'Jan' },
+            { category: 'Electronics', sales: 800, month: 'Jan' },
+            { category: 'Apparel', sales: 300, month: 'Feb' },
+            { category: 'Electronics', sales: 1200, month: 'Feb' },
+            { category: 'Home Goods', sales: 600, month: 'Feb' },
+            { category: 'Apparel', sales: 400, month: 'Feb' },
+            { category: 'Electronics', sales: 900, month: 'Mar' },
+            { category: 'Apparel', sales: 350, month: 'Mar' },
+            { category: 'Home Goods', sales: 700, month: 'Mar' },
+            { category: 'Electronics', sales: 1000, month: 'Apr' },
+            { category: 'Apparel', sales: 450, month: 'Apr' },
+            { category: 'Home Goods', sales: 800, month: 'Apr' },
+            { category: 'Electronics', sales: 1100, month: 'May' },
+            { category: 'Apparel', sales: 500, month: 'May' },
+            { category: 'Home Goods', sales: 900, month: 'May' },
+        ];
+
+        // Aggregate data for charts
+        const categorySales = salesData.reduce((acc, item) => {
+            acc[item.category] = (acc[item.category] || 0) + item.sales;
+            return acc;
+        }, {});
+
+        const monthlySales = salesData.reduce((acc, item) => {
+            acc[item.month] = (acc[item.month] || 0) + item.sales;
+            return acc;
+        }, {});
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chart 1: Sales by Product Category (Bar Chart)
+            const categorySalesCtx = document.getElementById('categorySalesChart').getContext('2d');
+            new Chart(categorySalesCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(categorySales),
+                    datasets: [{
+                        label: 'Total Sales ($)',
+                        data: Object.values(categorySales),
+                        backgroundColor: [
+                            'rgba(67, 56, 202, 0.8)', // Indigo
+                            'rgba(245, 158, 11, 0.8)', // Amber
+                            'rgba(75, 192, 192, 0.8)' // Teal
+                        ],
+                        borderColor: [
+                            'rgba(67, 56, 202, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Total Sales by Product Category',
+                            font: { size: 14 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Product Category'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Total Sales ($)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Sales Trend Over Time (Line Chart)
+            const salesTrendCtx = document.getElementById('salesTrendChart').getContext('2d');
+            new Chart(salesTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'], // Order of months
+                    datasets: [{
+                        label: 'Total Sales ($)',
+                        data: [monthlySales['Jan'], monthlySales['Feb'], monthlySales['Mar'], monthlySales['Apr'], monthlySales['May']],
+                        fill: false,
+                        borderColor: 'rgb(63, 131, 248)', // A nice blue
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Monthly Sales Trend',
+                            font: { size: 14 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Total Sales ($)'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

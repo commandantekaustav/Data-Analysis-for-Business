@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S58: Correlation Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .interactive-panel {
+            background-color: #eef2ff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .interactive-panel .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4338CA;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="number"], select, textarea {
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #c7d2fe;
+            background-color: white;
+            font-size: 1rem;
+            color: #374151;
+            width: 100%;
+            max-width: 250px;
+            margin-bottom: 0.5rem;
+        }
+        textarea {
+            max-width: 100%;
+            min-height: 80px;
+            resize: vertical;
+        }
+        .action-button {
+            background-color: #4338CA;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 1rem;
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+        }
+        .action-button:hover {
+            background-color: #6366F1;
+            transform: translateY(-1px);
+        }
+        .results-box {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+        }
+        .results-box h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        .interpretation-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #34D399;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px; /* Increased height for better visibility */
+            width: 100%;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .input-group label {
+            font-weight: 500;
+            color: #4B5563;
+            min-width: 120px; /* Align labels */
+        }
+        .code-block {
+            background-color: #2D3748; /* Dark background for code */
+            color: #E2E8F0; /* Light text */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', monospace; /* Monospace font */
+            overflow-x: auto; /* Allow horizontal scrolling for long lines */
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .code-block pre {
+            margin: 0;
+        }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #4A5568;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .copy-button:hover {
+            background-color: #6366F1;
+        }
+        /* Message Box Styling */
+        #messageBox {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S58: Correlation Analysis</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory-intro" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical-demo" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💻 Practical</a></li>
+                    <li><a href="#interpretation" class="nav-button text-sm sm:text-base font-medium py-2 px-3">🗣️ Interpretation</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory-intro" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Understanding Correlation</h2>
+            <p class="section-intro">In this session, we'll explore <strong>correlation analysis</strong>—a statistical technique used to measure and describe the strength and direction of a relationship between two numerical variables. Understanding correlation is crucial for uncovering patterns and making informed business decisions.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Correlation vs. Causation: A Crucial Distinction</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">One of the most important concepts in statistics is the difference between correlation and causation. It's a common mistake to confuse the two, leading to flawed conclusions and poor business decisions.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Correlation:</strong> Indicates a statistical relationship between two variables. When one variable changes, the other tends to change in a specific direction (positive or negative). It measures the strength and direction of this linear relationship.</li>
+                    <li><strong>Causation:</strong> Means that one event or variable directly causes another event or variable to occur. A change in the independent variable *produces* a change in the dependent variable.</li>
+                </ul>
+                <p class="mt-4 text-gray-700 leading-relaxed font-bold">Key Takeaway: Correlation does NOT imply causation!</p>
+                <p class="mt-2 text-gray-700 leading-relaxed">Just because two variables move together doesn't mean one causes the other. There might be a third, unobserved variable (a confounding variable) influencing both, or the relationship might be purely coincidental.</p>
+                <p class="mt-2 text-gray-700 leading-relaxed italic">Example: Ice cream sales and drowning incidents are often positively correlated. Does ice cream cause drowning? No, both are influenced by a third factor: warm weather, which increases both activities.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Pearson Correlation Coefficient (\(r\))</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">The Pearson product-moment correlation coefficient (often denoted as \(r\)) is the most common measure of linear correlation between two sets of data. It is a value between -1 and +1 inclusive.</p>
+                
+                <h4 class="text-lg font-semibold text-gray-800 mb-2">Formula:</h4>
+                <div class="code-block bg-gray-100 text-gray-800 p-4 rounded-md">
+                    <pre><code>$$ r = \frac{n \sum(xy) - (\sum x)(\sum y)}{\sqrt{[n \sum x^2 - (\sum x)^2][n \sum y^2 - (\sum y)^2]}} $$</code></pre>
+                    <p class="text-sm text-gray-600 mt-2">Where:</p>
+                    <ul class="list-disc pl-5 text-sm text-gray-600">
+                        <li>$n$ = number of data pairs</li>
+                        <li>$\sum xy$ = sum of the products of the paired data</li>
+                        <li>$\sum x$ = sum of the x values</li>
+                        <li>$\sum y$ = sum of the y values</li>
+                        <li>$\sum x^2$ = sum of the squared x values</li>
+                        <li>$\sum y^2$ = sum of the squared y values</li>
+                    </ul>
+                </div>
+
+                <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">Interpretation of \(r\) values:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>$r = +1$: Perfect positive linear relationship. As one variable increases, the other increases proportionally.</li>
+                    <li>$r = -1$: Perfect negative linear relationship. As one variable increases, the other decreases proportionally.</li>
+                    <li>$r = 0$: No linear relationship. The variables are not linearly associated. (They might have a non-linear relationship, though!)</li>
+                    <li>Values between 0 and +1: Positive linear relationship. Stronger as \(r\) approaches +1.</li>
+                    <li>Values between 0 and -1: Negative linear relationship. Stronger as \(r\) approaches -1.</li>
+                </ul>
+                <p class="mt-2 text-gray-700 leading-relaxed italic">General Guidelines (rule of thumb, context matters):</p>
+                <ul class="list-disc pl-5 space-y-1 text-gray-700 text-sm">
+                    <li>$\pm 0.0$ to $\pm 0.2$: Very weak or no linear relationship</li>
+                    <li>$\pm 0.2$ to $\pm 0.4$: Weak linear relationship</li>
+                    <li>$\pm 0.4$ to $\pm 0.6$: Moderate linear relationship</li>
+                    <li>$\pm 0.6$ to $\pm 0.8$: Strong linear relationship</li>
+                    <li>$\pm 0.8$ to $\pm 1.0$: Very strong linear relationship</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">Assumptions of Pearson Correlation:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Linearity:</strong> The relationship between the variables is linear. Pearson \(r\) will underestimate the strength of a non-linear relationship.</li>
+                    <li><strong>Interval or Ratio Data:</strong> Both variables should be measured on an interval or ratio scale (continuous numerical data).</li>
+                    <li><strong>Normality:</strong> Both variables should be approximately normally distributed. While not strictly required for the calculation itself, it's an assumption for hypothesis testing on \(r\).</li>
+                    <li><strong>No Significant Outliers:</strong> Outliers can heavily influence the correlation coefficient, pulling it away from the true relationship.</li>
+                    <li><strong>Homoscedasticity (for inference):</strong> The variance of one variable is roughly constant across all levels of the other variable (more critical for regression, but good to keep in mind).</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-gray-800 mt-4 mb-2">Visualizing Correlation: Scatter Plots</h4>
+                <p class="mb-4 text-gray-700 leading-relaxed">A scatter plot is an essential first step in correlation analysis. It visually represents the relationship between two numerical variables, allowing you to quickly assess:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Direction:</strong> Is it positive (points generally go up from left to right), negative (points generally go down from left to right), or no clear direction?</li>
+                    <li><strong>Strength:</strong> How tightly clustered are the points around an imaginary line? Tighter clustering indicates a stronger relationship.</li>
+                    <li><strong>Form:</strong> Is the relationship linear, or does it appear curved?</li>
+                    <li><strong>Outliers:</strong> Are there any data points that deviate significantly from the general pattern?</li>
+                </ul>
+                <p class="mt-2 text-gray-700 leading-relaxed">Always plot your data before calculating correlation coefficients!</p>
+            </div>
+        </section>
+
+        <section id="practical-demo" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💻</span>Practical: Calculating & Visualizing Correlation</h2>
+            <p class="section-intro">Let's get hands-on! We'll generate some synthetic data and then use Python to calculate the Pearson correlation coefficient and visualize the relationship with scatter plots.</p>
+            
+            <div class="interactive-panel">
+                <div class="panel-title">Interactive Data Generation & Correlation</div>
+                <p class="mb-4 text-gray-700">Adjust the parameters below to generate different types of relationships between two variables (X and Y). Then, click "Generate Data & Calculate Correlation" to see the scatter plot and the calculated Pearson \(r\).</p>
+                
+                <div class="input-group">
+                    <label for="numPoints">Number of Data Points:</label>
+                    <input type="number" id="numPoints" value="100" min="10" max="1000" step="10" class="w-full sm:w-auto">
+                    
+                    <label for="correlationType">Desired Correlation:</label>
+                    <select id="correlationType" class="w-full sm:w-auto">
+                        <option value="positive_strong">Strong Positive (e.g., Sales vs. Advertising)</option>
+                        <option value="positive_moderate">Moderate Positive</option>
+                        <option value="negative_strong">Strong Negative (e.g., Price vs. Demand)</option>
+                        <option value="negative_moderate">Moderate Negative</option>
+                        <option value="none">No Correlation</option>
+                        <option value="custom">Custom (adjust std dev)</option>
+                    </select>
+                </div>
+                <div class="input-group" id="customStdDevInputs" style="display: none;">
+                    <label for="stdDevX">Std Dev X:</label>
+                    <input type="number" id="stdDevX" value="10" step="1" min="1" class="w-full sm:w-auto">
+                    <label for="stdDevY">Std Dev Y:</label>
+                    <input type="number" id="stdDevY" value="10" step="1" min="1" class="w-full sm:w-auto">
+                    <label for="noiseFactor">Noise Factor (0-1):</label>
+                    <input type="number" id="noiseFactor" value="0.2" step="0.05" min="0" max="1" class="w-full sm:w-auto">
+                </div>
+
+                <div class="text-center">
+                    <button id="generateDataBtn" class="action-button">Generate Data & Calculate Correlation</button>
+                    <button id="showPythonCodeBtn" class="action-button bg-green-600 hover:bg-green-700">Show Python Code</button>
+                </div>
+
+                <div id="correlationResults" class="results-box hidden mt-4">
+                    <h4 class="text-indigo-600">Calculated Pearson Correlation:</h4>
+                    <div class="result-item">
+                        <span class="result-label">Pearson \(r\):</span>
+                        <span id="pearsonRValue" class="result-value"></span>
+                    </div>
+                    <div id="correlationInterpretation" class="interpretation-box mt-4">
+                        <h5 class="font-semibold text-base mb-1">Interpretation:</h5>
+                        <p id="correlationInterpretationText" class="text-sm"></p>
+                    </div>
+
+                    <h5 class="font-semibold text-lg text-indigo-600 mt-6 mb-2 text-center">Scatter Plot of X vs. Y</h5>
+                    <div class="chart-container">
+                        <canvas id="scatterPlotChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mt-2 mb-4">Figure 1: Scatter plot showing the relationship between variable X and variable Y. The pattern of points indicates the direction and strength of their linear correlation.</p>
+                </div>
+
+                <div id="pythonCodeSection" class="hidden mt-4">
+                    <h4 class="text-indigo-600">Python Code for Correlation & Scatter Plot:</h4>
+                    <div class="code-block">
+                        <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre><code id="pythonCorrelationCode">
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# --- Data Generation (based on interactive inputs) ---
+num_points = 100 # Example value, replace with input from UI
+correlation_type = "positive_strong" # Example value, replace with input from UI
+
+# For 'custom' type, you'd use std_dev_x, std_dev_y, noise_factor
+std_dev_x = 10
+std_dev_y = 10
+noise_factor = 0.2
+
+np.random.seed(42) # For reproducibility
+
+if correlation_type == "positive_strong":
+    X = np.random.normal(loc=50, scale=10, size=num_points)
+    Y = X * 0.8 + np.random.normal(loc=10, scale=5, size=num_points) # Strong positive
+elif correlation_type == "positive_moderate":
+    X = np.random.normal(loc=50, scale=10, size=num_points)
+    Y = X * 0.5 + np.random.normal(loc=20, scale=10, size=num_points) # Moderate positive
+elif correlation_type == "negative_strong":
+    X = np.random.normal(loc=50, scale=10, size=num_points)
+    Y = -X * 0.8 + np.random.normal(loc=100, scale=5, size=num_points) # Strong negative
+elif correlation_type == "negative_moderate":
+    X = np.random.normal(loc=50, scale=10, size=num_points)
+    Y = -X * 0.5 + np.random.normal(loc=80, scale=10, size=num_points) # Moderate negative
+elif correlation_type == "none":
+    X = np.random.normal(loc=50, scale=10, size=num_points)
+    Y = np.random.normal(loc=50, scale=10, size=num_points) # No correlation
+elif correlation_type == "custom":
+    X = np.random.normal(loc=50, scale=std_dev_x, size=num_points)
+    # Adjust Y based on X and noise for custom correlation
+    # A simple way to control correlation is to define Y as a linear function of X plus noise
+    # The smaller the noise_factor, the stronger the correlation.
+    Y = (X - np.mean(X)) / np.std(X) * (1 - noise_factor) * std_dev_y + np.random.normal(loc=0, scale=noise_factor * std_dev_y, size=num_points) + 50
+
+
+data_df = pd.DataFrame({'X': X, 'Y': Y})
+
+# --- Calculate Pearson Correlation Coefficient ---
+pearson_r = data_df['X'].corr(data_df['Y'], method='pearson')
+print(f"Pearson Correlation Coefficient (r): {pearson_r:.4f}")
+
+# --- Visualize Correlation with Scatter Plot ---
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x='X', y='Y', data=data_df)
+plt.title(f'Scatter Plot of X vs. Y (Pearson r = {pearson_r:.2f})')
+plt.xlabel('Variable X')
+plt.ylabel('Variable Y')
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+
+# --- Calculate and Visualize Correlation Matrix (for multiple variables) ---
+# Let's add a third variable, Z, which might be correlated with X or Y, or neither.
+# For demonstration, let's make Z weakly correlated with X.
+Z = X * 0.2 + np.random.normal(loc=30, scale=15, size=num_points)
+data_df['Z'] = Z
+
+correlation_matrix = data_df.corr(method='pearson')
+print("\nCorrelation Matrix:")
+print(correlation_matrix)
+
+plt.figure(figsize=(7, 6))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=.5)
+plt.title('Correlation Matrix of X, Y, and Z')
+plt.show()
+</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="interpretation" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">🗣️</span>Interpreting Correlation in Business Context</h2>
+            <p class="section-intro">Understanding the numbers is one thing; translating them into actionable business insights is another. Here's how to interpret correlation findings effectively.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">What Does Your Correlation Mean for Business?</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">When you find a significant correlation, consider these points for business interpretation:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Direction:</strong>
+                        <ul>
+                            <li><strong>Positive Correlation:</strong> If advertising spend and sales are positively correlated, it suggests that as advertising increases, sales tend to increase. This supports investing more in advertising.</li>
+                            <li><strong>Negative Correlation:</strong> If price and demand are negatively correlated, it suggests that as price increases, demand tends to decrease. This informs pricing strategies.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Strength:</strong>
+                        <ul>
+                            <li><strong>Strong Correlation ($|r| > 0.6$):</strong> Indicates a reliable relationship. Changes in one variable are strongly associated with changes in the other. This allows for more confident predictions or strategic adjustments.</li>
+                            <li><strong>Weak Correlation ($|r| < 0.4$):</strong> Suggests that while a linear relationship might exist, it's not very pronounced. Other factors likely play a significant role, or the relationship isn't truly linear.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Practical Significance vs. Statistical Significance:</strong>
+                        <p class="mt-2 text-gray-700 leading-relaxed">Even a statistically significant correlation (especially with large datasets) might have little practical importance if the correlation coefficient is very small. A correlation of \(r=0.1\) might be statistically significant with 10,000 data points, but it means very little in terms of practical association.</p>
+                    </li>
+                    <li><strong>Beware of Spurious Correlations:</strong> Always question if there's a logical reason for the correlation. Remember "Correlation is not causation." Business decisions based on spurious correlations can be disastrous.</li>
+                    <li><strong>Consider the Context:</strong> The same correlation coefficient might be considered strong in one field (e.g., social sciences) and weak in another (e.g., physics). Understand what constitutes a meaningful correlation in your specific business domain.</li>
+                    <li><strong>Actionability:</strong> Can you *do* anything with this correlation? Does it suggest a strategy, an area for further investigation, or a potential risk?</li>
+                </ul>
+                <p class="mt-4 text-gray-700 leading-relaxed font-bold">Exercise: Reflect on the scatter plot you generated. How would you explain the correlation you observed to a non-technical business stakeholder at RetailRampUp, avoiding jargon?</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <div id="messageBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg z-50" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span id="messageText" class="block sm:inline"></span>
+        <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" onclick="document.getElementById('messageBox').classList.add('hidden');">
+            <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+        </span>
+    </div>
+
+    <script>
+        // Global variables for data points
+        let currentXData = [];
+        let currentYData = [];
+        let scatterPlotChartInstance = null;
+
+        // --- Message Box Function ---
+        function showMessage(message, type = 'error') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            messageText.innerText = message;
+            messageBox.classList.remove('hidden');
+            if (type === 'error') {
+                messageBox.classList.remove('bg-green-100', 'border-green-400', 'text-green-700');
+                messageBox.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+            } else {
+                messageBox.classList.remove('bg-red-100', 'border-red-400', 'text-green-700'); // Remove red if previously error
+                messageBox.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+            }
+        }
+
+        // --- Code Copy Function ---
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling; // Get the <pre> element
+            const textToCopy = codeBlock.textContent;
+            
+            // Use document.execCommand('copy') for better iframe compatibility
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                button.textContent = 'Copied!';
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                button.textContent = 'Error!';
+            }
+            document.body.removeChild(textarea);
+
+            setTimeout(() => {
+                button.textContent = 'Copy';
+            }, 2000); // Reset button text after 2 seconds
+        }
+
+        // --- MathJax Rendering Function ---
+        function renderMathInElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element && typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                MathJax.typesetPromise([element]).catch(err => console.error("MathJax rendering error:", err));
+            } else if (!element) {
+                console.warn(`Element with ID '${elementId}' not found for MathJax rendering.`);
+            } else {
+                console.warn("MathJax not fully loaded or configured. Skipping MathJax rendering for:", elementId);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation button active state logic
+            document.querySelectorAll('nav a').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // --- Practical Section Logic ---
+            const numPointsInput = document.getElementById('numPoints');
+            const correlationTypeSelect = document.getElementById('correlationType');
+            const customStdDevInputs = document.getElementById('customStdDevInputs');
+            const stdDevXInput = document.getElementById('stdDevX');
+            const stdDevYInput = document.getElementById('stdDevY');
+            const noiseFactorInput = document.getElementById('noiseFactor');
+            const generateDataBtn = document.getElementById('generateDataBtn');
+            const correlationResultsDiv = document.getElementById('correlationResults');
+            const pearsonRValueSpan = document.getElementById('pearsonRValue');
+            const correlationInterpretationText = document.getElementById('correlationInterpretationText');
+            const showPythonCodeBtn = document.getElementById('showPythonCodeBtn');
+            const pythonCodeSection = document.getElementById('pythonCodeSection');
+            const pythonCorrelationCode = document.getElementById('pythonCorrelationCode');
+
+            correlationTypeSelect.addEventListener('change', function() {
+                if (this.value === 'custom') {
+                    customStdDevInputs.style.display = 'flex';
+                } else {
+                    customStdDevInputs.style.display = 'none';
+                }
+            });
+
+            generateDataBtn.addEventListener('click', function() {
+                const numPoints = parseInt(numPointsInput.value);
+                const correlationType = correlationTypeSelect.value;
+                const stdDevX = parseFloat(stdDevXInput.value);
+                const stdDevY = parseFloat(stdDevYInput.value);
+                const noiseFactor = parseFloat(noiseFactorInput.value);
+
+                if (isNaN(numPoints) || numPoints < 10) {
+                    showMessage("Please enter a valid number of data points (min 10).", 'error');
+                    return;
+                }
+                if (correlationType === 'custom' && (isNaN(stdDevX) || isNaN(stdDevY) || isNaN(noiseFactor) || noiseFactor < 0 || noiseFactor > 1)) {
+                    showMessage("Please enter valid standard deviations and a noise factor between 0 and 1 for custom correlation.", 'error');
+                    return;
+                }
+
+                generateSyntheticData(numPoints, correlationType, stdDevX, stdDevY, noiseFactor);
+                const pearsonR = calculatePearsonCorrelation(currentXData, currentYData);
+                pearsonRValueSpan.innerText = pearsonR.toFixed(4);
+                updateCorrelationInterpretation(pearsonR);
+                drawScatterPlot();
+                correlationResultsDiv.classList.remove('hidden');
+                updatePythonCodeBlock(numPoints, correlationType, stdDevX, stdDevY, noiseFactor);
+                renderMathInElement('correlationResults'); // Render MathJax for Pearson r
+            });
+
+            showPythonCodeBtn.addEventListener('click', function() {
+                pythonCodeSection.classList.toggle('hidden');
+            });
+
+            // Function to generate synthetic data based on desired correlation
+            function generateSyntheticData(n, type, stdDevX, stdDevY, noiseFactor) {
+                currentXData = [];
+                currentYData = [];
+                const meanX = 50;
+                const meanY = 50;
+
+                for (let i = 0; i < n; i++) {
+                    let x = meanX + (Math.random() - 0.5) * 2 * (stdDevX || 10); // Simple uniform distribution for X
+                    let y;
+
+                    if (type === "positive_strong") {
+                        y = x * 0.8 + (Math.random() - 0.5) * 2 * 5 + meanY - (meanX * 0.8);
+                    } else if (type === "positive_moderate") {
+                        y = x * 0.5 + (Math.random() - 0.5) * 2 * 10 + meanY - (meanX * 0.5);
+                    } else if (type === "negative_strong") {
+                        y = -x * 0.8 + (Math.random() - 0.5) * 2 * 5 + meanY + (meanX * 0.8);
+                    } else if (type === "negative_moderate") {
+                        y = -x * 0.5 + (Math.random() - 0.5) * 2 * 10 + meanY + (meanX * 0.5);
+                    } else if (type === "none") {
+                        y = meanY + (Math.random() - 0.5) * 2 * (stdDevY || 10);
+                    } else if (type === "custom") {
+                        // A more controlled way to generate correlated data
+                        // Generate X from a normal distribution
+                        let u1 = Math.random(); let u2 = Math.random();
+                        let randStdNormalX = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+                        x = meanX + randStdNormalX * (stdDevX || 10);
+
+                        // Generate Y such that it's correlated with X
+                        // Y = beta * X + error, where error depends on noiseFactor
+                        // For a given correlation 'rho', and std_dev_x, std_dev_y
+                        // beta = rho * (std_dev_y / std_dev_x)
+                        // error_std = std_dev_y * sqrt(1 - rho^2)
+                        // Let's simplify with noiseFactor: lower noiseFactor means stronger correlation
+                        let desiredRho = 1 - noiseFactor; // Closer to 1 means stronger correlation
+                        if (type.includes("negative")) desiredRho = -(1 - noiseFactor);
+
+                        let u3 = Math.random(); let u4 = Math.random();
+                        let randStdNormalError = Math.sqrt(-2.0 * Math.log(u3)) * Math.cos(2.0 * Math.PI * u4);
+                        
+                        // This is a simplified approach. For precise correlation, use multivariate normal.
+                        // For demonstration, let's make Y a linear function of X plus noise.
+                        // The noise factor directly controls the spread around the line.
+                        y = (x - meanX) * (1 - noiseFactor) + randStdNormalError * (stdDevY || 10) * noiseFactor + meanY;
+                    }
+                    currentXData.push(x);
+                    currentYData.push(y);
+                }
+            }
+
+            // Function to calculate Pearson Correlation Coefficient
+            function calculatePearsonCorrelation(xData, yData) {
+                if (xData.length !== yData.length || xData.length === 0) {
+                    return 0; // Or throw error
+                }
+
+                const n = xData.length;
+                let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
+
+                for (let i = 0; i < n; i++) {
+                    sumX += xData[i];
+                    sumY += yData[i];
+                    sumXY += xData[i] * yData[i];
+                    sumX2 += xData[i] * xData[i];
+                    sumY2 += yData[i] * yData[i];
+                }
+
+                const numerator = (n * sumXY) - (sumX * sumY);
+                const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+
+                if (denominator === 0) {
+                    return 0; // Avoid division by zero if one variable has no variance
+                }
+                return numerator / denominator;
+            }
+
+            // Function to update correlation interpretation text
+            function updateCorrelationInterpretation(r) {
+                let interpretation = "";
+                const absR = Math.abs(r);
+
+                if (absR >= 0.8) {
+                    interpretation = "Very strong ";
+                } else if (absR >= 0.6) {
+                    interpretation = "Strong ";
+                } else if (absR >= 0.4) {
+                    interpretation = "Moderate ";
+                } else if (absR >= 0.2) {
+                    interpretation = "Weak ";
+                } else {
+                    interpretation = "Very weak or no ";
+                }
+
+                if (r > 0) {
+                    interpretation += "positive linear relationship. As X increases, Y tends to increase.";
+                } else if (r < 0) {
+                    interpretation += "negative linear relationship. As X increases, Y tends to decrease.";
+                } else {
+                    interpretation = "No linear relationship between X and Y.";
+                }
+                correlationInterpretationText.innerText = interpretation;
+            }
+
+            // Function to draw Scatter Plot
+            function drawScatterPlot() {
+                const ctx = document.getElementById('scatterPlotChart').getContext('2d');
+                if (scatterPlotChartInstance) {
+                    scatterPlotChartInstance.destroy();
+                }
+
+                const dataPoints = currentXData.map((x, i) => ({ x: x, y: currentYData[i] }));
+
+                scatterPlotChartInstance = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Data Points',
+                            data: dataPoints,
+                            backgroundColor: '#4338CA', // Indigo
+                            borderColor: '#4338CA',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Scatter Plot of X vs. Y',
+                                font: { size: 16, weight: 'bold' },
+                                color: '#374151'
+                            },
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `X: ${context.parsed.x.toFixed(2)}, Y: ${context.parsed.y.toFixed(2)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: {
+                                    display: true,
+                                    text: 'Variable X',
+                                    color: '#4B5563',
+                                    font: { size: 14, weight: 'bold' }
+                                },
+                                ticks: {
+                                    color: '#4B5563',
+                                    font: { size: 12 }
+                                },
+                                grid: {
+                                    color: '#e5e7eb'
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Variable Y',
+                                    color: '#4B5563',
+                                    font: { size: 14, weight: 'bold' }
+                                },
+                                ticks: {
+                                    color: '#4B5563',
+                                    font: { size: 12 }
+                                },
+                                grid: {
+                                    color: '#e5e7eb'
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+            }
+
+            // Function to update the Python code block dynamically
+            function updatePythonCodeBlock(numPoints, correlationType, stdDevX, stdDevY, noiseFactor) {
+                let dataGenerationCode = "";
+                if (correlationType === "positive_strong") {
+                    dataGenerationCode = `
+    X = np.random.normal(loc=50, scale=10, size=num_points)
+    Y = X * 0.8 + np.random.normal(loc=10, scale=5, size=num_points) # Strong positive`;
+                } else if (correlationType === "positive_moderate") {
+                    dataGenerationCode = `
+    X = np.random.normal(loc=50, scale=10, size=num_points)
+    Y = X * 0.5 + np.random.normal(loc=20, scale=10, size=num_points) # Moderate positive`;
+                } else if (correlationType === "negative_strong") {
+                    dataGenerationCode = `
+    X = np.random.normal(loc=50, scale=10, size=num_points)
+    Y = -X * 0.8 + np.random.normal(loc=100, scale=5, size=num_points) # Strong negative`;
+                } else if (correlationType === "negative_moderate") {
+                    dataGenerationCode = `
+    X = np.random.normal(loc=50, scale=10, size=num_points)
+    Y = -X * 0.5 + np.random.normal(loc=80, scale=10, size=num_points) # Moderate negative`;
+                } else if (correlationType === "none") {
+                    dataGenerationCode = `
+    X = np.random.normal(loc=50, scale=10, size=num_points)
+    Y = np.random.normal(loc=50, scale=10, size=num_points) # No correlation`;
+                } else if (correlationType === "custom") {
+                    dataGenerationCode = `
+    # Custom correlation with std_dev_x=${stdDevX}, std_dev_y=${stdDevY}, noise_factor=${noiseFactor}
+    X = np.random.normal(loc=50, scale=${stdDevX}, size=num_points)
+    # A simplified way to control correlation: Y = (X - mean(X)) / std(X) * (1 - noise_factor) * std_dev_y + noise + mean(Y)
+    Y = (X - np.mean(X)) / np.std(X) * (1 - ${noiseFactor}) * stdDevY + np.random.normal(loc=0, scale=${noiseFactor} * ${stdDevY}, size=num_points) + 50`;
+                }
+
+                const fullCode = `
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# --- Data Generation (based on interactive inputs) ---
+num_points = ${numPoints}
+correlation_type = "${correlationType}"
+
+# For 'custom' type, you'd use std_dev_x, std_dev_y, noise_factor
+std_dev_x = ${stdDevX}
+std_dev_y = ${stdDevY}
+noise_factor = ${noiseFactor}
+
+np.random.seed(42) # For reproducibility
+
+${dataGenerationCode}
+
+data_df = pd.DataFrame({'X': X, 'Y': Y})
+
+# --- Calculate Pearson Correlation Coefficient ---
+pearson_r = data_df['X'].corr(data_df['Y'], method='pearson')
+print(f"Pearson Correlation Coefficient (r): {pearson_r:.4f}")
+
+# --- Visualize Correlation with Scatter Plot ---
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x='X', y='Y', data=data_df)
+plt.title(f'Scatter Plot of X vs. Y (Pearson r = {pearson_r:.2f})')
+plt.xlabel('Variable X')
+plt.ylabel('Variable Y')
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+
+# --- Calculate and Visualize Correlation Matrix (for multiple variables) ---
+# Let's add a third variable, Z, which might be correlated with X or Y, or neither.
+# For demonstration, let's make Z weakly correlated with X.
+Z = X * 0.2 + np.random.normal(loc=30, scale=15, size=num_points)
+data_df['Z'] = Z
+
+correlation_matrix = data_df.corr(method='pearson')
+print("\nCorrelation Matrix:")
+print(correlation_matrix)
+
+plt.figure(figsize=(7, 6))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=.5)
+plt.title('Correlation Matrix of X, Y, and Z')
+plt.show()
+                `;
+                pythonCorrelationCode.textContent = fullCode.trim();
+            }
+
+            // Initial render of MathJax for the theory section
+            renderMathInElement('theory-intro');
+        });
+
+        // Load MathJax for rendering LaTeX
+        const mathJaxScript = document.createElement('script');
+        mathJaxScript.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
+        mathJaxScript.async = true;
+        document.body.appendChild(mathJaxScript);
+    </script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S30: Hands-on Missing Data Imputation & Intro to Outliers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices:
+        - Hands-on Imputation: Report Info: Apply mean/median/mode. Goal: Apply. Viz/Method: Detailed Python code snippets with extensive comments, showing step-by-step application and demonstrating the DataFrame before/after. Justification: Provides a clear, actionable guide for practical imputation.
+        - Outliers Definition: Report Info: Definition, causes, impact. Goal: Inform. Viz/Method: Detailed text explanation. Justification: Provides a thorough conceptual understanding of outliers.
+        - Visual Identification: Report Info: Box plots, scatter plots, histograms. Goal: Illustrate. Viz/Method: Detailed descriptive text for each visualization, explaining how it helps identify outliers. Justification: Explains visual cues for outlier detection without requiring live charts.
+        CONFIRMATION: No charts used (Chart.js/Plotly.js not needed as report is conceptual/textual).
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); /* Adjust based on header/footer height */ }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+
+        .accordion-header { cursor: pointer; user-select: none; }
+        .accordion-content { display: none; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; }
+        .accordion-item.open .accordion-content { display: block; max-height: 1000px; /* Arbitrary large value */ padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .accordion-arrow { transition: transform 0.3s ease; }
+        .accordion-item.open .accordion-arrow { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S30: Hands-on Missing Data Imputation & Intro to Outliers</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#practical" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                    <li><a href="#theory" class="nav-button text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Hands-on Missing Data Imputation</h2>
+            <p class="section-intro">This section provides a conceptual "hands-on" exercise to solidify your understanding of applying mean, median, and mode imputation techniques using Python's Pandas library. We will work through a sample dataset, demonstrating how to fill missing values and observe the immediate changes to the DataFrame.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Hands-on Exercise: Applying Imputation Techniques with Pandas</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">We'll use a hypothetical dataset representing customer demographic and purchase information, intentionally introducing some missing values to practice our imputation skills. The goal is to fill these missing values using the mean, median, and mode as appropriate for each column.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800">
+                    <h4 class="font-semibold text-indigo-700 mb-2">Python Code Snippet (using Pandas for imputation)</h4>
+                    <pre><code class="language-python">
+import pandas as pd
+import numpy as np
+
+# 1. Create a sample DataFrame with missing values
+print("--- Step 1: Original Sample DataFrame ---")
+data = {
+    'CustomerID': [101, 102, 103, 104, 105, 106, 107, 108, 109, 110],
+    'Age': [25, 34, np.nan, 45, 29, np.nan, 50, 31, 42, np.nan],
+    'Income': [50000, 75000, np.nan, 90000, 60000, 48000, np.nan, 82000, 55000, 70000],
+    'Gender': ['Male', 'Female', 'Female', 'Male', 'Female', 'Male', 'Female', 'Male', np.nan, 'Female'],
+    'PurchaseCategory': ['Electronics', 'Clothing', 'Books', 'Electronics', np.nan, 'Books', 'Clothing', 'Electronics', 'Clothing', 'Books'],
+    'FeedbackScore': [4, 5, 3, 4, np.nan, 2, 5, 4, 3, 5]
+}
+df = pd.DataFrame(data)
+print(df)
+print("\nMissing values before imputation:\n", df.isnull().sum(), "\n")
+
+# Make a copy of the DataFrame to perform imputation on, preserving the original
+df_imputed = df.copy()
+
+# --- Imputation for Numerical Columns ---
+
+# 2. Impute 'Age' with its Mean
+# 'Age' is a numerical column. Mean imputation is a common approach.
+print("--- Step 2: Imputing 'Age' with its Mean ---")
+mean_age = df_imputed['Age'].mean()
+df_imputed['Age'].fillna(mean_age, inplace=True)
+print(f"Mean Age used for imputation: {mean_age:.2f}")
+print("DataFrame after 'Age' imputation:\n", df_imputed[['Age', 'Gender']].head(5)) # Show first 5 rows for quick check
+print(f"Missing 'Age' after imputation: {df_imputed['Age'].isnull().sum()}\n")
+
+# 3. Impute 'Income' with its Median
+# 'Income' is numerical, but might be skewed by high earners, so median is often preferred.
+print("--- Step 3: Imputing 'Income' with its Median ---")
+median_income = df_imputed['Income'].median()
+df_imputed['Income'].fillna(median_income, inplace=True)
+print(f"Median Income used for imputation: {median_income:.2f}")
+print("DataFrame after 'Income' imputation:\n", df_imputed[['Income', 'PurchaseCategory']].head(5))
+print(f"Missing 'Income' after imputation: {df_imputed['Income'].isnull().sum()}\n")
+
+# --- Imputation for Categorical/Discrete Numerical Columns ---
+
+# 4. Impute 'Gender' with its Mode
+# 'Gender' is categorical. Mode imputation is the appropriate simple method.
+print("--- Step 4: Imputing 'Gender' with its Mode ---")
+mode_gender = df_imputed['Gender'].mode()[0] # .mode() returns a Series, so [0] gets the first mode
+df_imputed['Gender'].fillna(mode_gender, inplace=True)
+print(f"Mode Gender used for imputation: '{mode_gender}'")
+print("DataFrame after 'Gender' imputation:\n", df_imputed[['Gender', 'FeedbackScore']].head(5))
+print(f"Missing 'Gender' after imputation: {df_imputed['Gender'].isnull().sum()}\n")
+
+# 5. Impute 'PurchaseCategory' with its Mode
+# 'PurchaseCategory' is also categorical.
+print("--- Step 5: Imputing 'PurchaseCategory' with its Mode ---")
+mode_category = df_imputed['PurchaseCategory'].mode()[0]
+df_imputed['PurchaseCategory'].fillna(mode_category, inplace=True)
+print(f"Mode PurchaseCategory used for imputation: '{mode_category}'")
+print("DataFrame after 'PurchaseCategory' imputation:\n", df_imputed[['PurchaseCategory', 'City']].head(5))
+print(f"Missing 'PurchaseCategory' after imputation: {df_imputed['PurchaseCategory'].isnull().sum()}\n")
+
+# 6. Impute 'FeedbackScore' (discrete numerical/ordinal) with its Mode
+# While numerical, FeedbackScore is ordinal (1-5), so mode might be more appropriate than mean/median.
+print("--- Step 6: Imputing 'FeedbackScore' with its Mode ---")
+mode_feedback = df_imputed['FeedbackScore'].mode()[0]
+df_imputed['FeedbackScore'].fillna(mode_feedback, inplace=True)
+print(f"Mode FeedbackScore used for imputation: {mode_feedback}")
+print("DataFrame after 'FeedbackScore' imputation:\n", df_imputed[['FeedbackScore']].head(5))
+print(f"Missing 'FeedbackScore' after imputation: {df_imputed['FeedbackScore'].isnull().sum()}\n")
+
+# 7. Verify no missing values remain in the imputed DataFrame
+print("--- Step 7: Final Check for Missing Values in Imputed DataFrame ---")
+print(df_imputed.isnull().sum())
+print("\nAll missing values have been handled.\n")
+
+# Display the full imputed DataFrame (optional, for final review)
+print("--- Final Imputed DataFrame (df_imputed) ---")
+print(df_imputed)
+                    </code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">This hands-on exercise demonstrates the practical application of `fillna()` in Pandas. You've seen how to calculate the mean, median, and mode for specific columns and then use these values to replace missing entries. Remember that `inplace=True` modifies the DataFrame directly, while omitting it (`inplace=False` or default) returns a new DataFrame, which is generally safer for preserving original data.</p>
+            </div>
+        </section>
+
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Introduction to Outliers</h2>
+            <p class="section-intro">Beyond missing values, another significant data quality issue that can severely impact analysis and model performance is the presence of outliers. This section will define what outliers are, explore their potential causes and profound impact, and introduce the crucial first step of visually identifying them within your datasets.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">What are Outliers? Definition, Causes, and Impact</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">An outlier is a data point that significantly deviates from other observations in a dataset. It is an observation that lies an abnormal distance from other values in a random sample from a population. Outliers can be genuine extreme values that represent rare but valid occurrences, or they can be errors resulting from data collection or entry mistakes.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Causes of Outliers:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Data Entry Errors:</strong> The most common cause. A typo during manual data entry (e.g., entering '100000' instead of '1000').</li>
+                    <li><strong>Measurement Errors:</strong> Faulty equipment, calibration issues, or human error during data collection (e.g., a sensor malfunction giving an unusually high reading).</li>
+                    <li><strong>Experimental Errors:</strong> Mistakes during an experiment or survey design that lead to unusual responses.</li>
+                    <li><strong>Intentional Errors:</strong> Sometimes, data might be intentionally falsified or entered incorrectly (e.g., a customer providing a fake age).</li>
+                    <li><strong>Natural Variation / True Extremes:</strong> These are legitimate data points that are simply very far from the mean. For example, a millionaire in a dataset of average incomes, or a record-breaking athletic performance. These are not errors but represent rare events.</li>
+                    <li><strong>Data Processing Errors:</strong> Mistakes during data transformation, merging, or aggregation can inadvertently create outliers.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Impact of Outliers: Why They Matter</h4>
+                <p class="mb-4 text-gray-700 leading-relaxed">Outliers can have a disproportionately significant impact on statistical analysis and machine learning models, often leading to misleading results if not handled appropriately:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Distortion of Statistical Measures:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Mean:</strong> Highly sensitive to outliers. A single extreme value can pull the mean significantly in its direction, misrepresenting the central tendency of the majority of the data.</li>
+                            <li><strong>Standard Deviation & Variance:</strong> These measures of spread are also heavily influenced by outliers, as they involve squared differences from the mean. Outliers inflate these values, suggesting greater variability than truly exists.</li>
+                            <li><strong>Correlation & Regression:</strong> Outliers can drastically alter correlation coefficients and the slope/intercept of regression lines, leading to incorrect conclusions about relationships between variables.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Degradation of Model Performance:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><strong>Machine Learning Models:</strong> Many ML algorithms (e.g., Linear Regression, K-Means Clustering, some neural networks) are sensitive to outliers. They might try to fit the outliers, leading to models that generalize poorly to new, unseen data, or that misclassify/mispredict common cases.</li>
+                            <li><strong>Overfitting:</strong> Models might become overly complex to accommodate outliers, leading to overfitting where the model performs well on training data but poorly on new data.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Misleading Visualizations:</strong> Outliers can distort the scale of plots, making it difficult to discern patterns or distributions in the majority of the data.</li>
+                    <li><strong>Incorrect Business Decisions:</strong> If analysis is based on data skewed by outliers, the resulting business decisions can be suboptimal or entirely wrong, leading to financial losses, inefficient operations, or missed opportunities.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">The key challenge with outliers is determining whether they are genuine extreme values that provide valuable insights (e.g., a record-breaking sale) or simply errors that need to be removed or adjusted. This often requires domain expertise and careful investigation.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Visual Identification of Outliers: Spotting the Extremes</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Before applying any statistical methods, visualizing your data is often the quickest and most intuitive way to spot potential outliers. Different types of plots are effective for different scenarios:</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">1. Box Plots (Box-and-Whisker Plots)</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><em>Description:</em> A standardized way of displaying the distribution of data based on five key numbers: minimum, first quartile (Q1), median (Q2), third quartile (Q3), and maximum. Outliers are typically plotted as individual points beyond the "whiskers."</li>
+                    <li><em>How it helps identify outliers:</em>
+                        <ul class="list-circle pl-5">
+                            <li>The whiskers usually extend to 1.5 times the Interquartile Range (IQR = Q3 - Q1) from the quartiles. Any data points falling outside these whiskers are statistically considered potential outliers.</li>
+                            <li>Provides a clear visual representation of the data's spread, skewness, and the presence of extreme values.</li>
+                        </ul>
+                    </li>
+                    <li><em>Best for:</em> Identifying outliers in a single numerical variable, especially useful for comparing distributions across different groups.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">2. Scatter Plots</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><em>Description:</em> Plots individual data points, typically showing the relationship between two numerical variables (X and Y axis).</li>
+                    <li><em>How it helps identify outliers:</em>
+                        <ul class="list-circle pl-5">
+                            <li>Outliers appear as points that lie far away from the main cluster of data points. They can be extreme on either the X-axis, Y-axis, or both.</li>
+                            <li>Particularly effective for identifying multivariate outliers (outliers that are extreme in combination with other variables, even if not extreme on a single variable).</li>
+                        </ul>
+                    </li>
+                    <li><em>Best for:</em> Identifying outliers in the context of two numerical variables and spotting unusual relationships.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">3. Histograms</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><em>Description:</em> A graphical representation of the distribution of numerical data. It's an estimate of the probability distribution of a continuous variable.</li>
+                    <li><em>How it helps identify outliers:</em>
+                        <ul class="list-circle pl-5">
+                            <li>Outliers appear as isolated bars or very small bars far from the main body of the distribution.</li>
+                            <li>Helps visualize the overall shape of the distribution and detect skewness, which can sometimes be caused by outliers.</li>
+                        </ul>
+                    </li>
+                    <li><em>Best for:</em> Understanding the distribution of a single numerical variable and identifying extreme values at the tails of the distribution.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Visual inspection is a crucial first step because it not only helps identify outliers but also provides context. It allows you to see if an outlier is truly isolated or part of a small, legitimate cluster of extreme values, informing your decision on how to handle it.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-6 mt-auto">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        function toggleAccordion(itemElement) {
+            itemElement.classList.toggle('open');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scroll for nav links and initial active state
+            document.querySelectorAll('a.nav-button').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll('a.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Set initial active nav button based on URL hash or first section
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'practical';
+            const initialNavButton = document.querySelector(`a.nav-button[href="#${initialSection}"]`);
+            if (initialNavButton) {
+                initialNavButton.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

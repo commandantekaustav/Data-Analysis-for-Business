@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S32: Hands-on Outlier Treatment & Intro to Excel for Prep</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices:
+        - Hands-on Outlier Capping: Report Info: Apply capping. Goal: Apply. Viz/Method: Detailed Python code snippets with extensive comments, showing step-by-step application and demonstrating the DataFrame before/after capping. Justification: Provides a clear, actionable guide for practical outlier treatment.
+        - Excel for Data Prep (Strengths/Limitations): Report Info: Pros/Cons. Goal: Inform. Viz/Method: Detailed bulleted lists. Justification: Provides a balanced view of Excel's utility.
+        - Relevant Excel Functions (TRIM, CLEAN, etc.): Report Info: Functions. Goal: Inform. Viz/Method: Detailed text explanation for each function with conceptual examples. Justification: Introduces practical Excel tools for basic cleaning.
+        CONFIRMATION: No charts used (Chart.js/Plotly.js not needed as report is conceptual/textual).
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); /* Adjust based on header/footer height */ }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+
+        .accordion-header { cursor: pointer; user-select: none; }
+        .accordion-content { display: none; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; }
+        .accordion-item.open .accordion-content { display: block; max-height: 1000px; /* Arbitrary large value */ padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .accordion-arrow { transition: transform 0.3s ease; }
+        .accordion-item.open .accordion-arrow { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S32: Hands-on Outlier Treatment & Intro to Excel for Prep</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#practical" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                    <li><a href="#theory" class="nav-button text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Hands-on Outlier Treatment (Capping)</h2>
+            <p class="section-intro">This section provides a conceptual "hands-on" exercise focusing on one effective outlier treatment strategy: capping, also known as Winsorization. We will use Python's Pandas library to demonstrate how to replace extreme values with more reasonable, predefined thresholds, and critically examine the "before and after" impact on the dataset.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Hands-on Exercise: Applying Capping (Winsorization) with Pandas</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Capping involves replacing values beyond a certain percentile with the value at that percentile. For instance, values above the 99th percentile might be replaced with the 99th percentile value, and values below the 1st percentile with the 1st percentile value. This method reduces the influence of outliers without removing the data points entirely. We'll use our `MonthlySpend` dataset with outliers from N-S31.</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800">
+                    <h4 class="font-semibold text-indigo-700 mb-2">Python Code Snippet (using Pandas for Capping)</h4>
+                    <pre><code class="language-python">
+import pandas as pd
+import numpy as np
+
+# 1. Create a sample DataFrame with outliers (same as N-S31 demo)
+print("--- Step 1: Original Sample DataFrame with Outliers ---")
+data = {
+    'CustomerID': range(1, 21),
+    'MonthlySpend': [50, 60, 55, 70, 80, 65, 75, 90, 100, 500, # Outlier: 500
+                     45, 62, 58, 72, 85, 68, 78, 92, 105, 1500] # Outlier: 1500
+}
+df_spend = pd.DataFrame(data)
+print(df_spend)
+print(f"\nOriginal 'MonthlySpend' statistics:\n{df_spend['MonthlySpend'].describe()}\n")
+
+# 2. Define the capping percentiles (e.g., 1st and 99th percentiles)
+# These thresholds will determine where we 'clip' the extreme values.
+print("--- Step 2: Defining Capping Percentiles ---")
+lower_bound_percentile = df_spend['MonthlySpend'].quantile(0.01) # 1st percentile
+upper_bound_percentile = df_spend['MonthlySpend'].quantile(0.99) # 99th percentile
+print(f"1st Percentile (Lower Cap): {lower_bound_percentile:.2f}")
+print(f"99th Percentile (Upper Cap): {upper_bound_percentile:.2f}\n")
+
+# 3. Apply capping to the 'MonthlySpend' column
+# We use .clip() method which is designed for this.
+# Values below lower_bound_percentile are replaced with lower_bound_percentile.
+# Values above upper_bound_percentile are replaced with upper_bound_percentile.
+print("--- Step 3: Applying Capping (Winsorization) ---")
+df_capped = df_spend.copy() # Work on a copy to preserve original df
+df_capped['MonthlySpend'] = df_capped['MonthlySpend'].clip(lower=lower_bound_percentile, upper=upper_bound_percentile)
+print(df_capped)
+print(f"\n'MonthlySpend' statistics after capping:\n{df_capped['MonthlySpend'].describe()}\n")
+
+# 4. Compare 'Before' and 'After'
+print("--- Step 4: Comparing Original vs. Capped Data (Visual Inspection) ---")
+print("Original Max Spend:", df_spend['MonthlySpend'].max())
+print("Capped Max Spend:", df_capped['MonthlySpend'].max())
+print("Original Mean Spend:", df_spend['MonthlySpend'].mean())
+print("Capped Mean Spend:", df_capped['MonthlySpend'].mean())
+
+# You would conceptually visualize this with plots:
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+# plt.figure(figsize=(12, 5))
+# plt.subplot(1, 2, 1)
+# sns.boxplot(y=df_spend['MonthlySpend'])
+# plt.title('Original Monthly Spend')
+# plt.subplot(1, 2, 2)
+# sns.boxplot(y=df_capped['MonthlySpend'])
+# plt.title('Capped Monthly Spend')
+# plt.tight_layout()
+# plt.show()
+print("\nImagine side-by-side box plots. The 'Capped Monthly Spend' box plot would show no individual outlier points beyond the whiskers, as they have been brought within the defined range.\n")
+                    </code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">This exercise demonstrates how to apply capping to a numerical column using Pandas' `clip()` method. You can observe that the maximum (and minimum, if applicable) values are now constrained by the chosen percentiles, and statistical measures like the mean will be less influenced by the original extreme outliers. Capping is a valuable technique when you want to reduce outlier influence while retaining all observations in your dataset.</p>
+            </div>
+        </section>
+
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Introduction to Excel for Data Preparation</h2>
+            <p class="section-intro">While Python and specialized tools are powerful for large-scale data preparation, Microsoft Excel remains an incredibly ubiquitous and accessible tool for basic data cleaning and manipulation, especially for smaller datasets. This section explores Excel's strengths and limitations in data preparation and introduces some of its most relevant functions for cleaning messy data.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Excel for Data Preparation: Strengths and Limitations</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Excel is often the first tool many professionals encounter for data handling. While it excels in certain areas, it's crucial to understand its boundaries when it comes to robust data preparation.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Strengths of Excel for Data Preparation:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Accessibility & Ubiquity:</strong> Almost everyone has access to Excel, and most business users are familiar with its interface. This makes it a common starting point for data work and easy for sharing simple datasets.</li>
+                    <li><strong>Visual & Intuitive Interface:</strong> The grid-like interface makes it easy to visually inspect data, spot obvious errors, and perform quick, ad-hoc manipulations without writing code.</li>
+                    <li><strong>Basic Cleaning Functions:</strong> Excel offers a range of built-in functions for common cleaning tasks (e.g., removing extra spaces, changing case, finding/replacing text).</li>
+                    <li><strong>Filtering & Sorting:</strong> Powerful and easy-to-use filtering and sorting capabilities allow for quick data subsetting and reordering.</li>
+                    <li><strong>Conditional Formatting:</strong> Helps visually highlight patterns, duplicates, or potential errors based on rules.</li>
+                    <li><strong>PivotTables:</strong> Excellent for quick data summarization and aggregation, which can sometimes reveal data quality issues.</li>
+                    <li><strong>Collaboration (Basic):</strong> For small teams and simple files, sharing and collaborating on Excel sheets is straightforward.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Limitations of Excel for Data Preparation:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Scalability Issues:</strong> Excel has row limits (around 1 million rows) and can become very slow or crash when dealing with large datasets. It's not designed for big data.</li>
+                    <li><strong>Lack of Reproducibility:</strong> Manual steps (e.g., copy-pasting, drag-filling) are not easily reproducible or auditable. If the source data changes, you have to repeat all steps manually. This makes automated workflows impossible.</li>
+                    <li><strong>Error Prone:</strong> Manual operations are susceptible to human error. Formulas can be accidentally overwritten, and complex nested functions can be difficult to debug.</li>
+                    <li><strong>Limited Automation:</strong> While VBA macros exist, they are less flexible and powerful than scripting languages like Python for complex, automated data pipelines.</li>
+                    <li><strong>Version Control Challenges:</strong> Tracking changes and collaborating on versions of a spreadsheet can be cumbersome without specialized tools, leading to "version control hell."</li>
+                    <li><strong>Limited Advanced Cleaning:</strong> Excel lacks built-in capabilities for advanced data cleaning tasks like sophisticated outlier detection (beyond visual inspection), complex missing data imputation (beyond simple fill-ins), or fuzzy matching for duplicates.</li>
+                    <li><strong>Data Type Inferences:</strong> Excel sometimes makes incorrect assumptions about data types (e.g., converting large numbers to scientific notation, or dates to a different format), which can lead to data loss or corruption.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">In summary, Excel is a fantastic tool for quick, visual data inspection and basic cleaning of smaller datasets. However, for larger datasets, complex cleaning tasks, or workflows requiring reproducibility and automation, more powerful programming languages like Python or specialized ETL (Extract, Transform, Load) tools are necessary.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Relevant Excel Functions for Basic Data Cleaning</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Excel provides several built-in functions that are highly useful for addressing common data quality issues, particularly those related to text data. Understanding these functions can significantly speed up basic cleaning tasks.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">1. `TRIM()`</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><em>Purpose:</em> Removes all spaces from text except for single spaces between words. This is incredibly useful for cleaning up leading, trailing, or multiple internal spaces that can cause inconsistencies in text matching and filtering.</li>
+                    <li><em>Conceptual Example:</em>
+                        <ul class="list-circle pl-5">
+                            <li>Original: `"  Product A   "`</li>
+                            <li>Formula: `=TRIM(A1)`</li>
+                            <li>Result: `"Product A"`</li>
+                        </ul>
+                    </li>
+                    <li><em>Use Case:</em> Cleaning product names, customer names, addresses, or any text field where extraneous spaces might exist.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">2. `CLEAN()`</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">The `CLEAN()` function removes all non-printable characters from text. These are characters that might not be visible but can cause issues when importing data or displaying text.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><em>Purpose:</em> Removes non-printable characters (e.g., carriage returns, line feeds, other control characters) that might appear in text imported from other systems or web sources.</li>
+                    <li><em>Conceptual Example:</em>
+                        <ul class="list-circle pl-5">
+                            <li>Original: `"Product A" & CHAR(10) & "Description"` (where CHAR(10) is a line feed)</li>
+                            <li>Formula: `=CLEAN(A1)`</li>
+                            <li>Result: `"Product ADescription"` (removes the line break)</li>
+                        </ul>
+                    </li>
+                    <li><em>Use Case:</em> Cleaning text fields that might contain hidden control characters, often encountered when importing data from PDFs or legacy systems.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">3. `UPPER()`, `LOWER()`, `PROPER()`</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">These functions are used for standardizing the case of text, which is crucial for consistent matching and analysis.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><em>Purpose:</em>
+                        <ul class="list-circle pl-5">
+                            <li>`UPPER()`: Converts all text to uppercase.</li>
+                            <li>`LOWER()`: Converts all text to lowercase.</li>
+                            <li>`PROPER()`: Capitalizes the first letter of each word and converts the rest to lowercase.</li>
+                        </ul>
+                    </li>
+                    <li><em>Conceptual Example:</em>
+                        <ul class="list-circle pl-5">
+                            <li>Original: `"new york"`</li>
+                            <li>`=UPPER(A1)` -> `"NEW YORK"`</li>
+                            <li>`=LOWER(A1)` -> `"new york"`</li>
+                            <li>`=PROPER(A1)` -> `"New York"`</li>
+                        </ul>
+                    </li>
+                    <li><em>Use Case:</em> Standardizing city names, product categories, or any text field where inconsistent casing might lead to duplicates (e.g., "New York" vs. "new york" being treated as different entries).</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">4. `FIND()`, `SEARCH()`, `LEFT()`, `RIGHT()`, `MID()`, `LEN()`</h4>
+                <p class="mb-2 text-gray-700 leading-relaxed">These are text manipulation functions used for extracting parts of a text string or finding specific characters.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><em>Purpose:</em>
+                        <ul class="list-circle pl-5">
+                            <li>`FIND()` / `SEARCH()`: Locate the starting position of a substring within a text string. (`FIND` is case-sensitive, `SEARCH` is not).</li>
+                            <li>`LEFT()`: Extracts a specified number of characters from the beginning of a text string.</li>
+                            <li>`RIGHT()`: Extracts a specified number of characters from the end of a text string.</li>
+                            <li>`MID()`: Extracts a specified number of characters from the middle of a text string, starting at a given position.</li>
+                            <li>`LEN()`: Returns the number of characters in a text string.</li>
+                        </ul>
+                    </li>
+                    <li><em>Conceptual Example:</em>
+                        <ul class="list-circle pl-5">
+                            <li>Original: `"Product_SKU_12345"`</li>
+                            <li>`=RIGHT(A1, 5)` -> `"12345"` (extracts SKU number)</li>
+                        </ul>
+                    </li>
+                    <li><em>Use Case:</em> Parsing product codes, extracting specific parts of an address, or cleaning data where information is concatenated within a single text field.</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">By combining these and other Excel functions, analysts can perform a surprising amount of basic data cleaning directly within spreadsheets, making them a valuable tool in the data preparation toolkit for smaller-scale tasks.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-6 mt-auto">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        function toggleAccordion(itemElement) {
+            itemElement.classList.toggle('open');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scroll for nav links and initial active state
+            document.querySelectorAll('a.nav-button').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll('a.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Set initial active nav button based on URL hash or first section
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'practical';
+            const initialNavButton = document.querySelector(`a.nav-button[href="#${initialSection}"]`);
+            if (initialNavButton) {
+                initialNavButton.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

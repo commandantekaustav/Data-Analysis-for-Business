@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S23: Data Source Strategy & Intro to Data Types</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices:
+        - Case Study Discussion (Combining Data): Report Info: Store location optimization. Goal: Illustrate, apply. Viz/Method: Detailed descriptive text with structured bullet points for data needs and benefits. Justification: Provides a concrete example of integrated data strategy.
+        - Why Data Types Matter: Report Info: Importance. Goal: Inform. Viz/Method: Expanded text explanation. Justification: Sets the foundation for understanding different data formats.
+        - Structured Data Definition: Report Info: Definition, characteristics, storage. Goal: Inform. Viz/Method: Detailed text explanation with bullet points for key attributes and examples. Justification: Provides a thorough understanding of the most common data type.
+        CONFIRMATION: No charts used (Chart.js/Plotly.js not needed as report is conceptual/textual).
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); /* Adjust based on header/footer height */ }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+
+        .accordion-header { cursor: pointer; user-select: none; }
+        .accordion-content { display: none; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; }
+        .accordion-item.open .accordion-content { display: block; max-height: 1000px; /* Arbitrary large value */ padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .accordion-arrow { transition: transform 0.3s ease; }
+        .accordion-item.open .accordion-arrow { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S23: Data Source Strategy & Intro to Data Types</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#practical" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                    <li><a href="#theory" class="nav-button text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Data Source Strategy - Combining Internal & External Data</h2>
+            <p class="section-intro">Effective data analytics often requires a holistic view, which means strategically combining internal and external data. This section explores a classic business problem – optimizing store location – to illustrate how integrating diverse data sources leads to more informed and impactful decisions.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Case Study Discussion: Store Location Optimization</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Imagine a retail chain planning to open several new stores. Choosing the right location is paramount for success, as it impacts foot traffic, sales potential, operational costs, and long-term profitability. A poor location choice can lead to significant losses, while an optimal one can drive substantial growth. This decision cannot be made effectively using internal data alone; it requires a rich blend of internal and external insights.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">The Challenge: Maximizing Success for New Retail Locations</h4>
+                <p class="mb-4 text-gray-700 leading-relaxed">The core challenge is to identify locations that not only align with the company's strategic goals but also possess the highest potential for customer acquisition and sustained revenue. This involves understanding demographic fit, competitive landscape, accessibility, and local market dynamics.</p>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">How Combining Data Provides a Competitive Edge:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Holistic View:</strong> Internal data tells you about your existing customers and store performance. External data tells you about potential customers, the broader market, and competitors in new areas. Combining them provides a 360-degree view.</li>
+                    <li><strong>Predictive Power:</strong> By integrating local demographic data, traffic patterns, and competitor presence (external) with historical sales data from similar existing stores (internal), a more accurate sales forecast for potential new locations can be generated.</li>
+                    <li><strong>Risk Mitigation:</strong> External data helps identify areas with high crime rates, low disposable income, or excessive competition, mitigating the risk of selecting a suboptimal site.</li>
+                    <li><strong>Opportunity Identification:</strong> External data can reveal underserved areas with high concentrations of target demographics, presenting untapped market opportunities.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Key Data Needed for Store Location Optimization:</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h5 class="font-semibold text-amber-600 mb-2">Internal Data Sources:</h5>
+                        <ul class="list-disc pl-5 space-y-1 text-gray-700">
+                            <li><strong>Existing Store Performance Data:</strong> Sales volumes, revenue, profitability by product category, customer foot traffic (if measured), operational costs, customer demographics from loyalty programs.</li>
+                            <li><strong>Customer Demographics (from CRM/Loyalty):</strong> Age, income, purchasing habits, distance traveled to existing stores for current customers.</li>
+                            <li><strong>Supply Chain & Logistics Data:</strong> Current warehouse locations, delivery routes, transportation costs, capacity constraints.</li>
+                            <li><strong>Marketing Campaign Performance Data:</strong> Effectiveness of past campaigns in different regions.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 class="font-semibold text-amber-600 mb-2">External Data Sources:</h5>
+                        <ul class="list-disc pl-5 space-y-1 text-gray-700">
+                            <li><strong>Demographic Data (Census/Market Research):</strong> Population density, age distribution, income levels, household size, education levels, lifestyle segments for potential new areas.</li>
+                            <li><strong>Geospatial & Traffic Data:</strong> Foot traffic patterns (from mobile data providers), vehicle traffic counts, public transportation routes, proximity to major roads, parking availability.</li>
+                            <li><strong>Competitor Data:</strong> Locations of direct and indirect competitors, their store sizes, product offerings, pricing strategies, and online reviews/ratings.</li>
+                            <li><strong>Economic Indicators:</strong> Local employment rates, average disposable income, retail vacancy rates, economic growth projections for the city/region.</li>
+                            <li><strong>Points of Interest (POI) Data:</strong> Proximity to schools, offices, residential areas, entertainment venues, and other complementary businesses.</li>
+                            <li><strong>Weather Data:</strong> Historical weather patterns that might influence seasonal product sales or foot traffic.</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="mt-6 text-sm text-gray-600 leading-relaxed">By integrating these diverse datasets, a data analyst can build sophisticated models to: identify optimal trade areas, predict sales for potential sites, assess cannibalization risk for existing stores, and ultimately provide data-backed recommendations for the best new store locations. This strategic approach moves beyond intuition to a rigorous, evidence-based decision-making process.</p>
+            </div>
+        </section>
+
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Introduction to Data Types</h2>
+            <p class="section-intro">Understanding different data types is fundamental to data analytics. It dictates how data can be stored, processed, and analyzed, and what tools and techniques are most appropriate. This section explains why data types matter and provides a detailed introduction to structured data, the most common type encountered in business.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Why Data Types Matter: The Foundation of Analysis</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">The concept of "data type" might seem technical, but it's profoundly important for data analytics. Data types classify the kind of values that can be stored in a variable or a column (e.g., numbers, text, dates). Understanding them is crucial for several reasons:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Correct Storage & Efficiency:</strong> Databases and programming languages allocate memory and storage based on data types. Using the correct type ensures efficient storage and retrieval of data. For example, storing a numerical age as text is inefficient and can lead to errors.</li>
+                    <li><strong>Valid Operations:</strong> Data types determine what operations can be performed on the data. You can perform arithmetic operations (addition, subtraction) on numbers but not on text. You can sort dates chronologically, but not arbitrary strings. Misinterpreting a data type can lead to incorrect calculations or analysis.</li>
+                    <li><strong>Data Quality & Integrity:</strong> Defining data types helps enforce data quality. If a column is defined as an integer, the system will prevent text from being entered, thus maintaining data integrity.</li>
+                    <li><strong>Choosing the Right Tools & Techniques:</strong> Different data types require different analytical approaches and tools. You would use statistical methods for numerical data, text mining for textual data, and specific algorithms for image data.</li>
+                    <li><strong>Accurate Visualization:</strong> The type of data dictates the appropriate visualization. A bar chart is suitable for categorical data, while a line chart is best for time-series numerical data. Using the wrong chart type can mislead interpretation.</li>
+                    <li><strong>Model Building:</strong> Machine learning models often require input data to be in specific numerical formats. Understanding data types helps in the necessary transformations (e.g., converting categorical text into numerical representations).</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">In essence, data types are the fundamental building blocks that dictate how data behaves, how it's stored, and what you can ultimately do with it in your analytical journey. Ignoring them is a common source of errors and inefficient analysis.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Structured Data: The Most Common Form</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Structured data is the most common and traditional type of data encountered in business analytics. It is highly organized and adheres to a predefined schema or model, making it easy to store, manage, and query in relational databases and spreadsheets.</p>
+                
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Characteristics of Structured Data:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Predefined Schema:</strong> It has a fixed format or structure. Data is organized into rows and columns, with each column having a specific name and data type (e.g., 'CustomerName' as text, 'OrderDate' as date, 'OrderTotal' as number).</li>
+                    <li><strong>Tabular Format:</strong> Typically resides in tables, where each row represents a record and each column represents a specific attribute or field.</li>
+                    <li><strong>Easily Searchable & Queryable:</strong> Its organized nature allows for efficient searching and querying using languages like SQL (Structured Query Language).</li>
+                    <li><strong>Relational:</strong> Often stored in relational databases, where tables are linked to each other via keys, allowing for complex queries across multiple datasets.</li>
+                    <li><strong>Quantitative & Categorical:</strong> Can contain both quantitative (numerical) data for calculations and categorical (textual) data for grouping and filtering.</li>
+                    <li><strong>Scalability:</strong> While traditionally associated with fixed schemas, modern relational databases can scale to handle large volumes of structured data.</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold text-indigo-700 mt-6 mb-3">Common Storage Methods for Structured Data:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><strong>Relational Databases (SQL Databases):</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> The most prevalent method for storing structured data. Data is organized into tables with predefined relationships. Examples include MySQL, PostgreSQL, Oracle Database, Microsoft SQL Server.</li>
+                            <li><em>Use Case:</em> Transaction processing systems, CRM systems, ERP systems, financial records, inventory management.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Spreadsheets:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> Tools like Microsoft Excel and Google Sheets are widely used for storing and analyzing smaller, structured datasets. Data is organized in rows and columns, similar to database tables.</li>
+                            <li><em>Use Case:</em> Personal finance tracking, small business record-keeping, ad-hoc analysis, simple data sharing.</li>
+                        </ul>
+                    </li>
+                    <li><strong>CSV (Comma Separated Values) Files:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> A plain text file format where data values are separated by commas (or other delimiters) and each line represents a new record. It's a simple, universal way to store tabular data.</li>
+                            <li><em>Use Case:</em> Data exchange between different applications, storing small to medium datasets for quick analysis, exporting data from databases.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Data Warehouses:</strong>
+                        <ul class="list-circle pl-5">
+                            <li><em>Description:</em> Large, centralized repositories that store integrated data from multiple disparate sources, primarily for reporting and analysis. Data is typically structured and optimized for querying rather than transaction processing.</li>
+                            <li><em>Use Case:</em> Business intelligence, historical trend analysis, complex analytical queries across an enterprise.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Understanding structured data is foundational because it forms the basis of most traditional business reporting and analytical systems. While other data types are gaining prominence, structured data remains critical for core business operations and analysis.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-6 mt-auto">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        // No specific interactive cards or accordions for this module's data.
+        // The content is primarily descriptive text.
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scroll for nav links and initial active state
+            document.querySelectorAll('a.nav-button').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll('a.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Set initial active nav button based on URL hash or first section
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'practical';
+            const initialNavButton = document.querySelector(`a.nav-button[href="#${initialSection}"]`);
+            if (initialNavButton) {
+                initialNavButton.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

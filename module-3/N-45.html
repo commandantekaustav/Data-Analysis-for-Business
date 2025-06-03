@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-S45: Identifying Correlations, Anomalies, & Patterns through EDA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAF9F6; color: #374151; scroll-behavior: smooth; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-button.active { border-color: #4338CA; color: #4338CA; font-weight: 600; }
+        .nav-button:not(.active):hover { border-color: #6366F1; color: #6366F1; }
+        .content-section { min-height: calc(100vh - 180px); }
+        .section-intro { font-size: 1.125rem; color: #4B5563; margin-bottom: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .header-icon { font-size: 1.5rem; margin-right: 0.5rem; color: #4338CA; }
+        .chart-container { position: relative; height: 400px; width: 100%; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+        .chart-description { margin-top: 1rem; font-size: 0.9rem; color: #555; text-align: center; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-indigo-700">N-S45: Identifying Correlations, Anomalies, & Patterns through EDA</h1>
+            <nav class="mt-4">
+                <ul class="flex flex-wrap justify-center gap-3 sm:gap-6">
+                    <li><a href="#theory" class="nav-button active text-sm sm:text-base font-medium py-2 px-3">📚 Theory</a></li>
+                    <li><a href="#practical" class="nav-button text-sm sm:text-base font-medium py-2 px-3">💡 Practical</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <section id="theory" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">📚</span>Theory: Identifying Correlations, Anomalies, & Patterns through EDA</h2>
+            <p class="section-intro">Beyond understanding individual variables and pairs, EDA also involves looking for deeper relationships, unusual occurrences, and overarching patterns within the dataset. This session focuses on how to interpret correlation, and leverage various visualizations to effectively spot anomalies and recurring patterns, which are crucial for generating actionable business insights.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Interpreting Correlation</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Correlation measures the strength and direction of a linear relationship between two numerical variables. The most common measure is the Pearson correlation coefficient.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Pearson Correlation Coefficient (r):</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>Ranges from -1 to +1.</li>
+                            <li><strong>+1:</strong> Perfect positive linear relationship (as one variable increases, the other increases proportionally).</li>
+                            <li><strong>-1:</strong> Perfect negative linear relationship (as one variable increases, the other decreases proportionally).</li>
+                            <li><strong>0:</strong> No linear relationship.</li>
+                            <li><strong>Values close to 0:</strong> Weak or no linear relationship.</li>
+                            <li><strong>Values close to $\pm$1:</strong> Strong linear relationship.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Correlation vs. Causation:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Crucial Point:</strong> Correlation does NOT imply causation. Just because two variables move together does not mean one causes the other. There might be a third, unobserved variable causing both, or the relationship might be coincidental.</li>
+                            <li><em>Example:</em> Ice cream sales and drowning incidents might both increase in summer. They are correlated, but ice cream sales don't cause drownings; hot weather causes both.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Visualizing Correlation:</strong>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Scatter Plots:</strong> Provide the most direct visual representation of a correlation. You can see the direction and spread.</li>
+                            <li><strong>Correlation Heatmaps:</strong> A matrix where each cell represents the correlation coefficient between two variables, colored by strength and direction. This is excellent for quickly grasping relationships across many variables.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600">Understanding correlation helps identify which variables might be good predictors for others in a modeling context, but always remember the causation caveat.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Using Visualizations to Spot Anomalies and Patterns</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">Visualizations are powerful tools for human pattern recognition. They allow us to quickly identify unusual data points (anomalies) and recurring behaviors (patterns) that might be missed in raw data tables.</p>
+                
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Spotting Anomalies (Outliers):</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Box Plots:</strong> Outliers are typically plotted as individual points beyond the "whiskers" of the box plot. This is a very effective way to visually identify them.</li>
+                    <li><strong>Scatter Plots:</strong> Look for data points that are far removed from the main cluster of points. These could be isolated points or small groups of points that don't follow the general trend.</li>
+                    <li><strong>Histograms/Density Plots:</strong> Look for small, isolated bars or bumps far from the main distribution.</li>
+                    <li><strong>Time Series Plots:</strong> Sudden, sharp spikes or drops that deviate significantly from the overall trend or seasonality can indicate anomalies.</li>
+                </ul>
+                <p class="mt-2 text-gray-700"><strong>Importance:</strong> Anomalies can be data entry errors, rare but significant events (e.g., a massive sale, a system outage), or indicators of fraud. Identifying them is crucial for data cleaning and for understanding unusual business events.</p>
+
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Identifying Patterns:</h4>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mb-4">
+                    <li><strong>Trends (Line Charts):</strong> Look for consistent upward or downward movement over time (e.g., increasing sales, decreasing customer acquisition cost).</li>
+                    <li><strong>Seasonality (Line Charts):</strong> Recurring patterns at fixed intervals (e.g., sales peaking every December, website traffic dipping every weekend).</li>
+                    <li><strong>Cyclical Patterns (Line Charts):</strong> Longer-term fluctuations that are not fixed to a calendar (e.g., economic cycles affecting consumer spending).</li>
+                    <li><strong>Clusters (Scatter Plots):</strong> Groups of data points that are close to each other but distinct from other groups, suggesting underlying segments (e.g., different customer segments based on age and spending).</li>
+                    <li><strong>Relationships (Scatter Plots, Heatmaps):</strong> Identify if variables move together (positive correlation), inversely (negative correlation), or have no apparent relationship.</li>
+                    <li><strong>Distribution Shapes (Histograms/Density Plots):</strong> Understand if data is normally distributed, skewed (left or right), or multimodal, which can indicate different underlying processes or populations.</li>
+                </ul>
+                <p class="mt-2 text-gray-700">Identifying patterns allows businesses to make informed predictions, optimize operations, and tailor strategies. For example, recognizing seasonality helps in inventory management and marketing campaign timing.</p>
+            </div>
+        </section>
+
+        <section id="practical" class="content-section mb-12">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-6 text-center"><span class="header-icon">💡</span>Practical: Hands-on (Python) - Correlation Heatmap & Guided EDA</h2>
+            <p class="section-intro">In this hands-on session, you will generate and interpret a correlation heatmap using Python, and then apply your EDA skills to a business dataset to identify key insights and prepare supporting visualizations. This will solidify your ability to uncover patterns and anomalies.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Task 1: Generate and Interpret a Correlation Heatmap</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">We'll use a hypothetical dataset of marketing campaign data, including `Ad_Spend`, `Impressions`, `Clicks`, and `Conversions` to see how these numerical variables relate to each other.</p>
+                
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Conceptual Data: Marketing Campaign Metrics</h4>
+                <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code>
+CampaignID,Ad_Spend,Impressions,Clicks,Conversions,Revenue
+1,100,10000,500,10,2000
+2,120,12000,600,12,2500
+3,80,8500,400,8,1500
+4,150,15000,750,15,3000
+5,90,9500,450,9,1800
+... (more data)
+                    </code></pre>
+                </div>
+
+                <p class="mb-4 text-gray-700"><strong>Conceptual Python Code (using Pandas and Seaborn):</strong></p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code class="language-python">
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Simulate a DataFrame
+np.random.seed(44) # new seed for this session
+n_rows = 50
+data = {
+    'CampaignID': range(1, n_rows + 1),
+    'Ad_Spend': np.random.randint(50, 200, n_rows),
+    'Impressions': np.random.randint(5000, 20000, n_rows),
+    'Clicks': np.random.randint(200, 1000, n_rows),
+    'Conversions': np.random.randint(5, 50, n_rows),
+    'Revenue': np.random.randint(1000, 10000, n_rows)
+}
+df_marketing = pd.DataFrame(data)
+
+# Introduce some correlation
+df_marketing['Impressions'] = df_marketing['Ad_Spend'] * 100 + np.random.normal(0, 500, n_rows)
+df_marketing['Clicks'] = df_marketing['Impressions'] * 0.05 + np.random.normal(0, 20, n_rows)
+df_marketing['Conversions'] = df_marketing['Clicks'] * 0.02 + np.random.normal(0, 1, n_rows)
+df_marketing['Revenue'] = df_marketing['Conversions'] * 100 + np.random.normal(0, 500, n_rows)
+
+# Ensure values are positive and reasonable
+df_marketing = df_marketing.apply(lambda x: x.apply(lambda y: max(0, int(y))))
+
+
+print("--- Correlation Matrix ---")
+# Select only numerical columns for correlation
+numerical_df = df_marketing[['Ad_Spend', 'Impressions', 'Clicks', 'Conversions', 'Revenue']]
+correlation_matrix = numerical_df.corr()
+print(correlation_matrix)
+
+# # Create a heatmap of the correlation matrix
+# plt.figure(figsize=(8, 7))
+# sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=.5)
+# plt.title('Correlation Heatmap of Marketing Metrics')
+# plt.show()
+                    </code></pre>
+                </div>
+                <div class="chart-container">
+                    <canvas id="correlationHeatmap"></canvas>
+                </div>
+                <p class="chart-description"><em>Simulated Correlation Heatmap of Marketing Metrics. Hover over cells to see correlation values.</em></p>
+                <p class="mt-4 text-gray-700"><strong>Interpretation:</strong> Observe the colors and numbers. Values close to 1 (dark red) indicate a strong positive correlation, values close to -1 (dark blue) indicate a strong negative correlation, and values close to 0 (white/light colors) indicate a weak or no linear correlation. For example, you would expect `Ad_Spend` to have a strong positive correlation with `Impressions` and `Clicks`.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-indigo-500 mb-3">Task 2: Guided EDA on a Business Dataset</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">You will now perform a guided EDA on a sales dataset. Your goal is to identify 2-3 key insights and prepare relevant visualizations to support them. This exercise simulates a real-world scenario where you need to extract actionable information from raw data.</p>
+                
+                <h4 class="text-lg font-medium text-gray-800 mb-2">Hypothetical Business Dataset: E-commerce Sales & Customer Feedback</h4>
+                <p class="mb-2 text-gray-700"><strong>Data Description:</strong> A dataset containing `OrderID`, `OrderDate`, `ProductCategory`, `SalesAmount`, `CustomerRating` (1-5 stars), and `DeliveryTime_Days`.</p>
+                <div class="bg-gray-100 p-3 rounded-md overflow-x-auto text-sm font-mono text-gray-800 mb-4">
+                    <pre><code>
+OrderID,OrderDate,ProductCategory,SalesAmount,CustomerRating,DeliveryTime_Days
+1001,2024-01-05,Electronics,250.50,4,3
+1002,2024-01-06,Apparel,75.00,5,2
+1003,2024-01-07,Books,30.25,3,4
+1004,2024-01-08,Electronics,1200.00,2,7  <-- Potential anomaly: High sales, low rating, long delivery
+1005,2024-01-09,Home Goods,150.00,4,3
+... (more data, including some outliers and patterns)
+                    </code></pre>
+                </div>
+
+                <p class="mb-4 text-gray-700"><strong>Your Steps (Conceptual Python Code & Interpretation):</strong></p>
+                <ol class="list-decimal pl-5 space-y-4 text-gray-700">
+                    <li>
+                        <strong>Load the Data & Initial Inspection:</strong>
+                        <p class="mt-2 text-gray-700">Use Pandas to load the data (e.g., `pd.read_csv('ecommerce_sales.csv')`). Use `df.head()`, `df.info()`, and `df.describe()` to get a first look.</p>
+                        <p class="mt-2 text-sm text-gray-600"><em>Think: Are there missing values? What are the data types? What are the basic statistics?</em></p>
+                    </li>
+                    <li>
+                        <strong>Univariate Analysis:</strong>
+                        <p class="mt-2 text-gray-700">Visualize distributions of key numerical columns (`SalesAmount`, `DeliveryTime_Days`) using histograms and box plots. For categorical data (`ProductCategory`, `CustomerRating`), use count plots.</p>
+                        <p class="mt-2 text-sm text-gray-600"><em>Look for: Skewness, common values, potential outliers (e.g., very high sales, very long delivery times).</em></p>
+                        <div class="chart-container">
+                            <canvas id="salesAmountHist"></canvas>
+                        </div>
+                        <p class="chart-description"><em>Simulated Histogram: Distribution of Sales Amount.</em></p>
+                    </li>
+                    <li>
+                        <strong>Bivariate Analysis:</strong>
+                        <p class="mt-2 text-gray-700">Explore relationships. For example:</p>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li>`SalesAmount` vs. `CustomerRating` (Scatter plot)</li>
+                            <li>`DeliveryTime_Days` vs. `CustomerRating` (Scatter plot or Box plot of `CustomerRating` by `DeliveryTime_Days` bins)</li>
+                            <li>`ProductCategory` vs. `SalesAmount` (Box plot of sales by category)</li>
+                        </ul>
+                        <p class="mt-2 text-sm text-gray-600"><em>Look for: Any correlations? Do certain categories have higher sales? Does delivery time impact ratings?</em></p>
+                        <div class="chart-container">
+                            <canvas id="deliveryRatingScatter"></canvas>
+                        </div>
+                        <p class="chart-description"><em>Simulated Scatter Plot: Delivery Time vs. Customer Rating.</em></p>
+                    </li>
+                    <li>
+                        <strong>Identify Key Insights & Prepare Visualizations:</strong>
+                        <p class="mt-2 text-gray-700">Based on your observations, formulate 2-3 actionable insights. For each insight, select the most appropriate visualization you created to support it.</p>
+                        <ul class="list-circle pl-5 mt-2">
+                            <li><strong>Insight 1 Example:</strong> "There's a significant drop in customer ratings for orders with delivery times exceeding 5 days."
+                                <p class="ml-4 text-sm text-gray-600"><em>Supporting Viz: Scatter plot of DeliveryTime_Days vs. CustomerRating, or a box plot of CustomerRating grouped by delivery time bins.</em></p>
+                            </li>
+                            <li><strong>Insight 2 Example:</strong> "Electronics is the highest revenue-generating category, but also shows a wider spread in customer ratings."
+                                <p class="ml-4 text-sm text-gray-600"><em>Supporting Viz: Bar chart of sales by category, and a box plot of customer ratings by product category.</em></p>
+                            </li>
+                            <li><strong>Insight 3 Example:</strong> "We observe a few unusually high sales orders that also have very low customer ratings, suggesting potential issues with large/complex orders."
+                                <p class="ml-4 text-sm text-gray-600"><em>Supporting Viz: Scatter plot of SalesAmount vs. CustomerRating, highlighting the outliers.</em></p>
+                            </li>
+                        </ul>
+                    </li>
+                </ol>
+                <p class="mt-4 text-sm text-gray-600">This guided exercise is crucial for developing your analytical thinking and ability to translate data observations into meaningful business insights, which is a core skill for any data analyst.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 text-sm">
+        <p>&copy; FACE Prep Campus, 2025</p>
+    </footer>
+
+    <script>
+        // Function to create bins for histogram - moved outside DOMContentLoaded
+        function createHistogramBins(data, binWidth) {
+            const min = Math.min(...data);
+            const max = Math.max(...data);
+            const bins = [];
+            for (let i = min; i <= max + binWidth; i += binWidth) {
+                bins.push(i);
+            }
+            const labels = bins.slice(0, -1).map((val, i) => `${val}-${bins[i+1]}`);
+            const counts = new Array(bins.length - 1).fill(0);
+
+            data.forEach(value => {
+                for (let i = 0; i < bins.length - 1; i++) {
+                    if (value >= bins[i] && (value < bins[i+1] || (i === bins.length - 2 && value === max))) {
+                        counts[i]++;
+                        break;
+                    }
+                }
+            });
+            return { labels, counts };
+        }
+
+        // Data for Correlation Heatmap simulation
+        const correlationLabels = ['Ad_Spend', 'Impressions', 'Clicks', 'Conversions', 'Revenue'];
+        // Simulate a correlation matrix (values between -1 and 1)
+        const correlationMatrixData = [
+            [1.00, 0.92, 0.85, 0.78, 0.75], // Ad_Spend
+            [0.92, 1.00, 0.95, 0.88, 0.82], // Impressions
+            [0.85, 0.95, 1.00, 0.92, 0.88], // Clicks
+            [0.78, 0.88, 0.92, 1.00, 0.95], // Conversions
+            [0.75, 0.82, 0.88, 0.95, 1.00]  // Revenue
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('nav a').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Correlation Heatmap (simulated using a custom Chart.js plugin for cells)
+            const correlationCtx = document.getElementById('correlationHeatmap').getContext('2d');
+
+            // Custom plugin to draw heatmap cells and text
+            const heatmapPlugin = {
+                id: 'heatmapPlugin',
+                beforeDraw: (chart) => {
+                    const {ctx, chartArea: {left, top, right, bottom}, scales: {x, y}} = chart;
+                    const cellWidth = (right - left) / correlationLabels.length;
+                    const cellHeight = (bottom - top) / correlationLabels.length;
+
+                    ctx.save();
+                    ctx.font = '12px Inter';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    for (let i = 0; i < correlationLabels.length; i++) {
+                        for (let j = 0; j < correlationLabels.length; j++) {
+                            const value = correlationMatrixData[i][j];
+                            const xPos = left + (j * cellWidth) + (cellWidth / 2);
+                            const yPos = top + (i * cellHeight) + (cellHeight / 2);
+
+                            // Color based on value
+                            let color;
+                            if (value > 0) {
+                                const intensity = value; // 0 to 1
+                                color = `rgba(220, 38, 38, ${intensity})`; // Red for positive
+                            } else {
+                                const intensity = Math.abs(value); // 0 to 1
+                                color = `rgba(37, 99, 235, ${intensity})`; // Blue for negative
+                            }
+                            if (i === j) { // Diagonal (self-correlation)
+                                color = 'rgba(107, 114, 128, 0.8)'; // Grey
+                            }
+
+                            ctx.fillStyle = color;
+                            ctx.fillRect(left + (j * cellWidth), top + (i * cellHeight), cellWidth, cellHeight);
+
+                            // Draw text
+                            ctx.fillStyle = (Math.abs(value) > 0.7 || i === j) ? 'white' : '#333'; // White text for strong correlations/diagonal
+                            ctx.fillText(value.toFixed(2), xPos, yPos);
+                        }
+                    }
+                    ctx.restore();
+                }
+            };
+
+            new Chart(correlationCtx, {
+                type: 'bar', // Using bar type but drawing custom cells
+                data: {
+                    labels: correlationLabels,
+                    datasets: [{
+                        label: 'Correlation',
+                        data: [], // No actual bars, just for labels
+                        backgroundColor: 'transparent'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y', // For matrix-like axis labels
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Correlation Heatmap of Marketing Metrics',
+                            font: { size: 16 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const row = context[0].dataIndex;
+                                    const col = context[0].datasetIndex; // This needs adjustment for custom drawing
+                                    // For simplicity, we'll just show the value
+                                    return `Correlation: ${correlationMatrixData[row][context[0].parsed.x].toFixed(2)}`;
+                                },
+                                label: function(context) {
+                                    const rowLabel = correlationLabels[context.dataIndex];
+                                    const colLabel = correlationLabels[context.datasetIndex]; // This is incorrect for custom drawing
+                                    // For a true tooltip, you'd need to map mouse position to cell
+                                    return ''; // Hide default label
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: false, // Hide x-axis ticks/labels as we draw them
+                            grid: { display: false },
+                            stacked: true // Allow cells to be drawn without overlap
+                        },
+                        y: {
+                            display: true,
+                            grid: { display: false },
+                            ticks: {
+                                font: { size: 12 }
+                            }
+                        }
+                    },
+                    events: ['mousemove', 'mouseout', 'click'], // Enable events for interactivity
+                    onHover: (event, elements, chart) => {
+                        // This is a basic hover, for true heatmap hover, more complex logic is needed
+                        // For now, just change cursor
+                        chart.canvas.style.cursor = elements[0] ? 'pointer' : 'default';
+                    }
+                },
+                plugins: [heatmapPlugin]
+            });
+
+            // Simulated E-commerce Sales & Customer Feedback Data
+            const ecommerceData = [];
+            for (let i = 0; i < 200; i++) {
+                const sales = parseFloat((Math.random() * 500 + 50).toFixed(2));
+                let rating = Math.floor(Math.random() * 5) + 1; // 1 to 5
+                let deliveryTime = Math.floor(Math.random() * 6) + 1; // 1 to 6 days
+
+                // Introduce some patterns/anomalies
+                if (sales > 400 && Math.random() < 0.3) { // High sales, sometimes lower rating
+                    rating = Math.floor(Math.random() * 2) + 1; // 1 or 2 stars
+                    deliveryTime = Math.floor(Math.random() * 3) + 5; // Longer delivery
+                }
+                if (deliveryTime >= 5 && Math.random() < 0.6) { // Longer delivery, often lower rating
+                    rating = Math.floor(Math.random() * 2) + 1;
+                }
+                if (sales < 100 && Math.random() < 0.2) { // Low sales, sometimes high rating
+                    rating = 5;
+                }
+
+                ecommerceData.push({
+                    salesAmount: sales,
+                    customerRating: rating,
+                    deliveryTime: deliveryTime,
+                    productCategory: ['Electronics', 'Apparel', 'Home Goods', 'Books'][Math.floor(Math.random() * 4)]
+                });
+            }
+
+            // Chart for Sales Amount Distribution (Histogram)
+            const salesAmounts = ecommerceData.map(d => d.salesAmount);
+            const salesBins = createHistogramBins(salesAmounts, 50); // 50 unit bins
+            const salesHistCtx = document.getElementById('salesAmountHist').getContext('2d');
+            new Chart(salesHistCtx, {
+                type: 'bar',
+                data: {
+                    labels: salesBins.labels,
+                    datasets: [{
+                        label: 'Frequency',
+                        data: salesBins.counts,
+                        backgroundColor: 'rgba(67, 56, 202, 0.8)',
+                        borderColor: 'rgba(67, 56, 202, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Distribution of Sales Amount',
+                            font: { size: 14 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Sales Amount ($)' },
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Frequency' }
+                        }
+                    }
+                }
+            });
+
+            // Chart for Delivery Time vs. Customer Rating (Scatter Plot)
+            const deliveryRatingScatterCtx = document.getElementById('deliveryRatingScatter').getContext('2d');
+            new Chart(deliveryRatingScatterCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Customer Feedback',
+                        data: ecommerceData.map(d => ({ x: d.deliveryTime, y: d.customerRating, sales: d.salesAmount })),
+                        backgroundColor: 'rgba(245, 158, 11, 0.6)', // Amber
+                        borderColor: 'rgba(245, 158, 11, 1)',
+                        borderWidth: 1,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Customer Rating vs. Delivery Time',
+                            font: { size: 14 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const dataPoint = ecommerceData[context.dataIndex];
+                                    return `Delivery Time: ${dataPoint.deliveryTime} days, Rating: ${dataPoint.customerRating} stars, Sales: $${dataPoint.salesAmount.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Delivery Time (Days)' },
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        },
+                        y: {
+                            title: { display: true, text: 'Customer Rating (Stars)' },
+                            beginAtZero: true,
+                            ticks: { stepSize: 1, max: 5 }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
